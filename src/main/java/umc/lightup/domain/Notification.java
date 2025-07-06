@@ -4,11 +4,11 @@ import jakarta.persistence.*;
 
 @Entity
 public class Notification extends BaseEntity {
-    @ManyToOne(optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "sender_id", nullable = false)
     private Member sender;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "receiver_id", nullable = false)
     private Member receiver;
 

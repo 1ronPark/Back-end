@@ -5,6 +5,6 @@ import jakarta.persistence.Entity;
 
 @Entity
 public class Strength extends BaseEntity {
-    @Column(length = 30, nullable = false)
+    @Column(length = 30, nullable = false, unique = true)
     private String name;
 }

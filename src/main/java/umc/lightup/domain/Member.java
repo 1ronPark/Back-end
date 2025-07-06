@@ -10,8 +10,8 @@ public class Member extends BaseEntity {
     @Column(length = 20)
     private String name;
 
-//    @Column(unique = true, length = 20)
-//    private String nickname; // 추가
+    @Column(unique = true, length = 20)
+    private String nickname; // 추가
 
     @Column(nullable = false)
     private Boolean gender; // 수정
@@ -20,7 +20,15 @@ public class Member extends BaseEntity {
     private Integer age;
 
     @Column(nullable = false)
-    private LocalDate birthday;
+    private LocalDate birth;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 8)
+    private Role role;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 4)
+    private Mbti mbti;
 
     @Column(unique = true, nullable = false, length = 30)
     private String email;
@@ -31,13 +39,16 @@ public class Member extends BaseEntity {
     @Column(unique = true, nullable = false, length = 20)
     private String phoneNumber;
 
+    @Column(length = 80)
+    private String career;
+
+    private String profileImageUrl; // 추가, S3 필요
+
 //    @Column(length = 32)
 //    private String briefExplanation; // 추가
 //
 //    @Column(columnDefinition = "CHAR(4)")
 //    private String Mbti; // 추가
-//
-//    private String picture; // 추가, S3 필요
 //
 //    private boolean active = true;
 //
@@ -47,9 +58,6 @@ public class Member extends BaseEntity {
 //
 //    @Column(columnDefinition = "TEXT")
 //    private String selfIntroduction;
-//
-//    @Column(columnDefinition = "TEXT")
-//    private String rewards;
 //
 //    private boolean receiveSuggestions = false;
 }

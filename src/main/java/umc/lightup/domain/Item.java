@@ -4,15 +4,18 @@ import jakarta.persistence.*;
 
 @Entity
 public class Item extends BaseEntity {
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "owner_id", nullable = false)
-    private Member owner;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
     @Column(length = 40, nullable = false)
     private String name;
 
     @Column(length = 50, nullable = false)
     private String introduce;
+
+    @Column(length = 80, nullable = false)
+    private String description;
 
     @Column(name = "project_status", length = 50, nullable = false)
     private String projectStatus;
@@ -24,8 +27,8 @@ public class Item extends BaseEntity {
     private String address;
 
     @Column(length = 30, nullable = false)
-    private String office;
+    private Boolean office;
 
-    @Column(name = "prefer_mbti", nullable = false)
-    private Boolean preferMbti;
+    @Column(name = "prefer_mbti", nullable = false, length = 30)
+    private String preferMbti;
 }

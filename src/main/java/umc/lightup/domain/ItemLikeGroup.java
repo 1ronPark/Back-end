@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 
 @Entity
 public class ItemLikeGroup extends BaseEntity {
-    @ManyToOne(optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
