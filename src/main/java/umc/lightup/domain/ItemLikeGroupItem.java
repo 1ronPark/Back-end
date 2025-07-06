@@ -4,6 +4,10 @@ import jakarta.persistence.*;
 
 @Entity
 public class ItemLikeGroupItem extends BaseEntity {
+    @Id
+    @GeneratedValue
+    private Long id;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "group_id", nullable = false)
     private ItemLikeGroup group;

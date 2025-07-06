@@ -2,9 +2,15 @@ package umc.lightup.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
 
 @Entity
 public class Region extends BaseEntity {
+    @Id
+    @GeneratedValue
+    private Long id;
+
     @Column(nullable = false, length = 20)
     private String sido;
 

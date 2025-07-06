@@ -7,6 +7,10 @@ import java.time.LocalDate;
 
 @Entity
 public class Member extends BaseEntity {
+    @Id
+    @GeneratedValue
+    private Long id;
+
     @Column(length = 20)
     private String name;
 
