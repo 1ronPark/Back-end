@@ -1,4 +1,4 @@
-package umc.lightup.common.enums;
+package umc.lightup.member.enums;
 
 public enum Role {
     LEADER, // 팀원을 구하는 유저

@@ -2,8 +2,8 @@ package umc.lightup.notification.domain;
 
 import jakarta.persistence.*;
 import umc.lightup.common.BaseEntity;
-import umc.lightup.common.enums.NotificationType;
-import umc.lightup.common.enums.ReferenceType;
+import umc.lightup.notification.enums.NotificationType;
+import umc.lightup.notification.enums.ReferenceType;
 import umc.lightup.member.domain.Member;
 
 @Entity

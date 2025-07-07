@@ -1,4 +1,4 @@
-package umc.lightup.common.enums;
+package umc.lightup.member.enums;
 
 public enum Mbti {
     ISTJ,

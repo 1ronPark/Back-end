@@ -2,7 +2,7 @@ package umc.lightup.tool.domain;
 
 import jakarta.persistence.*;
 import umc.lightup.common.BaseEntity;
-import umc.lightup.common.enums.ToolType;
+import umc.lightup.tool.enums.ToolType;
 
 @Entity
 public class Tool extends BaseEntity {
