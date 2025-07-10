@@ -7,7 +7,7 @@ import umc.lightup.tool.enums.ToolType;
 @Entity
 public class Tool extends BaseEntity {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(length = 30, nullable = false)

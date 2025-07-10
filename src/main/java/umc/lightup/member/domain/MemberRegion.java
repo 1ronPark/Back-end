@@ -7,7 +7,7 @@ import umc.lightup.region.domain.Region;
 @Entity
 public class MemberRegion extends BaseEntity {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

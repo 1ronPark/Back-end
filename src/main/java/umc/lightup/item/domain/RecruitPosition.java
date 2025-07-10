@@ -7,7 +7,7 @@ import umc.lightup.position.domain.Position;
 @Entity
 public class RecruitPosition extends BaseEntity {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
