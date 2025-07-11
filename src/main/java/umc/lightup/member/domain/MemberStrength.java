@@ -7,7 +7,7 @@ import umc.lightup.strength.domain.Strength;
 @Entity
 public class MemberStrength extends BaseEntity {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Entity
 public class ItemViewHistory { //extends 없음
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

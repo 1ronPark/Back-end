@@ -7,7 +7,7 @@ import umc.lightup.tool.domain.Tool;
 @Entity
 public class ItemTool extends BaseEntity {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

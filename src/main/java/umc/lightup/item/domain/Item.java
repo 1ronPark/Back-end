@@ -7,7 +7,7 @@ import umc.lightup.member.domain.Member;
 @Entity
 public class Item extends BaseEntity {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

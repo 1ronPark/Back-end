@@ -9,7 +9,7 @@ import umc.lightup.member.domain.Member;
 @Entity
 public class Notification extends BaseEntity {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

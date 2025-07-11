@@ -6,7 +6,7 @@ import umc.lightup.common.BaseEntity;
 @Entity
 public class MemberLike extends BaseEntity {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

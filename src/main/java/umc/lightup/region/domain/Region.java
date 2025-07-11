@@ -1,15 +1,12 @@
 package umc.lightup.region.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import umc.lightup.common.BaseEntity;
 
 @Entity
-public class Region extends BaseEntity {
+public class Region {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, length = 20)
@@ -18,6 +15,4 @@ public class Region extends BaseEntity {
     @Column(nullable = false, length = 30)
     private String sigungu;
 
-    @Column(unique = true, length = 50)
-    private String fullName;
 }

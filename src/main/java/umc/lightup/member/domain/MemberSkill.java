@@ -7,7 +7,7 @@ import umc.lightup.skill.domain.Skill;
 @Entity
 public class MemberSkill extends BaseEntity {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
