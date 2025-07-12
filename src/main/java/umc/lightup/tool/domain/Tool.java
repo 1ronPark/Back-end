@@ -1,11 +1,10 @@
 package umc.lightup.tool.domain;
 
 import jakarta.persistence.*;
-import umc.lightup.common.BaseEntity;
 import umc.lightup.tool.enums.ToolType;
 
 @Entity
-public class Tool extends BaseEntity {
+public class Tool {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
