@@ -1,8 +1,10 @@
 package umc.lightup.region.domain;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 import umc.lightup.common.BaseEntity;
 
+@Getter
 @Entity
 public class Region {
     @Id
