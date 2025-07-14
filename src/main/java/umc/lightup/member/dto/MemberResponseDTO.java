@@ -75,6 +75,7 @@ public class MemberResponseDTO {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    @EqualsAndHashCode
     public static class PortfolioInfoDTO {
         private String name;
         private String fileUrl;

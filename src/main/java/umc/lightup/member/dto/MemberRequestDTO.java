@@ -1,8 +1,7 @@
 package umc.lightup.member.dto;
 
 import jakarta.validation.constraints.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import umc.lightup.member.domain.Credential;
 import umc.lightup.member.domain.Member;
@@ -20,6 +19,9 @@ public class MemberRequestDTO {
 
     @Getter
     @Setter
+    @Builder
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor(access = AccessLevel.PROTECTED)
     public static class JoinDto{
         @NotEmpty
         private String name;
@@ -72,6 +74,9 @@ public class MemberRequestDTO {
 
     @Getter
     @Setter
+    @Builder
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor(access = AccessLevel.PROTECTED)
     public static class PasswordLoginRequestDTO{
         @NotBlank(message = "이메일은 필수입니다.")
         @Email(message = "올바른 이메일 형식이어야 합니다.")
