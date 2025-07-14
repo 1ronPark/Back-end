@@ -20,7 +20,7 @@ public class MemberRestController {
 
 
     @PostMapping("/join")
-    @Operation(summary = "유저 회원가입 API",description = "유저가 회원가입하는 API입니다.")
+    @Operation(summary = "유저 비밀번호 회원가입 API",description = "유저가 비밀번호로 회원가입하는 API입니다.")
     public ApiResponse<MemberResponseDTO.JoinResultDTO> join(@RequestBody @Valid MemberRequestDTO.JoinDto request) {
         Member member = memberCommandService.joinMember(request);
         return ApiResponse.onSuccess(MemberResponseDTO.joinResultDTOBuilder()
@@ -30,7 +30,7 @@ public class MemberRestController {
     }
 
     @PostMapping("/login")
-    @Operation(summary = "유저 로그인 API",description = "유저가 로그인하는 API입니다.")
+    @Operation(summary = "유저 비밀번호 로그인 API",description = "유저가 비밀번호로 로그인하는 API입니다.")
     public ApiResponse<MemberResponseDTO.LoginResultDTO> login
             (@RequestBody @Valid MemberRequestDTO.PasswordLoginRequestDTO request) {
         return ApiResponse.onSuccess(memberCommandService.loginMember(request));
@@ -38,7 +38,7 @@ public class MemberRestController {
 
     @GetMapping("/me")
     @Operation(
-            summary = "회원 정보 조회 API",
+            summary = "내 정보 조회 API",
             description = "자신의 회원 정보를 조회하는 API입니다.",
             security = { @SecurityRequirement(name = "JWT TOKEN")}
     )
@@ -50,7 +50,7 @@ public class MemberRestController {
 
     @GetMapping("/{memberId}")
     @Operation(
-            summary = "회원 정보 조회 API",
+            summary = "회원(타인) 정보 조회 API",
             description = "타인의 회원 정보를 조회하는 API입니다." +
                     " 프로젝트에 참여했을 때 일부 데이터를 추가로 공개하는 작업은 아직 진행하지 않았습니다.",
             security = { @SecurityRequirement(name = "JWT TOKEN")}
