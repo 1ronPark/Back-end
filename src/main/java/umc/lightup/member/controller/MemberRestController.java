@@ -14,7 +14,7 @@ import umc.lightup.member.service.MemberCommandService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/members")
+@RequestMapping("/api/v1/members")
 public class MemberRestController {
     private final MemberCommandService memberCommandService;
 
@@ -36,7 +36,7 @@ public class MemberRestController {
         return ApiResponse.onSuccess(memberCommandService.loginMember(request));
     }
 
-    @GetMapping("/my")
+    @GetMapping("/me")
     @Operation(
             summary = "회원 정보 조회 API",
             description = "자신의 회원 정보를 조회하는 API입니다.",
@@ -48,7 +48,7 @@ public class MemberRestController {
         return ApiResponse.onSuccess(MemberResponseDTO.toMyInfoDTO(member));
     }
 
-    @GetMapping("/my/{id}")
+    @GetMapping("/{memberId}")
     @Operation(
             summary = "회원 정보 조회 API",
             description = "타인의 회원 정보를 조회하는 API입니다." +
@@ -56,7 +56,7 @@ public class MemberRestController {
             security = { @SecurityRequirement(name = "JWT TOKEN")}
     )
     public ApiResponse<MemberResponseDTO.MemberInfoDTO> getMemberInfo(Authentication authentication,
-                                                                  @PathVariable("id") long id) {
+                                                                  @PathVariable("memberId") long id) {
         String email = null;
         if (authentication != null)
             email = authentication.getName();
