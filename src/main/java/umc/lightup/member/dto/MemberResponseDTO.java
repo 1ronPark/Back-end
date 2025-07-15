@@ -47,6 +47,24 @@ public class MemberResponseDTO {
         private String profileImageUrl;
     }
 
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class MemberPositionResultDTO {
+        private String memberName;
+        private String positionName;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class MemberPositionDeleteResultDTO {
+        private String memberName;
+        private String deletePositionName;
+    }
+
     public static LoginResultDTO.LoginResultDTOBuilder loginResultDTOBuilder() {
         return LoginResultDTO.builder();
     }
@@ -54,6 +72,15 @@ public class MemberResponseDTO {
     public static JoinResultDTO.JoinResultDTOBuilder joinResultDTOBuilder() {
         return JoinResultDTO.builder();
     }
+
+    public static MemberPositionResultDTO.MemberPositionResultDTOBuilder memberPositionResultDTOBuilder() {
+        return MemberPositionResultDTO.builder();
+    }
+
+    public static MemberPositionDeleteResultDTO.MemberPositionDeleteResultDTOBuilder memberPositionDeleteResultDTOBuilder() {
+        return MemberPositionDeleteResultDTO.builder();
+    }
+
 
     public static MemberInfoDTO toMemberInfoDTO(Member member) {
         return MemberInfoDTO.builder()

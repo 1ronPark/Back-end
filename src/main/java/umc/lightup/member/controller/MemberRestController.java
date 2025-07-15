@@ -12,9 +12,12 @@ import umc.lightup.member.dto.MemberRequestDTO;
 import umc.lightup.member.dto.MemberResponseDTO;
 import umc.lightup.member.service.MemberCommandService;
 
+import static umc.lightup.member.dto.MemberResponseDTO.memberPositionDeleteResultDTOBuilder;
+import static umc.lightup.member.dto.MemberResponseDTO.memberPositionResultDTOBuilder;
+
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/members")
+@RequestMapping("/api/v1/members")
 public class MemberRestController {
     private final MemberCommandService memberCommandService;
 
@@ -45,5 +48,31 @@ public class MemberRestController {
         String email = authentication.getName();
         Member member = memberCommandService.getMember(email);
         return ApiResponse.onSuccess(MemberResponseDTO.toMemberInfoDTO(member));
+    }
+
+    @PostMapping("/position")
+    public ApiResponse<MemberResponseDTO.MemberPositionResultDTO> selectMemberPosition(Authentication authentication, @RequestParam String positionName) {
+        String userName = authentication.getName();
+        Member member = memberCommandService.getMember(userName);
+
+        memberCommandService.selectPosition(member.getId(), positionName);
+
+        return ApiResponse.onSuccess(memberPositionResultDTOBuilder()
+                .memberName(userName)
+                .positionName(positionName)
+                .build());
+    }
+
+    @DeleteMapping("/position")
+    public ApiResponse<MemberResponseDTO.MemberPositionDeleteResultDTO> deleteMemberPosition(Authentication authentication, @RequestParam String positionName) {
+        String userName = authentication.getName();
+        Member member = memberCommandService.getMember(userName);
+
+        memberCommandService.deletePosition(member.getId(), positionName);
+
+        return ApiResponse.onSuccess(memberPositionDeleteResultDTOBuilder()
+                .memberName(userName)
+                .deletePositionName(positionName)
+                .build());
     }
 }

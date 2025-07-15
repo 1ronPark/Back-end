@@ -11,7 +11,11 @@ public interface MemberCommandService {
 
     Member getMember(String email);
 
+    void selectPosition(Long memberId, String positionName);
+
     boolean isNicknameExist(String nickname);
     boolean isEmailExist(String email);
     boolean isPhoneNumberExist(String phoneNumber);
+
+    void deletePosition(Long memberId, String positionName);
 }
