@@ -17,4 +17,13 @@ public class MemberSkill extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "skill_id", nullable = false)
     private Skill skill;
+
+    protected MemberSkill() {}
+
+    public static MemberSkill createMemberSkill(Member member, Skill skill) {
+        MemberSkill memberSkill = new MemberSkill();
+        memberSkill.member = member;
+        memberSkill.skill = skill;
+        return memberSkill;
+    }
 }

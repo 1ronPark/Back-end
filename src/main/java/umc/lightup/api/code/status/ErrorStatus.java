@@ -21,7 +21,12 @@ public enum ErrorStatus implements BaseErrorCode {
     DUPLICATE_NICKNAME(HttpStatus.BAD_REQUEST, "MEMBER4003", "이미 존재하는 닉네임입니다."),
     DUPLICATE_EMAIL(HttpStatus.BAD_REQUEST, "MEMBER4004", "이미 존재하는 이메일입니다."),
     DUPLICATE_PHONE_NUMBER(HttpStatus.BAD_REQUEST, "MEMBER4005", "이미 존재하는 휴대폰 번호입니다."),
-    NO_CREDENTIAL(HttpStatus.INTERNAL_SERVER_ERROR, "MEMBER5000", "저장된 패스워드가 없습니다.")
+    NO_CREDENTIAL(HttpStatus.INTERNAL_SERVER_ERROR, "MEMBER5000", "저장된 패스워드가 없습니다."),
+
+    //Skill 관련 에러
+    DUPLICATED_SKILL_NAME(HttpStatus.BAD_REQUEST, "SKILL4000", "이미 존재하는 스킬 이름입니다."),
+    SKILL_NOT_FOUND(HttpStatus.NOT_FOUND, "SKILL4001", "스킬이 존재하지 않습니다."),
+    DUPLICATED_SKILL_SELECT(HttpStatus.BAD_REQUEST, "SKILL4002", "이미 선택한 스킬입니다.")
     ;
 
 

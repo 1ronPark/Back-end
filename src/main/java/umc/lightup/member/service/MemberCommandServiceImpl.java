@@ -11,11 +11,15 @@ import umc.lightup.config.JwtTokenProvider;
 import umc.lightup.exception.handler.GeneralHandler;
 import umc.lightup.member.domain.Credential;
 import umc.lightup.member.domain.Member;
+import umc.lightup.member.domain.MemberSkill;
 import umc.lightup.member.dto.MemberRequestDTO;
 import umc.lightup.member.dto.MemberResponseDTO;
 import umc.lightup.member.enums.CredentialType;
 import umc.lightup.member.repository.CredentialRepository;
 import umc.lightup.member.repository.MemberRepository;
+import umc.lightup.member.repository.MemberSkillRepository;
+import umc.lightup.skill.domain.Skill;
+import umc.lightup.skill.repository.SkillRepository;
 
 import java.util.Collections;
 
@@ -25,6 +29,8 @@ import java.util.Collections;
 public class MemberCommandServiceImpl implements MemberCommandService {
     private final MemberRepository memberRepository;
     private final CredentialRepository credentialRepository;
+    private final MemberSkillRepository memberSkillRepository;
+    private final SkillRepository skillRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -68,6 +74,21 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     public Member getMember(String email){
         return memberRepository.findByEmail(email)
                 .orElseThrow(()-> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
+    }
+
+    @Override
+    @Transactional
+    public String selectSkill(Long skillId, Member member) {
+        Skill foundSkill = skillRepository.findById(skillId)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.SKILL_NOT_FOUND));
+        MemberSkill memberSkill = MemberSkill.createMemberSkill(member, foundSkill);
+
+        if (memberSkillRepository.existsByMemberAndSkill(member, foundSkill)) {
+            throw new GeneralHandler(ErrorStatus.DUPLICATED_SKILL_SELECT);
+        }
+        memberSkillRepository.save(memberSkill);
+
+        return foundSkill.getName();
     }
 
     @Override

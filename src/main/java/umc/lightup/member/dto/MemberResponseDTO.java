@@ -47,6 +47,15 @@ public class MemberResponseDTO {
         private String profileImageUrl;
     }
 
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class selectSkillResultDTO {
+        String skillName;
+        String memberName;
+    }
+
     public static LoginResultDTO.LoginResultDTOBuilder loginResultDTOBuilder() {
         return LoginResultDTO.builder();
     }
