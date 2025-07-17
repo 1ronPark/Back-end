@@ -18,6 +18,9 @@ import umc.lightup.member.dto.MemberViewInfo;
 import umc.lightup.member.enums.CredentialType;
 import umc.lightup.member.repository.*;
 import umc.lightup.region.domain.Region;
+import umc.lightup.region.repository.RegionRepository;
+import umc.lightup.skill.repository.SkillRepository;
+import umc.lightup.strength.repository.StrengthRepository;
 
 import java.util.Collections;
 import java.util.List;
@@ -28,9 +31,9 @@ import java.util.List;
 public class MemberCommandServiceImpl implements MemberCommandService {
     private final MemberRepository memberRepository;
     private final CredentialRepository credentialRepository;
-    private final MemberSkillRepository memberSkillRepository;
-    private final MemberStrengthRepository memberStrengthRepository;
-    private final MemberRegionRepository memberRegionRepository;
+    private final RegionRepository regionRepository;
+    private final SkillRepository skillRepository;
+    private final StrengthRepository strengthRepository;
     private final PortfolioRepository portfolioRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
@@ -82,9 +85,9 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         // 한 번에 반환하기 위해 DTO 반환을 사용했는데 좋은 설계 방식인지는 한번 고민할 필요가 있음
         Member member = memberRepository.findById(id)
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
-        List<String> skills = memberSkillRepository.findNameByMember(member);
-        List<String> strengths = memberStrengthRepository.findNameByMember(member);
-        List<Region> regions = memberRegionRepository.findByMember(member);
+        List<String> skills = skillRepository.findNameByMember(member);
+        List<String> strengths = strengthRepository.findNameByMember(member);
+        List<Region> regions = regionRepository.findByMember(member);
         List<Portfolio> portfolios = portfolioRepository.findByMember(member);
         return MemberViewInfo.builder()
                 .member(member)
