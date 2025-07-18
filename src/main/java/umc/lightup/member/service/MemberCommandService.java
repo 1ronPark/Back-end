@@ -12,6 +12,7 @@ public interface MemberCommandService {
     Member getMember(String email);
 
     String selectSkill(Long skillId,Member member);
+    String selectStrength(Long strengthId,Member member);
 
     boolean isNicknameExist(String nickname);
     boolean isEmailExist(String email);

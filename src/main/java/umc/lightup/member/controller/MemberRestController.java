@@ -61,4 +61,18 @@ public class MemberRestController {
         String skillName = memberCommandService.selectSkill(skillId, member);
         return ApiResponse.onSuccess(MemberConverter.toSelectSkillResultDTO(skillName, member));
     }
+
+    @PostMapping("/strengths")
+    @Operation(
+            summary = "강점 선택 API",
+            description = "유저가 자신의 강점을 선택하는 API입니다."
+    )
+    public ApiResponse<MemberResponseDTO.selectStrengthResultDTO> selectStrength(Authentication authentication, @RequestBody MemberRequestDTO.MemberStrengthSelectRequestDTO request) {
+        Long strengthId = request.getStrengthId();
+        String email = authentication.getName();
+        Member member = memberCommandService.getMember(email);
+
+        String strengthName = memberCommandService.selectStrength(strengthId, member);
+        return ApiResponse.onSuccess(MemberConverter.toSelectStrengthResultDTO(strengthName, member));
+    }
 }

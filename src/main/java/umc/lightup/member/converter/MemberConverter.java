@@ -11,4 +11,11 @@ public class MemberConverter {
                 .memberName(member.getName())
                 .build();
     }
+
+    public static MemberResponseDTO.selectStrengthResultDTO toSelectStrengthResultDTO(String strengthName, Member member) {
+        return MemberResponseDTO.selectStrengthResultDTO.builder()
+                .strengthName(strengthName)
+                .memberName(member.getName())
+                .build();
+    }
 }

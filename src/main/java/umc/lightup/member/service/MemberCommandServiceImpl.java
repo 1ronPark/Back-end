@@ -12,14 +12,18 @@ import umc.lightup.exception.handler.GeneralHandler;
 import umc.lightup.member.domain.Credential;
 import umc.lightup.member.domain.Member;
 import umc.lightup.member.domain.MemberSkill;
+import umc.lightup.member.domain.MemberStrength;
 import umc.lightup.member.dto.MemberRequestDTO;
 import umc.lightup.member.dto.MemberResponseDTO;
 import umc.lightup.member.enums.CredentialType;
 import umc.lightup.member.repository.CredentialRepository;
 import umc.lightup.member.repository.MemberRepository;
 import umc.lightup.member.repository.MemberSkillRepository;
+import umc.lightup.member.repository.MemberStrengthRepository;
 import umc.lightup.skill.domain.Skill;
 import umc.lightup.skill.repository.SkillRepository;
+import umc.lightup.strength.domain.Strength;
+import umc.lightup.strength.repository.StrengthRepository;
 
 import java.util.Collections;
 
@@ -30,7 +34,9 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     private final MemberRepository memberRepository;
     private final CredentialRepository credentialRepository;
     private final MemberSkillRepository memberSkillRepository;
+    private final MemberStrengthRepository memberStrengthRepository;
     private final SkillRepository skillRepository;
+    private final StrengthRepository strengthRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -89,6 +95,21 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         memberSkillRepository.save(memberSkill);
 
         return foundSkill.getName();
+    }
+
+    @Override
+    @Transactional
+    public String selectStrength(Long strengthId, Member member) {
+        Strength foundStrength = strengthRepository.findById(strengthId)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.STRENGTH_NOT_FOUND));
+        MemberStrength memberStrength = MemberStrength.createMemberStrength(member, foundStrength);
+
+        if (memberStrengthRepository.existsByMemberAndStrength(member, foundStrength)) {
+            throw new GeneralHandler(ErrorStatus.DUPLICATED_STRENGTH_SELECT);
+        }
+        memberStrengthRepository.save(memberStrength);
+
+        return foundStrength.getName();
     }
 
     @Override

@@ -86,4 +86,10 @@ public class MemberRequestDTO {
     public static class MemberSkillSelectRequestDTO {
         private Long skillId;
     }
+
+    @Getter
+    @Setter
+    public static class MemberStrengthSelectRequestDTO {
+        private Long strengthId;
+    }
 }

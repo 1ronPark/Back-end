@@ -1,0 +1,52 @@
+package umc.lightup.strength.service;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import umc.lightup.api.code.status.ErrorStatus;
+import umc.lightup.exception.handler.GeneralHandler;
+import umc.lightup.member.domain.Member;
+import umc.lightup.member.domain.MemberSkill;
+import umc.lightup.member.domain.MemberStrength;
+import umc.lightup.member.repository.MemberSkillRepository;
+import umc.lightup.member.repository.MemberStrengthRepository;
+import umc.lightup.skill.converter.SkillConverter;
+import umc.lightup.skill.domain.Skill;
+import umc.lightup.skill.dto.SkillRequestDTO;
+import umc.lightup.skill.repository.SkillRepository;
+import umc.lightup.strength.converter.StrengthConverter;
+import umc.lightup.strength.domain.Strength;
+import umc.lightup.strength.dto.StrengthRequestDTO;
+import umc.lightup.strength.repository.StrengthRepository;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class StrengthService {
+
+    private final StrengthRepository strengthRepository;
+    private final MemberStrengthRepository memberStrengthRepository;
+
+    public List<String> getStrengthsList() {
+        List<Strength> strengths = strengthRepository.findAll();
+        return strengths.stream()
+                .map(Strength::getName)
+                .toList();
+    }
+
+    @Transactional
+    public String createStrength(StrengthRequestDTO.CreateStrengthDTO request, Member member) {
+        Strength newStrength = StrengthConverter.toStrength(request, member);
+
+        if (strengthRepository.existsByName(newStrength.getName())) {
+            throw new GeneralHandler(ErrorStatus.DUPLICATED_STRENGTH_NAME);
+        }
+        strengthRepository.save(newStrength);
+
+        MemberStrength memberStrength = MemberStrength.createMemberStrength(member, newStrength);
+        memberStrengthRepository.save(memberStrength);
+        return newStrength.getName();
+    }
+}

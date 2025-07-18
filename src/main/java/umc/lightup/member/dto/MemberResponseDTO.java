@@ -56,6 +56,15 @@ public class MemberResponseDTO {
         String memberName;
     }
 
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class selectStrengthResultDTO {
+        String strengthName;
+        String memberName;
+    }
+
     public static LoginResultDTO.LoginResultDTOBuilder loginResultDTOBuilder() {
         return LoginResultDTO.builder();
     }
