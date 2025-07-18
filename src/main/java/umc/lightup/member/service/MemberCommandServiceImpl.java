@@ -11,11 +11,21 @@ import umc.lightup.config.JwtTokenProvider;
 import umc.lightup.exception.handler.GeneralHandler;
 import umc.lightup.member.domain.Credential;
 import umc.lightup.member.domain.Member;
+import umc.lightup.member.domain.MemberPosition;
 import umc.lightup.member.domain.Portfolio;
 import umc.lightup.member.dto.MemberRequestDTO;
 import umc.lightup.member.dto.MemberResponseDTO;
 import umc.lightup.member.dto.MemberViewInfo;
 import umc.lightup.member.enums.CredentialType;
+import umc.lightup.member.repository.CredentialRepository;
+import umc.lightup.member.repository.MemberPositionRepository;
+import umc.lightup.member.repository.MemberRepository;
+import umc.lightup.position.domain.Position;
+import umc.lightup.position.repository.PositionRepository;
+
+import java.util.Collections;
+import java.util.Optional;
+
 import umc.lightup.member.repository.*;
 import umc.lightup.region.domain.Region;
 import umc.lightup.region.repository.RegionRepository;
@@ -31,10 +41,13 @@ import java.util.List;
 public class MemberCommandServiceImpl implements MemberCommandService {
     private final MemberRepository memberRepository;
     private final CredentialRepository credentialRepository;
+    private final MemberPositionRepository memberPositionRepository;
+    private final PositionRepository positionRepository;
     private final RegionRepository regionRepository;
     private final SkillRepository skillRepository;
     private final StrengthRepository strengthRepository;
     private final PortfolioRepository portfolioRepository;
+  
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -77,7 +90,36 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     @Override
     public Member getMember(String email){
         return memberRepository.findByEmail(email)
-                .orElseThrow(()-> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
+    }
+
+    @Override
+    @Transactional
+    public void selectPosition(Long memberId, String positionName) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Position position = positionRepository.findByName(positionName)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.POSITION_NOT_FOUND));
+
+        if (memberPositionRepository.existsByMemberIdAndPositionId(memberId, position.getId())){
+            throw new GeneralHandler(ErrorStatus._BAD_REQUEST);
+        }
+
+        memberPositionRepository.save(new MemberPosition(member, position));
+    }
+
+    @Override
+    @Transactional
+    public void deletePosition(Long memberId, String positionName) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Position position = positionRepository.findByName(positionName)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.POSITION_NOT_FOUND));
+
+        MemberPosition memberPosition = memberPositionRepository.findByMemberIdAndPositionId(memberId, position.getId())
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus._BAD_REQUEST));
+
+        memberPositionRepository.delete(memberPosition);
     }
 
     @Override

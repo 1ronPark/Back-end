@@ -47,7 +47,7 @@ public class MemberResponseDTO {
         private String career;
         private String profileImageUrl;
     }
-
+  
     @Getter
     @Builder
     @NoArgsConstructor
@@ -70,7 +70,25 @@ public class MemberResponseDTO {
         private String phoneNumber;
         private String profileImageUrl;
     }
+    
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class MemberPositionResultDTO {
+        private String memberName;
+        private String positionName;
+    }
 
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class MemberPositionDeleteResultDTO {
+        private String memberName;
+        private String deletePositionName;
+    }
+  
     @Getter
     @Builder
     @NoArgsConstructor
@@ -89,6 +107,18 @@ public class MemberResponseDTO {
         return JoinResultDTO.builder();
     }
 
+    public static MemberPositionResultDTO.MemberPositionResultDTOBuilder memberPositionResultDTOBuilder() {
+        return MemberPositionResultDTO.builder();
+    }
+
+    public static MemberPositionDeleteResultDTO.MemberPositionDeleteResultDTOBuilder memberPositionDeleteResultDTOBuilder() {
+        return MemberPositionDeleteResultDTO.builder();
+    }
+
+    public static MemberInfoDTO toMemberInfoDTO(Member member) {
+        return MemberInfoDTO.builder()
+    }
+  
     public static MyInfoDTO toMyInfoDTO(Member member) {
         return MyInfoDTO.builder()
                 .id(member.getId())
