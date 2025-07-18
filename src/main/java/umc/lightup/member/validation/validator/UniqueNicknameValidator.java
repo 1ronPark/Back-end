@@ -21,7 +21,7 @@ public class UniqueNicknameValidator implements ConstraintValidator<UniqueNickna
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
-        if (value == null) return true; // nullable임
+        if (value == null) return true; // null 여부는 여기서는 확인 안함
         boolean isValid = !memberCommandService.isNicknameExist(value);
 
         if (!isValid) {

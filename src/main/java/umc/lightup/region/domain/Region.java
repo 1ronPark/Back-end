@@ -1,11 +1,13 @@
 package umc.lightup.region.domain;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import umc.lightup.common.BaseEntity;
+import lombok.*;
 
 @Getter
 @Entity
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class Region {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

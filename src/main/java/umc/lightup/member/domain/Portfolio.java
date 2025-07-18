@@ -1,9 +1,14 @@
 package umc.lightup.member.domain;
 
 import jakarta.persistence.*;
+import lombok.*;
 import umc.lightup.common.BaseEntity;
 
 @Entity
+@Builder
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class Portfolio extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

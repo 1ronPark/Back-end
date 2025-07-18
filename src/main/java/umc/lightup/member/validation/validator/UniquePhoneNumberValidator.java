@@ -21,6 +21,7 @@ public class UniquePhoneNumberValidator implements ConstraintValidator<UniquePho
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
+        if (value == null) return true; // null 여부는 여기서는 확인 안함
         boolean isValid = !memberCommandService.isPhoneNumberExist(value);
 
         if (!isValid) {
