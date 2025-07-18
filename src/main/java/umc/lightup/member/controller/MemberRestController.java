@@ -23,6 +23,7 @@ public class MemberRestController {
 
 
     @PostMapping("/join")
+    @Operation(summary = "유저 비밀번호 회원가입 API",description = "유저가 비밀번호로 회원가입하는 API입니다.")
     public ApiResponse<MemberResponseDTO.JoinResultDTO> join(@RequestBody @Valid MemberRequestDTO.JoinDto request) {
         Member member = memberCommandService.joinMember(request);
         return ApiResponse.onSuccess(MemberResponseDTO.joinResultDTOBuilder()
@@ -32,22 +33,37 @@ public class MemberRestController {
     }
 
     @PostMapping("/login")
-    @Operation(summary = "유저 로그인 API",description = "유저가 로그인하는 API입니다.")
+    @Operation(summary = "유저 비밀번호 로그인 API",description = "유저가 비밀번호로 로그인하는 API입니다.")
     public ApiResponse<MemberResponseDTO.LoginResultDTO> login
             (@RequestBody @Valid MemberRequestDTO.PasswordLoginRequestDTO request) {
         return ApiResponse.onSuccess(memberCommandService.loginMember(request));
     }
 
-    @GetMapping("/info")
+    @GetMapping("/me")
     @Operation(
-            summary = "회원 정보 조회 API",
-            description = "테스트용 회원 정보를 조회하는 API입니다.",
+            summary = "내 정보 조회 API",
+            description = "자신의 회원 정보를 조회하는 API입니다.",
             security = { @SecurityRequirement(name = "JWT TOKEN")}
     )
-    public ApiResponse<MemberResponseDTO.MemberInfoDTO> getMemberInfo(Authentication authentication) {
+    public ApiResponse<MemberResponseDTO.MyInfoDTO> getMyInfo(Authentication authentication) {
         String email = authentication.getName();
         Member member = memberCommandService.getMember(email);
-        return ApiResponse.onSuccess(MemberResponseDTO.toMemberInfoDTO(member));
+        return ApiResponse.onSuccess(MemberResponseDTO.toMyInfoDTO(member));
+    }
+
+    @GetMapping("/{memberId}")
+    @Operation(
+            summary = "회원(타인) 정보 조회 API",
+            description = "타인의 회원 정보를 조회하는 API입니다." +
+                    " 프로젝트에 참여했을 때 일부 데이터를 추가로 공개하는 작업은 아직 진행하지 않았습니다.",
+            security = { @SecurityRequirement(name = "JWT TOKEN")}
+    )
+    public ApiResponse<MemberResponseDTO.MemberInfoDTO> getMemberInfo(Authentication authentication,
+                                                                  @PathVariable("memberId") long id) {
+        String email = null;
+        if (authentication != null)
+            email = authentication.getName();
+        return ApiResponse.onSuccess(memberCommandService.getMember(id, email));
     }
 
     @PostMapping("/position")
