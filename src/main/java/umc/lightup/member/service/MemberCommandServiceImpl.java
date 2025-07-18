@@ -13,10 +13,14 @@ import umc.lightup.member.domain.Credential;
 import umc.lightup.member.domain.Member;
 import umc.lightup.member.domain.MemberSkill;
 import umc.lightup.member.domain.MemberStrength;
+import umc.lightup.member.domain.MemberPosition;
+import umc.lightup.member.domain.Portfolio;
 import umc.lightup.member.dto.MemberRequestDTO;
 import umc.lightup.member.dto.MemberResponseDTO;
+import umc.lightup.member.dto.MemberViewInfo;
 import umc.lightup.member.enums.CredentialType;
 import umc.lightup.member.repository.CredentialRepository;
+import umc.lightup.member.repository.MemberPositionRepository;
 import umc.lightup.member.repository.MemberRepository;
 import umc.lightup.member.repository.MemberSkillRepository;
 import umc.lightup.member.repository.MemberStrengthRepository;
@@ -24,8 +28,20 @@ import umc.lightup.skill.domain.Skill;
 import umc.lightup.skill.repository.SkillRepository;
 import umc.lightup.strength.domain.Strength;
 import umc.lightup.strength.repository.StrengthRepository;
+import umc.lightup.position.domain.Position;
+import umc.lightup.position.repository.PositionRepository;
 
 import java.util.Collections;
+import java.util.Optional;
+
+import umc.lightup.member.repository.*;
+import umc.lightup.region.domain.Region;
+import umc.lightup.region.repository.RegionRepository;
+import umc.lightup.skill.repository.SkillRepository;
+import umc.lightup.strength.repository.StrengthRepository;
+
+import java.util.Collections;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -33,10 +49,15 @@ import java.util.Collections;
 public class MemberCommandServiceImpl implements MemberCommandService {
     private final MemberRepository memberRepository;
     private final CredentialRepository credentialRepository;
+    private final MemberPositionRepository memberPositionRepository;
     private final MemberSkillRepository memberSkillRepository;
     private final MemberStrengthRepository memberStrengthRepository;
+    private final PositionRepository positionRepository;
     private final SkillRepository skillRepository;
     private final StrengthRepository strengthRepository;
+    private final RegionRepository regionRepository;
+    private final PortfolioRepository portfolioRepository;
+  
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -79,7 +100,57 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     @Override
     public Member getMember(String email){
         return memberRepository.findByEmail(email)
-                .orElseThrow(()-> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
+    }
+
+    @Override
+    @Transactional
+    public void selectPosition(Long memberId, String positionName) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Position position = positionRepository.findByName(positionName)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.POSITION_NOT_FOUND));
+
+        if (memberPositionRepository.existsByMemberIdAndPositionId(memberId, position.getId())){
+            throw new GeneralHandler(ErrorStatus._BAD_REQUEST);
+        }
+
+        memberPositionRepository.save(new MemberPosition(member, position));
+    }
+
+    @Override
+    @Transactional
+    public void deletePosition(Long memberId, String positionName) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Position position = positionRepository.findByName(positionName)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.POSITION_NOT_FOUND));
+
+        MemberPosition memberPosition = memberPositionRepository.findByMemberIdAndPositionId(memberId, position.getId())
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus._BAD_REQUEST));
+
+        memberPositionRepository.delete(memberPosition);
+    }
+
+    @Override
+    public MemberResponseDTO.MemberInfoDTO getMember(long id, String viewerEmail){
+        // 한 번에 반환하기 위해 DTO 반환을 사용했는데 좋은 설계 방식인지는 한번 고민할 필요가 있음
+        Member member = memberRepository.findById(id)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        List<String> skills = skillRepository.findNameByMember(member);
+        List<String> strengths = strengthRepository.findNameByMember(member);
+        List<Region> regions = regionRepository.findByMember(member);
+        List<Portfolio> portfolios = portfolioRepository.findByMember(member);
+        return MemberViewInfo.builder()
+                .member(member)
+                .skills(skills)
+                .strengths(strengths)
+                .regions(regions)
+                .portfolios(portfolios)
+                .emailOpen(false)
+                .phoneOpen(false)
+                .pictureOpen(false)
+                .build().toMemberInfoDTO();
     }
 
     @Override

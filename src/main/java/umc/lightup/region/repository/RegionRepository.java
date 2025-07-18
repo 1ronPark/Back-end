@@ -2,6 +2,8 @@ package umc.lightup.region.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import umc.lightup.member.domain.Member;
 import umc.lightup.region.domain.Region;
 
 import java.util.List;
@@ -12,4 +14,7 @@ public interface RegionRepository extends JpaRepository<Region, Long> {
     List<String> findDistinctSido();
 
     List<Region> findBySido(String sido);
+
+    @Query("select r from MemberRegion mr join mr.region r where mr.member=:member")
+    List<Region> findByMember(@Param("member") Member member);
 }

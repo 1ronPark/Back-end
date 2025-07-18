@@ -1,10 +1,7 @@
 package umc.lightup.member.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.security.core.GrantedAuthority;
@@ -22,8 +19,8 @@ import java.util.List;
 @Entity
 @Getter
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -68,6 +65,15 @@ public class Member extends BaseEntity implements UserDetails {
 
 //    @OneToMany(mappedBy = "member", orphanRemoval = true)
 //    private List<Credential> credentials;
+
+//    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, orphanRemoval = true)
+//    private List<MemberSkill> skills;
+//
+//    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, orphanRemoval = true)
+//    private List<MemberStrength> strengths;
+//
+//    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, orphanRemoval = true)
+//    private List<Portfolio> portfolios;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
