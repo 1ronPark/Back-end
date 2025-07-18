@@ -114,10 +114,6 @@ public class MemberResponseDTO {
     public static MemberPositionDeleteResultDTO.MemberPositionDeleteResultDTOBuilder memberPositionDeleteResultDTOBuilder() {
         return MemberPositionDeleteResultDTO.builder();
     }
-
-    public static MemberInfoDTO toMemberInfoDTO(Member member) {
-        return MemberInfoDTO.builder()
-    }
   
     public static MyInfoDTO toMyInfoDTO(Member member) {
         return MyInfoDTO.builder()
