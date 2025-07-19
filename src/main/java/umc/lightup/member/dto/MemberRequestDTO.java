@@ -72,6 +72,50 @@ public class MemberRequestDTO {
         }
     }
 
+    // Unique check을 하지 않은 상태
+    @Getter
+    @Setter
+    @Builder
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class ChangeDto{
+        @NotEmpty
+        private String name;
+        private String nickname;
+        @NotNull
+        private Boolean gender;
+        @NotNull
+        @Past
+        private LocalDate birth;
+        @NotNull
+        private Role role;
+        @NotNull
+        private Mbti mbti;
+        @NotEmpty
+        @Email
+        private String email;
+        private String school;
+        @NotEmpty
+        @Pattern(regexp = "0[1-8]\\d{0,1}-\\d{3,4}-\\d{4,5}")
+        private String phoneNumber;
+
+        public Member toMember(long id){
+            return Member.builder()
+                    .id(id)
+                    .name(this.name)
+                    .nickname(this.nickname)
+                    .gender(this.gender)
+                    .birth(this.birth)
+                    .role(this.role)
+                    .mbti(this.mbti)
+                    .email(this.email)
+                    .school(this.school)
+                    .phoneNumber(this.phoneNumber)
+                    .age((int) this.birth.until(LocalDate.now(), ChronoUnit.YEARS))
+                    .build();
+        }
+    }
+
     @Getter
     @Setter
     @Builder

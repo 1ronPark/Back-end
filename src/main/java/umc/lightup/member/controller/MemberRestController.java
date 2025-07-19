@@ -91,4 +91,18 @@ public class MemberRestController {
                 .deletePositionName(positionName)
                 .build());
     }
+
+    @PutMapping("/me")
+    @Operation(
+            summary = "회원 정보 변경 API",
+            description = "회원 정보를 변경하는 API입니다. 이메일도 변경이 가능하나 인증과 관련된 사항이기에 반드시 logout을 시행해 주셔야 합니다.",
+            security = { @SecurityRequirement(name = "JWT TOKEN")}
+    )
+    public ApiResponse<MemberResponseDTO.MyInfoDTO> changeMemberInfo(Authentication authentication,
+                                                                         @RequestBody @Valid MemberRequestDTO.ChangeDto request) {
+        //반환값을 설정하는 게 맞나? 201 No Content를 반환하는 것도 괜찮았을 것 같은데... 특히 이메일 변경되면 로그아웃이 필수가 되어 버렸기 때문에...
+        //반환값은 단순 디버그용 그 이상이 아니게 될 수도 있음(정작 Test 코드에선 return 값을 아주 잘 활용 중)
+        String email = authentication.getName();
+        return ApiResponse.onSuccess(MemberResponseDTO.toMyInfoDTO(memberCommandService.putMember(email, request)));
+    }
 }

@@ -2,10 +2,7 @@ package umc.lightup.members;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -195,7 +192,7 @@ public class MemberTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jacksonObjectMapper.writeValueAsString(joinDto)))
 
-        //Then (따지자면 여기서부터가 Then이 맞긴 함)
+                //Then (따지자면 여기서부터가 Then이 맞긴 함)
                 .andExpect(status().isBadRequest())
                 .andReturn().getResponse().getContentAsString();
         System.out.println(content);
@@ -203,7 +200,8 @@ public class MemberTest {
 
         ApiResponse<NicknameCheck> response =
                 jacksonObjectMapper.readValue(content,
-                        new TypeReference<ApiResponse<NicknameCheck>>(){});
+                        new TypeReference<ApiResponse<NicknameCheck>>() {
+                        });
         assertEquals(ErrorStatus.DUPLICATE_NICKNAME.toString(), response.getResult().getNickname());
     }
 
@@ -245,14 +243,15 @@ public class MemberTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jacksonObjectMapper.writeValueAsString(joinDto)))
 
-        //Then
+                //Then
                 .andExpect(status().isBadRequest())
                 .andReturn().getResponse().getContentAsString();
         System.out.println(content);
 
         ApiResponse<PhoneCheck> response =
                 jacksonObjectMapper.readValue(content,
-                        new TypeReference<ApiResponse<PhoneCheck>>(){});
+                        new TypeReference<ApiResponse<PhoneCheck>>() {
+                        });
         assertNotNull(response.getResult().getPhoneNumber());
     }
 
@@ -261,6 +260,7 @@ public class MemberTest {
      */
     @Test
     @DisplayName("전체적인 API 테스트")
+    @Order(1)
     void joinLoginMyInfoAndEmptyMemberInfo() throws Exception {
 
         //Given
@@ -295,7 +295,8 @@ public class MemberTest {
         LocalDateTime after = LocalDateTime.now();
         ApiResponse<MemberResponseDTO.JoinResultDTO> joinResponse =
                 jacksonObjectMapper.readValue(joinResult,
-                        new TypeReference<ApiResponse<MemberResponseDTO.JoinResultDTO>>(){});
+                        new TypeReference<ApiResponse<MemberResponseDTO.JoinResultDTO>>() {
+                        });
 
         //Then
         assertEquals(3L, joinResponse.getResult().getMemberId());
@@ -315,7 +316,8 @@ public class MemberTest {
                 .andReturn().getResponse().getContentAsString();
         ApiResponse<MemberResponseDTO.LoginResultDTO> loginResponse =
                 jacksonObjectMapper.readValue(loginResult,
-                        new TypeReference<ApiResponse<MemberResponseDTO.LoginResultDTO>>(){});
+                        new TypeReference<ApiResponse<MemberResponseDTO.LoginResultDTO>>() {
+                        });
 
         //Then
         assertEquals(3L, loginResponse.getResult().getMemberId());
@@ -330,7 +332,8 @@ public class MemberTest {
                 .andReturn().getResponse().getContentAsString();
         ApiResponse<MemberResponseDTO.MyInfoDTO> myInfoResponse =
                 jacksonObjectMapper.readValue(myInfoResult,
-                        new TypeReference<ApiResponse<MemberResponseDTO.MyInfoDTO>>(){});
+                        new TypeReference<ApiResponse<MemberResponseDTO.MyInfoDTO>>() {
+                        });
 
         //Then
         int age3 = (int) birth3.until(before, ChronoUnit.YEARS);
@@ -356,7 +359,8 @@ public class MemberTest {
                 .andReturn().getResponse().getContentAsString();
         ApiResponse<MemberResponseDTO.MemberInfoDTO> response =
                 jacksonObjectMapper.readValue(content,
-                        new TypeReference<ApiResponse<MemberResponseDTO.MemberInfoDTO>>(){});
+                        new TypeReference<ApiResponse<MemberResponseDTO.MemberInfoDTO>>() {
+                        });
 
         //Then
         MemberResponseDTO.MemberInfoDTO result = response.getResult();
@@ -399,15 +403,15 @@ public class MemberTest {
                         .fileUrl("url2")
                         .build());
 
-        skillSet.forEach(skillId->memberSkillRepository.save(MemberSkill.builder()
+        skillSet.forEach(skillId -> memberSkillRepository.save(MemberSkill.builder()
                 .member(member)
                 .skill(skillRepository.findById(skillId).get())
                 .build()));
-        strengthSet.forEach(strengthId->memberStrengthRepository.save(MemberStrength.builder()
+        strengthSet.forEach(strengthId -> memberStrengthRepository.save(MemberStrength.builder()
                 .member(member)
                 .strength(strengthRepository.findById(strengthId).get())
                 .build()));
-        regionSet.forEach(regionId->memberRegionRepository.save(MemberRegion.builder()
+        regionSet.forEach(regionId -> memberRegionRepository.save(MemberRegion.builder()
                 .member(member)
                 .region(regionRepository.findById(regionId).get())
                 .build()));
@@ -419,33 +423,34 @@ public class MemberTest {
                 .andReturn().getResponse().getContentAsString();
         ApiResponse<MemberResponseDTO.MemberInfoDTO> response =
                 jacksonObjectMapper.readValue(content,
-                        new TypeReference<ApiResponse<MemberResponseDTO.MemberInfoDTO>>(){});
+                        new TypeReference<ApiResponse<MemberResponseDTO.MemberInfoDTO>>() {
+                        });
 
         //Then
         MemberResponseDTO.MemberInfoDTO result = response.getResult();
         assertAll("basic member information",
-                ()->assertEquals(member.getName(), result.getName()),
-                ()->assertEquals(member.getNickname(), result.getNickname()),
-                ()->assertEquals(member.getAge(), result.getAge()),
-                ()->assertEquals(member.getGender(), result.isGender()),
-                ()->assertEquals(member.getRole(), result.getRole()),
-                ()->assertEquals(member.getMbti(), result.getMbti()),
-                ()->assertEquals(member.getCareer(), result.getCareer()),
-                ()->assertEquals(member.getSchool(), result.getSchool())
+                () -> assertEquals(member.getName(), result.getName()),
+                () -> assertEquals(member.getNickname(), result.getNickname()),
+                () -> assertEquals(member.getAge(), result.getAge()),
+                () -> assertEquals(member.getGender(), result.isGender()),
+                () -> assertEquals(member.getRole(), result.getRole()),
+                () -> assertEquals(member.getMbti(), result.getMbti()),
+                () -> assertEquals(member.getCareer(), result.getCareer()),
+                () -> assertEquals(member.getSchool(), result.getSchool())
         );
 
         assertIterableEquals(
-                skillSet.stream().map(skillId->skillRepository.findById(skillId).get().getName()).toList(),
+                skillSet.stream().map(skillId -> skillRepository.findById(skillId).get().getName()).toList(),
                 result.getSkills(),
                 "skills information"); //순서도 같도록 의도한 것
 
         assertIterableEquals(
-                strengthSet.stream().map(strengthId->strengthRepository.findById(strengthId).get().getName()).toList(),
+                strengthSet.stream().map(strengthId -> strengthRepository.findById(strengthId).get().getName()).toList(),
                 result.getStrengths(),
                 "strengths information"); //순서도 같도록 의도한 것
 
         assertIterableEquals(
-                regionSet.stream().map(regionId-> {
+                regionSet.stream().map(regionId -> {
                     Region region = regionRepository.findById(regionId).get();
                     return region.getSido() + " " + region.getSigungu();
                 }).toList(),
@@ -470,9 +475,9 @@ public class MemberTest {
 //                "portfolio information"); //순서도 같도록 의도한 것
 
         assertAll("hidden information",
-                ()->assertNull(result.getEmail()),
-                ()->assertNull(result.getPhoneNumber()),
-                ()->assertNull(result.getProfileImageUrl())
+                () -> assertNull(result.getEmail()),
+                () -> assertNull(result.getPhoneNumber()),
+                () -> assertNull(result.getProfileImageUrl())
         );
     }
 
@@ -491,15 +496,15 @@ public class MemberTest {
                         .fileUrl("url2-1")
                         .build());
 
-        skillSet.forEach(skillId->memberSkillRepository.save(MemberSkill.builder()
+        skillSet.forEach(skillId -> memberSkillRepository.save(MemberSkill.builder()
                 .member(member)
                 .skill(skillRepository.findById(skillId).get())
                 .build()));
-        strengthSet.forEach(strengthId->memberStrengthRepository.save(MemberStrength.builder()
+        strengthSet.forEach(strengthId -> memberStrengthRepository.save(MemberStrength.builder()
                 .member(member)
                 .strength(strengthRepository.findById(strengthId).get())
                 .build()));
-        regionSet.forEach(regionId->memberRegionRepository.save(MemberRegion.builder()
+        regionSet.forEach(regionId -> memberRegionRepository.save(MemberRegion.builder()
                 .member(member)
                 .region(regionRepository.findById(regionId).get())
                 .build()));
@@ -511,33 +516,34 @@ public class MemberTest {
                 .andReturn().getResponse().getContentAsString();
         ApiResponse<MemberResponseDTO.MemberInfoDTO> response =
                 jacksonObjectMapper.readValue(content,
-                        new TypeReference<ApiResponse<MemberResponseDTO.MemberInfoDTO>>(){});
+                        new TypeReference<ApiResponse<MemberResponseDTO.MemberInfoDTO>>() {
+                        });
 
         //Then
         MemberResponseDTO.MemberInfoDTO result = response.getResult();
         assertAll("basic member information",
-                ()->assertEquals(member.getName(), result.getName()),
-                ()->assertEquals(member.getNickname(), result.getNickname()),
-                ()->assertEquals(member.getAge(), result.getAge()),
-                ()->assertEquals(member.getGender(), result.isGender()),
-                ()->assertEquals(member.getRole(), result.getRole()),
-                ()->assertEquals(member.getMbti(), result.getMbti()),
-                ()->assertEquals(member.getCareer(), result.getCareer()),
-                ()->assertEquals(member.getSchool(), result.getSchool())
+                () -> assertEquals(member.getName(), result.getName()),
+                () -> assertEquals(member.getNickname(), result.getNickname()),
+                () -> assertEquals(member.getAge(), result.getAge()),
+                () -> assertEquals(member.getGender(), result.isGender()),
+                () -> assertEquals(member.getRole(), result.getRole()),
+                () -> assertEquals(member.getMbti(), result.getMbti()),
+                () -> assertEquals(member.getCareer(), result.getCareer()),
+                () -> assertEquals(member.getSchool(), result.getSchool())
         );
 
         assertIterableEquals(
-                skillSet.stream().map(skillId->skillRepository.findById(skillId).get().getName()).toList(),
+                skillSet.stream().map(skillId -> skillRepository.findById(skillId).get().getName()).toList(),
                 result.getSkills(),
                 "skills information"); //순서도 같도록 의도한 것
 
         assertIterableEquals(
-                strengthSet.stream().map(strengthId->strengthRepository.findById(strengthId).get().getName()).toList(),
+                strengthSet.stream().map(strengthId -> strengthRepository.findById(strengthId).get().getName()).toList(),
                 result.getStrengths(),
                 "strengths information"); //순서도 같도록 의도한 것
 
         assertIterableEquals(
-                regionSet.stream().map(regionId-> {
+                regionSet.stream().map(regionId -> {
                     Region region = regionRepository.findById(regionId).get();
                     return region.getSido() + " " + region.getSigungu();
                 }).toList(),
@@ -562,9 +568,9 @@ public class MemberTest {
 //                "portfolio information"); //순서도 같도록 의도한 것
 
         assertAll("hidden information",
-                ()->assertNull(result.getEmail()),
-                ()->assertNull(result.getPhoneNumber()),
-                ()->assertNull(result.getProfileImageUrl())
+                () -> assertNull(result.getEmail()),
+                () -> assertNull(result.getPhoneNumber()),
+                () -> assertNull(result.getProfileImageUrl())
         );
     }
 
@@ -583,4 +589,367 @@ public class MemberTest {
 //                .andExpect(status().isOk())
 //                .andExpect((ResultMatcher) jsonPath("$.email").value("user@example.com"));
 //    }
+
+
+    @Test
+    @DisplayName("회원정보 수정 테스트")
+    void putMyInfoTest() throws Exception {
+
+        //Given
+        String email4 = "someone4@example.com";
+        String password4 = "password";
+        String name4 = "이름4";
+        String nickname4 = "닉네임4";
+        LocalDate birth4 = LocalDate.of(2006, Month.DECEMBER, 31);
+        Role role4 = Role.LEADER;
+        Mbti mbti4 = Mbti.INTJ;
+        String phoneNumber4 = "02-000-0000";
+        boolean gender4 = true;
+        MemberRequestDTO.JoinDto joinDto = MemberRequestDTO.JoinDto.builder()
+                .name(name4)
+                .nickname(nickname4)
+                .gender(gender4)
+                .birth(birth4)
+                .role(role4)
+                .mbti(mbti4)
+                .email(email4)
+                .phoneNumber(phoneNumber4)
+                .password(password4)
+                .build();
+
+
+        LocalDateTime before = LocalDateTime.now();
+        String joinResult = mockMvc.perform(post("/api/v1/members/join")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jacksonObjectMapper.writeValueAsString(joinDto)))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        LocalDateTime after = LocalDateTime.now();
+        ApiResponse<MemberResponseDTO.JoinResultDTO> joinResponse =
+                jacksonObjectMapper.readValue(joinResult,
+                        new TypeReference<ApiResponse<MemberResponseDTO.JoinResultDTO>>() {
+                        });
+
+        assertEquals(4L, joinResponse.getResult().getMemberId());
+        assertTrue(before.isBefore(joinResponse.getResult().getCreatedAt()) ||
+                before.isEqual(joinResponse.getResult().getCreatedAt()));
+        assertTrue(after.isAfter(joinResponse.getResult().getCreatedAt()) ||
+                after.isEqual(joinResponse.getResult().getCreatedAt()));
+
+        String loginResult = mockMvc.perform(post("/api/v1/members/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jacksonObjectMapper.writeValueAsString(MemberRequestDTO.PasswordLoginRequestDTO.builder()
+                                .email(email4)
+                                .password(password4)
+                                .build())))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        ApiResponse<MemberResponseDTO.LoginResultDTO> loginResponse =
+                jacksonObjectMapper.readValue(loginResult,
+                        new TypeReference<ApiResponse<MemberResponseDTO.LoginResultDTO>>() {
+                        });
+
+        assertEquals(4L, loginResponse.getResult().getMemberId());
+
+
+        String accessToken = loginResponse.getResult().getAccessToken();
+
+        String myInfoResult = mockMvc.perform(get("/api/v1/members/me")
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        ApiResponse<MemberResponseDTO.MyInfoDTO> myInfoResponse =
+                jacksonObjectMapper.readValue(myInfoResult,
+                        new TypeReference<ApiResponse<MemberResponseDTO.MyInfoDTO>>() {
+                        });
+
+        int age4 = (int) birth4.until(before, ChronoUnit.YEARS);
+        MemberResponseDTO.MyInfoDTO myInfoResponseResult = myInfoResponse.getResult();
+        assertAll("MyInfo check",
+                () -> assertEquals(4L, myInfoResponseResult.getId()),
+                () -> assertEquals(name4, myInfoResponseResult.getName()),
+                () -> assertEquals(nickname4, myInfoResponseResult.getNickname()),
+                () -> assertEquals(gender4, myInfoResponseResult.isGender()),
+                () -> assertEquals(age4, myInfoResponseResult.getAge()),
+                () -> assertEquals(birth4, myInfoResponseResult.getBirth()),
+                () -> assertEquals(role4, myInfoResponseResult.getRole()),
+                () -> assertEquals(mbti4, myInfoResponseResult.getMbti()),
+                () -> assertEquals(email4, myInfoResponseResult.getEmail()),
+                () -> assertEquals(phoneNumber4, myInfoResponseResult.getPhoneNumber()),
+                () -> assertNull(myInfoResponseResult.getSchool()),
+                () -> assertNull(myInfoResponseResult.getCareer()),
+                () -> assertNull(myInfoResponseResult.getProfileImageUrl())
+        );
+
+        //When
+        //변경사항 없음
+        MemberRequestDTO.ChangeDto change1 = MemberRequestDTO.ChangeDto.builder()
+                .name(name4)
+                .nickname(nickname4)
+                .gender(gender4)
+                .birth(birth4)
+                .role(role4)
+                .mbti(mbti4)
+                .email(email4)
+                .phoneNumber(phoneNumber4)
+                .build();
+
+
+        String change1Result = mockMvc.perform(put("/api/v1/members/me")
+                        .header("Authorization", "Bearer " + accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jacksonObjectMapper.writeValueAsString(change1))
+                )
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        ApiResponse<MemberResponseDTO.MyInfoDTO> change1Response =
+                jacksonObjectMapper.readValue(change1Result,
+                        new TypeReference<ApiResponse<MemberResponseDTO.MyInfoDTO>>() {
+                        });
+
+        //Then
+        MemberResponseDTO.MyInfoDTO change1ResponseResult = change1Response.getResult();
+        assertAll("MyInfo check without change",
+                () -> assertEquals(4L, change1ResponseResult.getId()),
+                () -> assertEquals(name4, change1ResponseResult.getName()),
+                () -> assertEquals(nickname4, change1ResponseResult.getNickname()),
+                () -> assertEquals(gender4, change1ResponseResult.isGender()),
+                () -> assertEquals(age4, change1ResponseResult.getAge()),
+                () -> assertEquals(birth4, change1ResponseResult.getBirth()),
+                () -> assertEquals(role4, change1ResponseResult.getRole()),
+                () -> assertEquals(mbti4, change1ResponseResult.getMbti()),
+                () -> assertEquals(email4, change1ResponseResult.getEmail()),
+                () -> assertEquals(phoneNumber4, change1ResponseResult.getPhoneNumber()),
+                () -> assertNull(change1ResponseResult.getSchool()),
+                () -> assertNull(change1ResponseResult.getCareer()),
+                () -> assertNull(change1ResponseResult.getProfileImageUrl())
+        );
+
+
+        //When
+        //중복 조건 없는 새로운 변경사항
+        LocalDate changedBirth = LocalDate.of(1996, Month.JANUARY, 1);
+        MemberRequestDTO.ChangeDto change2 = MemberRequestDTO.ChangeDto.builder()
+                .name("name4")
+                .nickname(nickname4)
+                .gender(false)
+                .birth(changedBirth)
+                .role(Role.TEAMMATE)
+                .mbti(Mbti.ENFJ)
+                .email(email4)
+                .phoneNumber(phoneNumber4)
+                .build();
+
+
+        String change2Result = mockMvc.perform(put("/api/v1/members/me")
+                        .header("Authorization", "Bearer " + accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jacksonObjectMapper.writeValueAsString(change2))
+                )
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        ApiResponse<MemberResponseDTO.MyInfoDTO> change2Response =
+                jacksonObjectMapper.readValue(change2Result,
+                        new TypeReference<ApiResponse<MemberResponseDTO.MyInfoDTO>>() {
+                        });
+
+        //Then
+        MemberResponseDTO.MyInfoDTO change2ResponseResult = change2Response.getResult();
+        int changedAge = (int) changedBirth.until(before, ChronoUnit.YEARS);
+        assertAll("MyInfo check with non-unique changes",
+                () -> assertEquals(4L, change2ResponseResult.getId()),
+                () -> assertEquals("name4", change2ResponseResult.getName()),
+                () -> assertEquals(nickname4, change2ResponseResult.getNickname()),
+                () -> assertEquals(false, change2ResponseResult.isGender()),
+                () -> assertEquals(changedAge, change2ResponseResult.getAge()),
+                () -> assertEquals(changedBirth, change2ResponseResult.getBirth()),
+                () -> assertEquals(Role.TEAMMATE, change2ResponseResult.getRole()),
+                () -> assertEquals(Mbti.ENFJ, change2ResponseResult.getMbti()),
+                () -> assertEquals(email4, change2ResponseResult.getEmail()),
+                () -> assertEquals(phoneNumber4, change2ResponseResult.getPhoneNumber()),
+                () -> assertNull(change2ResponseResult.getSchool()),
+                () -> assertNull(change2ResponseResult.getCareer()),
+                () -> assertNull(change2ResponseResult.getProfileImageUrl())
+        );
+
+        //When
+        //중복 조건 변경사항
+        MemberRequestDTO.ChangeDto change3 = MemberRequestDTO.ChangeDto.builder()
+                .name(name4)
+                .nickname(null)
+                .gender(gender4)
+                .birth(birth4)
+                .role(role4)
+                .mbti(mbti4)
+                .email("newEmail@example.com")
+                .phoneNumber("010-1111-2222")
+                .build();
+
+
+        String change3Result = mockMvc.perform(put("/api/v1/members/me")
+                        .header("Authorization", "Bearer " + accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jacksonObjectMapper.writeValueAsString(change3))
+                )
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        ApiResponse<MemberResponseDTO.MyInfoDTO> change3Response =
+                jacksonObjectMapper.readValue(change3Result,
+                        new TypeReference<ApiResponse<MemberResponseDTO.MyInfoDTO>>() {
+                        });
+
+        //Then
+        MemberResponseDTO.MyInfoDTO change3ResponseResult = change3Response.getResult();
+        assertAll("MyInfo check with unique changes",
+                () -> assertEquals(4L, change3ResponseResult.getId()),
+                () -> assertEquals(name4, change3ResponseResult.getName()),
+                () -> assertNull(change3ResponseResult.getNickname()),
+                () -> assertEquals(gender4, change3ResponseResult.isGender()),
+                () -> assertEquals(age4, change3ResponseResult.getAge()),
+                () -> assertEquals(birth4, change3ResponseResult.getBirth()),
+                () -> assertEquals(role4, change3ResponseResult.getRole()),
+                () -> assertEquals(mbti4, change3ResponseResult.getMbti()),
+                () -> assertEquals("newEmail@example.com", change3ResponseResult.getEmail()),
+                () -> assertEquals("010-1111-2222", change3ResponseResult.getPhoneNumber()),
+                () -> assertNull(change3ResponseResult.getSchool()),
+                () -> assertNull(change3ResponseResult.getCareer()),
+                () -> assertNull(change3ResponseResult.getProfileImageUrl())
+        );
+
+        //이제 이메일이 바뀌었으니 에러가 나야 함
+        mockMvc.perform(get("/api/v1/members/me")
+                        .header("Authorization", "Bearer " + accessToken)
+                )
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("중복 조건 회원정보수정 테스트")
+    void putMyInfoDuplicatedTest() throws Exception {
+        //Given
+        //BeforeAll에 있던 거
+        String loginResult = mockMvc.perform(post("/api/v1/members/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jacksonObjectMapper.writeValueAsString(MemberRequestDTO.PasswordLoginRequestDTO.builder()
+                                .email("someone2@example.com")
+                                .password("password")
+                                .build())))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        ApiResponse<MemberResponseDTO.LoginResultDTO> loginResponse =
+                jacksonObjectMapper.readValue(loginResult,
+                        new TypeReference<ApiResponse<MemberResponseDTO.LoginResultDTO>>() {
+                        });
+
+        assertEquals(2L, loginResponse.getResult().getMemberId());
+
+
+        String accessToken = loginResponse.getResult().getAccessToken();
+
+        String myInfoResult = mockMvc.perform(get("/api/v1/members/me")
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        ApiResponse<MemberResponseDTO.MyInfoDTO> myInfoResponse =
+                jacksonObjectMapper.readValue(myInfoResult,
+                        new TypeReference<ApiResponse<MemberResponseDTO.MyInfoDTO>>() {
+                        });
+        MemberResponseDTO.MyInfoDTO myInfoResponseResult = myInfoResponse.getResult();
+
+        //When
+        //닉네임
+        MemberRequestDTO.ChangeDto change1 = MemberRequestDTO.ChangeDto.builder()
+                .name(myInfoResponseResult.getName())
+                .nickname("닉네임1")
+                .gender(myInfoResponseResult.isGender())
+                .birth(myInfoResponseResult.getBirth())
+                .role(myInfoResponseResult.getRole())
+                .mbti(myInfoResponseResult.getMbti())
+                .email(myInfoResponseResult.getEmail())
+                .phoneNumber(myInfoResponseResult.getPhoneNumber())
+                .build();
+
+
+        String change1Result = mockMvc.perform(put("/api/v1/members/me")
+                        .header("Authorization", "Bearer " + accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jacksonObjectMapper.writeValueAsString(change1))
+                )
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
+        ApiResponse<Void> change1Response =
+                jacksonObjectMapper.readValue(change1Result,
+                        new TypeReference<ApiResponse<Void>>() {
+                        });
+
+        //Then
+        assertAll("MyInfo check with duplicated nickname",
+                () -> assertEquals(ErrorStatus.DUPLICATE_NICKNAME.getCode(), change1Response.getCode()),
+                () -> assertEquals(ErrorStatus.DUPLICATE_NICKNAME.getMessage(), change1Response.getMessage())
+        );
+
+        //When
+        //이메일 중복
+        MemberRequestDTO.ChangeDto change2 = MemberRequestDTO.ChangeDto.builder()
+                .name(myInfoResponseResult.getName())
+                .nickname(myInfoResponseResult.getNickname())
+                .gender(myInfoResponseResult.isGender())
+                .birth(myInfoResponseResult.getBirth())
+                .role(myInfoResponseResult.getRole())
+                .mbti(myInfoResponseResult.getMbti())
+                .email("someone@example.com")
+                .phoneNumber(myInfoResponseResult.getPhoneNumber())
+                .build();
+
+
+        String change2Result = mockMvc.perform(put("/api/v1/members/me")
+                        .header("Authorization", "Bearer " + accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jacksonObjectMapper.writeValueAsString(change2))
+                )
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
+        ApiResponse<Void> change2Response =
+                jacksonObjectMapper.readValue(change2Result,
+                        new TypeReference<ApiResponse<Void>>() {
+                        });
+
+        //Then
+        assertAll("MyInfo check with duplicated email",
+                () -> assertEquals(ErrorStatus.DUPLICATE_EMAIL.getCode(), change2Response.getCode()),
+                () -> assertEquals(ErrorStatus.DUPLICATE_EMAIL.getMessage(), change2Response.getMessage())
+        );
+
+        //When
+        //휴대전화 중복
+        MemberRequestDTO.ChangeDto change3 = MemberRequestDTO.ChangeDto.builder()
+                .name(myInfoResponseResult.getName())
+                .nickname(myInfoResponseResult.getNickname())
+                .gender(myInfoResponseResult.isGender())
+                .birth(myInfoResponseResult.getBirth())
+                .role(myInfoResponseResult.getRole())
+                .mbti(myInfoResponseResult.getMbti())
+                .email(myInfoResponseResult.getEmail())
+                .phoneNumber("010-5555-6666")
+                .build();
+
+
+        String change3Result = mockMvc.perform(put("/api/v1/members/me")
+                        .header("Authorization", "Bearer " + accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jacksonObjectMapper.writeValueAsString(change3))
+                )
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
+        ApiResponse<Void> change3Response =
+                jacksonObjectMapper.readValue(change3Result,
+                        new TypeReference<ApiResponse<Void>>() {
+                        });
+
+        //Then
+        assertAll("MyInfo check with duplicated phone number",
+                () -> assertEquals(ErrorStatus.DUPLICATE_PHONE_NUMBER.getCode(), change3Response.getCode()),
+                () -> assertEquals(ErrorStatus.DUPLICATE_PHONE_NUMBER.getMessage(), change3Response.getMessage())
+        );
+    }
 }
