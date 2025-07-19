@@ -26,7 +26,9 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/api/v1/members/me").authenticated()
+                        .requestMatchers("/api/v1/members/me",
+                                "/api/v1/members/password/change")
+                        .authenticated()
                         .anyRequest().permitAll()
                 )
                 .csrf(AbstractHttpConfigurer::disable)
