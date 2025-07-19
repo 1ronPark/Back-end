@@ -1,8 +1,7 @@
 package umc.lightup.skill.domain;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import umc.lightup.common.BaseEntity;
 import umc.lightup.member.domain.Member;
 
@@ -13,7 +12,7 @@ public class Skill extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 30, nullable = false, unique = true)
+    @Column(length = 30, nullable = false, unique = false)
     private String name;
 
     @Column(nullable = false)

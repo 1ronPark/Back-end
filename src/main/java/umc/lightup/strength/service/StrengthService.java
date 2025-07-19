@@ -30,7 +30,7 @@ public class StrengthService {
     private final MemberStrengthRepository memberStrengthRepository;
 
     public List<String> getStrengthsList() {
-        List<Strength> strengths = strengthRepository.findAll();
+        List<Strength> strengths = strengthRepository.findBasicStrengths();
         return strengths.stream()
                 .map(Strength::getName)
                 .toList();
@@ -40,9 +40,11 @@ public class StrengthService {
     public String createStrength(StrengthRequestDTO.CreateStrengthDTO request, Member member) {
         Strength newStrength = StrengthConverter.toStrength(request, member);
 
-        if (strengthRepository.existsByName(newStrength.getName())) {
+        //생성 요청 받은 강점 이름이 기본 제공 강점 이름과 동일할 경우
+        if (strengthRepository.countByNameAndIsCustomFalse(newStrength.getName()) > 0) {
             throw new GeneralHandler(ErrorStatus.DUPLICATED_STRENGTH_NAME);
         }
+
         strengthRepository.save(newStrength);
 
         MemberStrength memberStrength = MemberStrength.createMemberStrength(member, newStrength);

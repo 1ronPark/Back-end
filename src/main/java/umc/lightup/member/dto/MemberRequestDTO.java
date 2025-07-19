@@ -84,12 +84,14 @@ public class MemberRequestDTO {
     @Getter
     @Setter
     public static class MemberSkillSelectRequestDTO {
+        @NotNull
         private Long skillId;
     }
 
     @Getter
     @Setter
     public static class MemberStrengthSelectRequestDTO {
+        @NotNull
         private Long strengthId;
     }
 }

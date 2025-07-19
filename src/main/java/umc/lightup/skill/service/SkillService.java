@@ -24,7 +24,7 @@ public class SkillService {
     private final MemberSkillRepository memberSkillRepository;
 
     public List<String> getSkillsList() {
-        List<Skill> skills = skillRepository.findAll();
+        List<Skill> skills = skillRepository.findBasicSkills();
         return skills.stream()
                 .map(Skill::getName)
                 .toList();
@@ -34,9 +34,11 @@ public class SkillService {
     public String createSkill(SkillRequestDTO.CreateSkillDTO request, Member member) {
         Skill newSkill = SkillConverter.toSkill(request, member);
 
-        if (skillRepository.existsByName(newSkill.getName())) {
+        //생성 요청 받은 스킬 이름이 기본 제공 스킬 이름과 동일할 경우
+        if (skillRepository.countByNameAndIsCustomFalse(newSkill.getName()) > 0) {
             throw new GeneralHandler(ErrorStatus.DUPLICATED_SKILL_NAME);
         }
+
         skillRepository.save(newSkill);
 
         MemberSkill memberSkill = MemberSkill.createMemberSkill(member, newSkill);
