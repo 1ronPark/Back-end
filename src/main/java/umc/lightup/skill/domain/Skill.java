@@ -2,11 +2,15 @@ package umc.lightup.skill.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+
 import umc.lightup.common.BaseEntity;
 import umc.lightup.member.domain.Member;
 
 @Getter
 @Entity
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class Skill extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,8 +24,6 @@ public class Skill extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member owner;
-
-    protected Skill() {}
 
     public static Skill createSkill(String name, boolean isCustom, Member owner) {
         Skill skill = new Skill();

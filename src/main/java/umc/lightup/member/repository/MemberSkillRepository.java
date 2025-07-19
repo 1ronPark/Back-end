@@ -10,3 +10,4 @@ import umc.lightup.skill.domain.Skill;
 public interface MemberSkillRepository extends JpaRepository<MemberSkill, Long> {
     boolean existsByMemberAndSkill(Member member, Skill skill);
 }
+

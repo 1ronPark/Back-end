@@ -1,12 +1,16 @@
 package umc.lightup.strength.domain;
 
 import jakarta.persistence.*;
-import lombok.Getter;
+import lombok.*;
+
 import umc.lightup.common.BaseEntity;
 import umc.lightup.member.domain.Member;
 
 @Entity
 @Getter
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class Strength extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

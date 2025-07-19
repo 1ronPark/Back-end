@@ -10,3 +10,4 @@ import umc.lightup.strength.domain.Strength;
 public interface MemberStrengthRepository extends JpaRepository<MemberStrength, Long> {
     boolean existsByMemberAndStrength(Member member, Strength skill);
 }
+

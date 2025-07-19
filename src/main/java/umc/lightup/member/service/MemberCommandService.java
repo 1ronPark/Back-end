@@ -6,10 +6,9 @@ import umc.lightup.member.dto.MemberResponseDTO;
 
 public interface MemberCommandService {
     Member joinMember(MemberRequestDTO.JoinDto request);
-
     MemberResponseDTO.LoginResultDTO loginMember(MemberRequestDTO.PasswordLoginRequestDTO request);
-
     Member getMember(String email);
+    MemberResponseDTO.MemberInfoDTO getMember(long id, String viewerEmail);
 
     String selectSkill(Long skillId,Member member);
     String selectStrength(Long strengthId,Member member);
@@ -17,4 +16,7 @@ public interface MemberCommandService {
     boolean isNicknameExist(String nickname);
     boolean isEmailExist(String email);
     boolean isPhoneNumberExist(String phoneNumber);
+  
+    void selectPosition(Long memberId, String positionName);
+    void deletePosition(Long memberId, String positionName);
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import umc.lightup.api.code.BaseCode;
 import umc.lightup.api.code.status.ErrorStatus;
@@ -12,6 +13,7 @@ import umc.lightup.api.code.status.SuccessStatus;
 @Getter
 @AllArgsConstructor
 @JsonPropertyOrder({"isSuccess", "code", "message", "result"})
+@EqualsAndHashCode
 public class ApiResponse<T> {
 
     @JsonProperty("isSuccess")
