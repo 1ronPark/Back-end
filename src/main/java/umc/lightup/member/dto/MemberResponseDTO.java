@@ -99,6 +99,15 @@ public class MemberResponseDTO {
         private String fileUrl;
     }
 
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PasswordChangeResultDTO{
+        long memberId;
+        LocalDateTime updatedAt;
+    }
+
     public static LoginResultDTO.LoginResultDTOBuilder loginResultDTOBuilder() {
         return LoginResultDTO.builder();
     }

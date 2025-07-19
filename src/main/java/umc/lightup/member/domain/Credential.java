@@ -1,10 +1,7 @@
 package umc.lightup.member.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import umc.lightup.common.BaseEntity;
 import umc.lightup.member.enums.CredentialType;
 
@@ -26,6 +23,7 @@ public class Credential extends BaseEntity {
     @Column(nullable = false)
     private CredentialType credentialType;
 
+    @Setter //별로 열고 싶지는 않았는데...
     @Column(nullable = false)
     private String credential;
 }

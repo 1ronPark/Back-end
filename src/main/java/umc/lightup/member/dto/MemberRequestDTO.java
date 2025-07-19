@@ -132,6 +132,19 @@ public class MemberRequestDTO {
 
     @Getter
     @Setter
+    @Builder
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class PasswordChangeRequestDTO{
+        @NotBlank(message = "기존 패스워드는 필수입니다.")
+        private String prevPassword;
+
+        @NotBlank(message = "새로운 패스워드는 필수입니다.")
+        private String newPassword;
+    }
+
+    @Getter
+    @Setter
     public static class MemberPositionRequestDTO {
 
         @NotEmpty

@@ -7,9 +7,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import umc.lightup.api.ApiResponse;
+import umc.lightup.member.domain.Credential;
 import umc.lightup.member.domain.Member;
 import umc.lightup.member.dto.MemberRequestDTO;
 import umc.lightup.member.dto.MemberResponseDTO;
+import umc.lightup.member.service.CredentialQueryService;
 import umc.lightup.member.service.MemberCommandService;
 
 import static umc.lightup.member.dto.MemberResponseDTO.memberPositionDeleteResultDTOBuilder;
@@ -20,6 +22,7 @@ import static umc.lightup.member.dto.MemberResponseDTO.memberPositionResultDTOBu
 @RequestMapping("/api/v1/members")
 public class MemberRestController {
     private final MemberCommandService memberCommandService;
+    private final CredentialQueryService credentialQueryService;
 
 
     @PostMapping("/join")
@@ -99,10 +102,25 @@ public class MemberRestController {
             security = { @SecurityRequirement(name = "JWT TOKEN")}
     )
     public ApiResponse<MemberResponseDTO.MyInfoDTO> changeMemberInfo(Authentication authentication,
-                                                                         @RequestBody @Valid MemberRequestDTO.ChangeDto request) {
+                                                                     @RequestBody @Valid MemberRequestDTO.ChangeDto request) {
         //반환값을 설정하는 게 맞나? 201 No Content를 반환하는 것도 괜찮았을 것 같은데... 특히 이메일 변경되면 로그아웃이 필수가 되어 버렸기 때문에...
         //반환값은 단순 디버그용 그 이상이 아니게 될 수도 있음(정작 Test 코드에선 return 값을 아주 잘 활용 중)
         String email = authentication.getName();
         return ApiResponse.onSuccess(MemberResponseDTO.toMyInfoDTO(memberCommandService.putMember(email, request)));
+    }
+
+    @PostMapping("/password/change")
+    @Operation(
+            summary = "비밀번호 변경 API",
+            description = "비밀번호를 변경하는 API입니다. 로그아웃이 필요하지는 않습니다.",
+            security = { @SecurityRequirement(name = "JWT TOKEN")}
+    )
+    public ApiResponse<MemberResponseDTO.PasswordChangeResultDTO> passwordChange(Authentication authentication,
+                                                                                 @RequestBody @Valid MemberRequestDTO.PasswordChangeRequestDTO request) {
+        //반환값을 설정하는 게 맞나? 201 No Content를 반환하는 것도 괜찮았을 것 같은데...
+        String email = authentication.getName();
+        Credential credential = credentialQueryService.updatePasswordByEmail(email, request);
+        //나중에 이거 어차피 converter 형식으로 바꿔야 함, 아직 converter 클래스가 없는 버전이라 일단은 이렇게 둠(물론 이렇게 두는 방식이 좋은 방식은 아니지만 귀찮아서...)
+        return ApiResponse.onSuccess(new MemberResponseDTO.PasswordChangeResultDTO(credential.getMember().getId(), credential.getUpdatedAt()));
     }
 }

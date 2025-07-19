@@ -952,4 +952,161 @@ public class MemberTest {
                 () -> assertEquals(ErrorStatus.DUPLICATE_PHONE_NUMBER.getMessage(), change3Response.getMessage())
         );
     }
+
+    @Test
+    @DisplayName("비밀번호 변경 및 원상복귀 테스트")
+    void passwordChangeTest() throws Exception {
+        //귀찮아서 이렇게 했지만 원래는 member 새로 만드는 것부터 하는 게 좋긴 함
+        String loginResult = mockMvc.perform(post("/api/v1/members/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jacksonObjectMapper.writeValueAsString(MemberRequestDTO.PasswordLoginRequestDTO.builder()
+                                .email("someone@example.com")
+                                .password("password")
+                                .build())))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        ApiResponse<MemberResponseDTO.LoginResultDTO> loginResponse =
+                jacksonObjectMapper.readValue(loginResult,
+                        new TypeReference<ApiResponse<MemberResponseDTO.LoginResultDTO>>() {
+                        });
+
+        assertEquals(1L, loginResponse.getResult().getMemberId());
+
+        String accessToken = loginResponse.getResult().getAccessToken();
+
+        //When
+        MemberRequestDTO.PasswordChangeRequestDTO change1 =
+                MemberRequestDTO.PasswordChangeRequestDTO.builder()
+                        .prevPassword("password")
+                        .newPassword("password1234")
+                        .build();
+
+        LocalDateTime before = LocalDateTime.now();
+        String content1 = mockMvc.perform(post("/api/v1/members/password/change")
+                        .header("Authorization", "Bearer " + accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jacksonObjectMapper.writeValueAsString(change1)))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        LocalDateTime after = LocalDateTime.now();
+        ApiResponse<MemberResponseDTO.PasswordChangeResultDTO> change1Response =
+                jacksonObjectMapper.readValue(content1,
+                        new TypeReference<ApiResponse<MemberResponseDTO.PasswordChangeResultDTO>>(){});
+
+        //Then
+        assertEquals(1L, change1Response.getResult().getMemberId());
+        assertTrue(before.isBefore(change1Response.getResult().getUpdatedAt()) ||
+                after.isAfter(change1Response.getResult().getUpdatedAt()));
+
+        mockMvc.perform(post("/api/v1/members/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jacksonObjectMapper.writeValueAsString(MemberRequestDTO.PasswordLoginRequestDTO.builder()
+                                .email("someone@example.com")
+                                .password("password")
+                                .build())))
+                .andExpect(status().is4xxClientError());
+
+        //Token 다시 받아오기
+        loginResult = mockMvc.perform(post("/api/v1/members/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jacksonObjectMapper.writeValueAsString(MemberRequestDTO.PasswordLoginRequestDTO.builder()
+                                .email("someone@example.com")
+                                .password("password1234")
+                                .build())))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        loginResponse = jacksonObjectMapper.readValue(loginResult,
+                new TypeReference<ApiResponse<MemberResponseDTO.LoginResultDTO>>(){});
+
+        assertEquals(1L, loginResponse.getResult().getMemberId());
+
+        //accessToken = loginResponse.getResult().getAccessToken();
+
+        //다시 돌려놓아야 다른 테스트에서 문제가 발생하지 않음
+        //When
+        MemberRequestDTO.PasswordChangeRequestDTO change2 =
+                MemberRequestDTO.PasswordChangeRequestDTO.builder()
+                        .prevPassword("password1234")
+                        .newPassword("password")
+                        .build();
+
+        before = LocalDateTime.now();
+        String content2 = mockMvc.perform(post("/api/v1/members/password/change")
+                        .header("Authorization", "Bearer " + accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jacksonObjectMapper.writeValueAsString(change2)))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        after = LocalDateTime.now();
+        ApiResponse<MemberResponseDTO.PasswordChangeResultDTO> change2Response =
+                jacksonObjectMapper.readValue(content2,
+                        new TypeReference<ApiResponse<MemberResponseDTO.PasswordChangeResultDTO>>(){});
+
+        //Then
+        assertEquals(1L, change2Response.getResult().getMemberId());
+        assertTrue(before.isBefore(change2Response.getResult().getUpdatedAt()) ||
+                after.isAfter(change2Response.getResult().getUpdatedAt()));
+
+        mockMvc.perform(post("/api/v1/members/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jacksonObjectMapper.writeValueAsString(MemberRequestDTO.PasswordLoginRequestDTO.builder()
+                                .email("someone@example.com")
+                                .password("password1234")
+                                .build())))
+                .andExpect(status().is4xxClientError());
+
+        mockMvc.perform(post("/api/v1/members/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jacksonObjectMapper.writeValueAsString(MemberRequestDTO.PasswordLoginRequestDTO.builder()
+                                .email("someone@example.com")
+                                .password("password")
+                                .build())))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 실패 테스트(비밀번호 불일치)")
+    void passwordChangeFailTest() throws Exception {
+        //귀찮아서 이렇게 했지만 원래는 member 새로 만드는 것부터 하는 게 좋긴 함
+        String loginResult = mockMvc.perform(post("/api/v1/members/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jacksonObjectMapper.writeValueAsString(MemberRequestDTO.PasswordLoginRequestDTO.builder()
+                                .email("someone2@example.com")
+                                .password("password")
+                                .build())))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        ApiResponse<MemberResponseDTO.LoginResultDTO> loginResponse =
+                jacksonObjectMapper.readValue(loginResult,
+                        new TypeReference<ApiResponse<MemberResponseDTO.LoginResultDTO>>() {
+                        });
+
+        assertEquals(2L, loginResponse.getResult().getMemberId());
+
+        String accessToken = loginResponse.getResult().getAccessToken();
+
+
+        //When
+        MemberRequestDTO.PasswordChangeRequestDTO change1 =
+                MemberRequestDTO.PasswordChangeRequestDTO.builder()
+                        .prevPassword("password1234")
+                        .newPassword("password")
+                        .build();
+
+        String content1 = mockMvc.perform(post("/api/v1/members/password/change")
+                        .header("Authorization", "Bearer " + accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jacksonObjectMapper.writeValueAsString(change1)))
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
+        ApiResponse<Void> change1Response =
+                jacksonObjectMapper.readValue(content1,
+                        new TypeReference<ApiResponse<Void>>(){});
+
+        //Then
+        assertAll("Password change with wrong old password",
+                () -> assertEquals(ErrorStatus.INVALID_PASSWORD.getCode(), change1Response.getCode()),
+                () -> assertEquals(ErrorStatus.INVALID_PASSWORD.getMessage(), change1Response.getMessage())
+        );
+    }
 }

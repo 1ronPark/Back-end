@@ -10,7 +10,7 @@ import umc.lightup.AppConfig;
 import umc.lightup.common.BaseEntity;
 import umc.lightup.member.enums.Mbti;
 import umc.lightup.member.enums.Role;
-import umc.lightup.member.service.CredentialQueryServiceImpl;
+import umc.lightup.member.service.CredentialQueryService;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -86,7 +86,7 @@ public class Member extends BaseEntity implements UserDetails {
         // Bean을 수동으로 가져와 Credential 알아내는 코드
         // AppConfig 클래스가 필요함
         ApplicationContext applicationContext = new AnnotationConfigApplicationContext(AppConfig.class);
-        CredentialQueryServiceImpl credentialQueryService = applicationContext.getBean(CredentialQueryServiceImpl.class);
+        CredentialQueryService credentialQueryService = applicationContext.getBean(CredentialQueryService.class);
         return credentialQueryService.findByEmail(getEmail()).getCredential();
     }
 
