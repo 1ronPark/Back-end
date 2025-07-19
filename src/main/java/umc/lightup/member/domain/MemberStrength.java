@@ -26,8 +26,6 @@ public class MemberStrength extends BaseEntity {
     @JoinColumn(name = "strength_id", nullable = false)
     private Strength strength;
 
-    protected MemberStrength() {}
-
     public static MemberStrength createMemberStrength(Member member, Strength strength) {
         MemberStrength memberStrength = new MemberStrength();
         memberStrength.member = member;

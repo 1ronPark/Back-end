@@ -25,8 +25,6 @@ public class MemberSkill extends BaseEntity {
     @JoinColumn(name = "skill_id", nullable = false)
     private Skill skill;
 
-    protected MemberSkill() {}
-
     public static MemberSkill createMemberSkill(Member member, Skill skill) {
         MemberSkill memberSkill = new MemberSkill();
         memberSkill.member = member;

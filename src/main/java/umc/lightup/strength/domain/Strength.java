@@ -25,8 +25,6 @@ public class Strength extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member owner;
 
-    protected Strength() {}
-
     public static Strength createStrength(String name, boolean isCustom, Member owner) {
         Strength strength = new Strength();
         strength.name = name;
