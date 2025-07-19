@@ -1109,4 +1109,60 @@ public class MemberTest {
                 () -> assertEquals(ErrorStatus.INVALID_PASSWORD.getMessage(), change1Response.getMessage())
         );
     }
+
+    @Test
+    @DisplayName("이미 존재하는 이메일에 대한 이메일 존재 여부 확인 테스트 1")
+    void emailExistTrueTest1() throws Exception {
+        //When
+        String content1 = mockMvc.perform(post("/api/v1/members/email/exist")
+                        .param("email", "someone@example.com"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        ApiResponse<MemberResponseDTO.EmailExistResultDTO> change1Response =
+                jacksonObjectMapper.readValue(content1,
+                        new TypeReference<ApiResponse<MemberResponseDTO.EmailExistResultDTO>>(){});
+
+        //Then
+        assertTrue(change1Response.getResult().isExist());
+    }
+
+    @Test
+    @DisplayName("이미 존재하는 이메일에 대한 이메일 존재 여부 확인 테스트 2")
+    void emailExistTrueTest2() throws Exception {
+        //When
+        String content1 = mockMvc.perform(post("/api/v1/members/email/exist")
+                        .param("email", "someone2@example.com"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        ApiResponse<MemberResponseDTO.EmailExistResultDTO> change1Response =
+                jacksonObjectMapper.readValue(content1,
+                        new TypeReference<ApiResponse<MemberResponseDTO.EmailExistResultDTO>>(){});
+
+        //Then
+        assertTrue(change1Response.getResult().isExist());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 이메일에 대한 이메일 존재 여부 확인 테스트")
+    void emailExistFalseTest() throws Exception {
+        //When
+        String content1 = mockMvc.perform(post("/api/v1/members/email/exist")
+                        .param("email", "none@example.com"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        ApiResponse<MemberResponseDTO.EmailExistResultDTO> change1Response =
+                jacksonObjectMapper.readValue(content1,
+                        new TypeReference<ApiResponse<MemberResponseDTO.EmailExistResultDTO>>(){});
+
+        //Then
+        assertFalse(change1Response.getResult().isExist());
+    }
+
+    @Test
+    @DisplayName("이메일이 아닌 형식에 대한 이메일 존재 여부 확인 테스트")
+    void emailExistErrorTest() throws Exception {
+        mockMvc.perform(post("/api/v1/members/email/exist")
+                        .param("email", "jdnosfajdn"))
+                .andExpect(status().isBadRequest());
+    }
 }

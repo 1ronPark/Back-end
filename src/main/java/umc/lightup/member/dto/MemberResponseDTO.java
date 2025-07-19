@@ -108,6 +108,14 @@ public class MemberResponseDTO {
         LocalDateTime updatedAt;
     }
 
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class EmailExistResultDTO{
+        boolean exist;
+    }
+
     public static LoginResultDTO.LoginResultDTOBuilder loginResultDTOBuilder() {
         return LoginResultDTO.builder();
     }

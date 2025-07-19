@@ -3,6 +3,8 @@ package umc.lightup.member.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -122,5 +124,17 @@ public class MemberRestController {
         Credential credential = credentialQueryService.updatePasswordByEmail(email, request);
         //나중에 이거 어차피 converter 형식으로 바꿔야 함, 아직 converter 클래스가 없는 버전이라 일단은 이렇게 둠(물론 이렇게 두는 방식이 좋은 방식은 아니지만 귀찮아서...)
         return ApiResponse.onSuccess(new MemberResponseDTO.PasswordChangeResultDTO(credential.getMember().getId(), credential.getUpdatedAt()));
+    }
+
+    @PostMapping("/email/exist")
+    @Operation(
+            summary = "이메일 존재 여부 확인 API",
+            description = "이메일 존재 여부를 확인하는 API입니다. 회원가입 시 중복 여부나 로그인 시 메일 존재 여부 확인 등의 용도로 사용할 수 있습니다."
+    )
+    public ApiResponse<MemberResponseDTO.EmailExistResultDTO> emailExist(@RequestParam @NotBlank @Email String email) {
+        //항상 DTO 쓰다 여기에만 RequestParam 쓰니 이상하긴 하네...
+        //아 그냥 ApiResponse<Boolean> 반환해버리고 싶다
+        boolean emailExist = memberCommandService.isEmailExist(email);
+        return ApiResponse.onSuccess(new MemberResponseDTO.EmailExistResultDTO(emailExist));
     }
 }
