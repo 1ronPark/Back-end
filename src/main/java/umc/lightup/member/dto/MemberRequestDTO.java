@@ -85,12 +85,26 @@ public class MemberRequestDTO {
         @NotBlank(message = "패스워드는 필수입니다.")
         private String password;
     }
-
+  
     @Getter
     @Setter
     public static class MemberPositionRequestDTO {
-
         @NotEmpty
         private String position;
+    }
+
+    @Getter
+    @Setter
+    public static class MemberSkillSelectRequestDTO {
+        @NotNull
+        private Long skillId;
+    }
+
+    @Getter
+    @Setter
+    public static class MemberStrengthSelectRequestDTO {
+        @NotNull
+        private Long strengthId;
+     
     }
 }

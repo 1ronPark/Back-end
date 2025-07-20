@@ -9,7 +9,10 @@ public interface MemberCommandService {
     MemberResponseDTO.LoginResultDTO loginMember(MemberRequestDTO.PasswordLoginRequestDTO request);
     Member getMember(String email);
     MemberResponseDTO.MemberInfoDTO getMember(long id, String viewerEmail);
-  
+
+    String selectSkill(Long skillId,Member member);
+    String selectStrength(Long strengthId,Member member);
+
     boolean isNicknameExist(String nickname);
     boolean isEmailExist(String email);
     boolean isPhoneNumberExist(String phoneNumber);

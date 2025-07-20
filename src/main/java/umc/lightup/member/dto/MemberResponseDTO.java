@@ -99,6 +99,24 @@ public class MemberResponseDTO {
         private String fileUrl;
     }
 
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class selectSkillResultDTO {
+        String skillName;
+        String memberName;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class selectStrengthResultDTO {
+        String strengthName;
+        String memberName;
+    }
+
     public static LoginResultDTO.LoginResultDTOBuilder loginResultDTOBuilder() {
         return LoginResultDTO.builder();
     }
