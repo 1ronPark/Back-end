@@ -36,7 +36,7 @@ public class NotificationRestController {
   @ApiResponses({
           @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
   })
-  public ApiResponse<NotificationResponseDTO.NotificationListDTO> getNotificationList(Authentication authentication, @NotNull @Min(0) @RequestParam(name = "page") Integer page, @RequestParam(name = "size") Integer size){
+  public ApiResponse<NotificationResponseDTO.NotificationListDTO> getNotificationList(Authentication authentication, @NotNull @Min(0) @RequestParam(name = "page") Integer page, @Min(1) @RequestParam(name = "size", required = false, defaultValue = "10") Integer size){
     Member member = memberCommandService.getMember(authentication.getName());
     Page<Notification> notificationList = notificationQueryService.getNotificationList(member, page, size);
     return ApiResponse.onSuccess(NotificationConverter.notificationListDTO(notificationList));
