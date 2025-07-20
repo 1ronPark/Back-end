@@ -10,10 +10,11 @@ public interface MemberCommandService {
     Member getMember(String email);
     MemberResponseDTO.MemberInfoDTO getMember(long id, String viewerEmail);
     Member putMember(String email, MemberRequestDTO.ChangeDto request);
+    String selectSkill(Long skillId,Member member);
+    String selectStrength(Long strengthId,Member member);
     boolean isNicknameExist(String nickname);
     boolean isEmailExist(String email);
     boolean isPhoneNumberExist(String phoneNumber);
-
     void selectPosition(Long memberId, String positionName);
     void deletePosition(Long memberId, String positionName);
 }

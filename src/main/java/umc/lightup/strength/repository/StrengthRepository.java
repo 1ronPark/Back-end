@@ -11,8 +11,10 @@ import java.util.List;
 
 @Repository
 public interface StrengthRepository extends JpaRepository<Strength, Long> {
-//    @Query("select s.name from Strength s where s.id in :ids")
-//    List<String> findAllNameById(@Param("ids") List<Long> ids);
+    @Query("select s from Strength s where s.isCustom = false")
+    List<Strength> findBasicStrengths();
+    @Query("select count(*) from Strength where name = :name and isCustom = false")
+    Long countByNameAndIsCustomFalse (@Param("name") String name);
     @Query("select s.name from MemberStrength ms join ms.strength s where ms.member=:member")
     List<String> findNameByMember(@Param("member") Member member);
 }

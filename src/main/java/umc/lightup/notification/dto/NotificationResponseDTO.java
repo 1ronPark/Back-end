@@ -1,0 +1,34 @@
+package umc.lightup.notification.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
+
+public class NotificationResponseDTO {
+  @Builder
+  @Getter
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class NotificationListDTO {
+    List<NotificationDTO> notificationList;
+    Integer listSize;
+    Integer totalPage;
+    Long totalElements;
+    Boolean isFirst;
+    Boolean isLast;
+  }
+
+  @Builder
+  @Getter
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class NotificationDTO {
+    Long notificationId;  // 알림 Id
+    String message;       // 알림 메시지 내용
+    String notificationType;  // 알림 종류
+    Boolean isRead;           // 알림 읽음 여부
+  }
+}

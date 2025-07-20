@@ -11,8 +11,10 @@ import java.util.List;
 
 @Repository
 public interface SkillRepository extends JpaRepository<Skill, Long> {
-//    @Query("select s.name from Skill s where s.id in :ids")
-//    List<String> findAllNameById(@Param("ids") List<Long> ids);
+    @Query("select s from Skill s where s.isCustom = false")
+    List<Skill> findBasicSkills();
+    @Query("select count(*) from Skill where name = :name and isCustom = false")
+    Long countByNameAndIsCustomFalse (@Param("name") String name);
     @Query("select s.name from MemberSkill ms join ms.skill s where ms.member=:member")
     List<String> findNameByMember(@Param("member") Member member);
 }

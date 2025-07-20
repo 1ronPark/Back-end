@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import umc.lightup.api.ApiResponse;
 import umc.lightup.api.code.status.SuccessStatus;
 import umc.lightup.member.domain.Credential;
+import umc.lightup.member.converter.MemberConverter;
 import umc.lightup.member.domain.Member;
 import umc.lightup.member.dto.MemberRequestDTO;
 import umc.lightup.member.dto.MemberResponseDTO;
@@ -140,5 +141,33 @@ public class MemberRestController {
         //아 그냥 ApiResponse<Boolean> 반환해버리고 싶다
         boolean emailExist = memberCommandService.isEmailExist(email);
         return ApiResponse.onSuccess(new MemberResponseDTO.EmailExistResultDTO(emailExist));
+    }
+  
+    @PostMapping("/skills")
+    @Operation(
+            summary = "스킬 선택 API",
+            description = "유저가 자신의 스킬을 선택하는 API입니다."
+    )
+    public ApiResponse<MemberResponseDTO.selectSkillResultDTO> selectSkill(Authentication authentication, @RequestBody MemberRequestDTO.MemberSkillSelectRequestDTO request) {
+        Long skillId = request.getSkillId();
+        String email = authentication.getName();
+        Member member = memberCommandService.getMember(email);
+
+        String skillName = memberCommandService.selectSkill(skillId, member);
+        return ApiResponse.onSuccess(MemberConverter.toSelectSkillResultDTO(skillName, member));
+    }
+
+    @PostMapping("/strengths")
+    @Operation(
+            summary = "강점 선택 API",
+            description = "유저가 자신의 강점을 선택하는 API입니다."
+    )
+    public ApiResponse<MemberResponseDTO.selectStrengthResultDTO> selectStrength(Authentication authentication, @RequestBody MemberRequestDTO.MemberStrengthSelectRequestDTO request) {
+        Long strengthId = request.getStrengthId();
+        String email = authentication.getName();
+        Member member = memberCommandService.getMember(email);
+
+        String strengthName = memberCommandService.selectStrength(strengthId, member);
+        return ApiResponse.onSuccess(MemberConverter.toSelectStrengthResultDTO(strengthName, member));
     }
 }

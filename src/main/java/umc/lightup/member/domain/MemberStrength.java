@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import umc.lightup.common.BaseEntity;
+import umc.lightup.skill.domain.Skill;
 import umc.lightup.strength.domain.Strength;
 
 @Entity
@@ -24,4 +25,11 @@ public class MemberStrength extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "strength_id", nullable = false)
     private Strength strength;
+
+    public static MemberStrength createMemberStrength(Member member, Strength strength) {
+        MemberStrength memberStrength = new MemberStrength();
+        memberStrength.member = member;
+        memberStrength.strength = strength;
+        return memberStrength;
+    }
 }
