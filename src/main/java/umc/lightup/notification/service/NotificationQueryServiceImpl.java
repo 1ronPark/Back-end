@@ -18,8 +18,7 @@ public class NotificationQueryServiceImpl implements NotificationQueryService {
   private final NotificationRepostiory notificationRepostiory;
 
   @Override
-  public Page<Notification> getNotificationList(Long userId, Integer page, Integer size) {
-    Member member = memberRepository.findById(userId).get();
+  public Page<Notification> getNotificationList(Member member, Integer page, Integer size) {
     Page<Notification> NotificationPage = notificationRepostiory.findAllByReceiver(member, PageRequest.of(page, size));
     return NotificationPage;
   }

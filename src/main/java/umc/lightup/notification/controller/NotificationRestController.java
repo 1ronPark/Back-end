@@ -4,6 +4,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
@@ -33,9 +36,9 @@ public class NotificationRestController {
   @ApiResponses({
           @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
   })
-  public ApiResponse<NotificationResponseDTO.NotificationListDTO> getNotificationList(Authentication authentication, @Valid @RequestParam(name = "page") Integer page, @RequestParam(name = "size") Integer size){
+  public ApiResponse<NotificationResponseDTO.NotificationListDTO> getNotificationList(Authentication authentication, @NotNull @Min(0) @RequestParam(name = "page") Integer page, @RequestParam(name = "size") Integer size){
     Member member = memberCommandService.getMember(authentication.getName());
-    Page<Notification> notificationList = notificationQueryService.getNotificationList(member.getId(), page, size);
+    Page<Notification> notificationList = notificationQueryService.getNotificationList(member, page, size);
     return ApiResponse.onSuccess(NotificationConverter.notificationListDTO(notificationList));
   }
 }
