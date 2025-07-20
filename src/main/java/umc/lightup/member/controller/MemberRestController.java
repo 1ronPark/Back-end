@@ -6,9 +6,11 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import umc.lightup.api.ApiResponse;
+import umc.lightup.api.code.status.SuccessStatus;
 import umc.lightup.member.domain.Credential;
 import umc.lightup.member.domain.Member;
 import umc.lightup.member.dto.MemberRequestDTO;
@@ -105,25 +107,27 @@ public class MemberRestController {
     )
     public ApiResponse<MemberResponseDTO.MyInfoDTO> changeMemberInfo(Authentication authentication,
                                                                      @RequestBody @Valid MemberRequestDTO.ChangeDto request) {
-        //반환값을 설정하는 게 맞나? 201 No Content를 반환하는 것도 괜찮았을 것 같은데... 특히 이메일 변경되면 로그아웃이 필수가 되어 버렸기 때문에...
+        //반환값을 설정하는 게 맞나? 204 No Content를 반환하는 것도 괜찮았을 것 같은데... 특히 이메일 변경되면 로그아웃이 필수가 되어 버렸기 때문에...
         //반환값은 단순 디버그용 그 이상이 아니게 될 수도 있음(정작 Test 코드에선 return 값을 아주 잘 활용 중)
+        //여기서 주의할 점은 이메일 변경되면 로그아웃이 필수이지만 백엔드에서는 아무런 처리를 해 주지 않는다는 것. 알아서 기존 token 지우고 다시 로그인 해야 함.
+        //로그아웃이 필수인 이유가 jwt에 이메일을 저장하기 때문인데, 이 때문에 A와 B가 서로의 비밀번호를 몰라도 서로 이메일을 바꾸면 A는 B 계정에, B는 A 계정에 접속할 수 있음.
         String email = authentication.getName();
         return ApiResponse.onSuccess(MemberResponseDTO.toMyInfoDTO(memberCommandService.putMember(email, request)));
     }
 
     @PostMapping("/password/change")
+    @ResponseStatus(HttpStatus.NO_CONTENT) //명시적으로 쓰기 싫었는데 안 쓰니 200 OK가 나가버리네...
     @Operation(
             summary = "비밀번호 변경 API",
             description = "비밀번호를 변경하는 API입니다. 로그아웃이 필요하지는 않습니다.",
             security = { @SecurityRequirement(name = "JWT TOKEN")}
     )
-    public ApiResponse<MemberResponseDTO.PasswordChangeResultDTO> passwordChange(Authentication authentication,
-                                                                                 @RequestBody @Valid MemberRequestDTO.PasswordChangeRequestDTO request) {
-        //반환값을 설정하는 게 맞나? 201 No Content를 반환하는 것도 괜찮았을 것 같은데...
+    public ApiResponse<Void> passwordChange(Authentication authentication,
+                                            @RequestBody @Valid MemberRequestDTO.PasswordChangeRequestDTO request) {
         String email = authentication.getName();
-        Credential credential = credentialQueryService.updatePasswordByEmail(email, request);
-        //나중에 이거 어차피 converter 형식으로 바꿔야 함, 아직 converter 클래스가 없는 버전이라 일단은 이렇게 둠(물론 이렇게 두는 방식이 좋은 방식은 아니지만 귀찮아서...)
-        return ApiResponse.onSuccess(new MemberResponseDTO.PasswordChangeResultDTO(credential.getMember().getId(), credential.getUpdatedAt()));
+        credentialQueryService.updatePasswordByEmail(email, request);
+        return ApiResponse.of(SuccessStatus._NO_CONTENT, null);
+        //null 반환이 과연 옳은가? 물론 이 null 안 쓰려면 응답 통일 형식부터 갈아엎어야 하는 대공사가 필요하긴 함
     }
 
     @PostMapping("/email/exist")

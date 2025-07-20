@@ -103,15 +103,6 @@ public class MemberResponseDTO {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class PasswordChangeResultDTO{
-        long memberId;
-        LocalDateTime updatedAt;
-    }
-
-    @Builder
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
     public static class EmailExistResultDTO{
         boolean exist;
     }

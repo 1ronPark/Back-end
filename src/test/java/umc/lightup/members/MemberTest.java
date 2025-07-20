@@ -981,23 +981,13 @@ public class MemberTest {
                         .newPassword("password1234")
                         .build();
 
-        LocalDateTime before = LocalDateTime.now();
-        String content1 = mockMvc.perform(post("/api/v1/members/password/change")
+        mockMvc.perform(post("/api/v1/members/password/change")
                         .header("Authorization", "Bearer " + accessToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jacksonObjectMapper.writeValueAsString(change1)))
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-        LocalDateTime after = LocalDateTime.now();
-        ApiResponse<MemberResponseDTO.PasswordChangeResultDTO> change1Response =
-                jacksonObjectMapper.readValue(content1,
-                        new TypeReference<ApiResponse<MemberResponseDTO.PasswordChangeResultDTO>>(){});
+                .andExpect(status().isNoContent());
 
         //Then
-        assertEquals(1L, change1Response.getResult().getMemberId());
-        assertTrue(before.isBefore(change1Response.getResult().getUpdatedAt()) ||
-                after.isAfter(change1Response.getResult().getUpdatedAt()));
-
         mockMvc.perform(post("/api/v1/members/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jacksonObjectMapper.writeValueAsString(MemberRequestDTO.PasswordLoginRequestDTO.builder()
@@ -1030,23 +1020,15 @@ public class MemberTest {
                         .newPassword("password")
                         .build();
 
-        before = LocalDateTime.now();
-        String content2 = mockMvc.perform(post("/api/v1/members/password/change")
+        String content = mockMvc.perform(post("/api/v1/members/password/change")
                         .header("Authorization", "Bearer " + accessToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jacksonObjectMapper.writeValueAsString(change2)))
-                .andExpect(status().isOk())
+                .andExpect(status().isNoContent())
                 .andReturn().getResponse().getContentAsString();
-        after = LocalDateTime.now();
-        ApiResponse<MemberResponseDTO.PasswordChangeResultDTO> change2Response =
-                jacksonObjectMapper.readValue(content2,
-                        new TypeReference<ApiResponse<MemberResponseDTO.PasswordChangeResultDTO>>(){});
 
         //Then
-        assertEquals(1L, change2Response.getResult().getMemberId());
-        assertTrue(before.isBefore(change2Response.getResult().getUpdatedAt()) ||
-                after.isAfter(change2Response.getResult().getUpdatedAt()));
-
+        System.out.println("content = " + content);
         mockMvc.perform(post("/api/v1/members/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jacksonObjectMapper.writeValueAsString(MemberRequestDTO.PasswordLoginRequestDTO.builder()
