@@ -99,6 +99,14 @@ public class MemberResponseDTO {
         private String fileUrl;
     }
 
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class EmailExistResultDTO{
+        boolean exist;
+    }
+  
     @Getter
     @Builder
     @NoArgsConstructor

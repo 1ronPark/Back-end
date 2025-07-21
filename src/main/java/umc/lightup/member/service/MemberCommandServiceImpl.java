@@ -32,7 +32,6 @@ import umc.lightup.position.domain.Position;
 import umc.lightup.position.repository.PositionRepository;
 
 import java.util.Collections;
-import java.util.Optional;
 
 import umc.lightup.member.repository.*;
 import umc.lightup.region.domain.Region;
@@ -40,7 +39,6 @@ import umc.lightup.region.repository.RegionRepository;
 import umc.lightup.skill.repository.SkillRepository;
 import umc.lightup.strength.repository.StrengthRepository;
 
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -153,6 +151,23 @@ public class MemberCommandServiceImpl implements MemberCommandService {
                 .build().toMemberInfoDTO();
     }
 
+    @Override
+    @Transactional
+    public Member putMember(String email, MemberRequestDTO.ChangeDto request) {
+        Member member = getMember(email);
+        if (!member.getEmail().equals(request.getEmail()) &&
+                isEmailExist(request.getEmail()))
+            throw new GeneralHandler(ErrorStatus.DUPLICATE_EMAIL);
+        if (!member.getPhoneNumber().equals(request.getPhoneNumber()) &&
+                isPhoneNumberExist(request.getPhoneNumber()))
+            throw new GeneralHandler(ErrorStatus.DUPLICATE_PHONE_NUMBER);
+        if (member.getNickname() != null &&
+                !member.getNickname().equals(request.getNickname()) &&
+                isNicknameExist(request.getNickname()))
+            throw new GeneralHandler(ErrorStatus.DUPLICATE_NICKNAME);
+        return memberRepository.save(request.toMember(member.getId()));
+    }
+  
     @Override
     @Transactional
     public String selectSkill(Long skillId, Member member) {
