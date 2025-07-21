@@ -36,12 +36,14 @@ public class ItemCommandServiceImpl implements ItemCommandService {
 
         Item saveditem = itemRepository.save(item);
 
-        String uuid = UUID.randomUUID().toString();
-        Uuid savedUuid = uuidRepository.save(Uuid.builder()
-                .uuid(uuid).build());
+        if (file != null) {
+            String uuid = UUID.randomUUID().toString();
+            Uuid savedUuid = uuidRepository.save(Uuid.builder()
+                    .uuid(uuid).build());
 
-        String fileUrl = s3Manager.uploadFile(s3Manager.generateItemFileKeyName(savedUuid), file);
-        itemImageRepository.save(ItemConverter.toItemImage(item, fileUrl));
+            String fileUrl = s3Manager.uploadFile(s3Manager.generateItemFileKeyName(savedUuid), file);
+            itemImageRepository.save(ItemConverter.toItemImage(item, fileUrl));
+        }
 
         return saveditem;
     }

@@ -34,7 +34,7 @@ public class ItemRestController {
     public ApiResponse<ItemResponseDTO.ItemJoinResultDTO> createItem(Authentication authentication,
                                                    @Parameter(content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
                                                                      @RequestPart("request") @Valid ItemRequestDTO.ItemJoinRequestDTO request,
-                                                   @RequestPart("itemImage")MultipartFile itemImage) {
+                                                   @RequestPart(value = "itemImage", required = false)MultipartFile itemImage) {
         Member member = memberCommandService.getMember(authentication.getName());
         Item item = itemCommandService.createItem(member, request, itemImage);
         return ApiResponse.onSuccess(ItemConverter.toItemJoinResultDTO(member, item));
