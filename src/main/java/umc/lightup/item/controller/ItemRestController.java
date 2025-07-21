@@ -30,7 +30,7 @@ public class ItemRestController {
     private final MemberCommandService memberCommandService;
 
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    @Operation(summary = "Item을 생성하는 API 입니다.", description = "Item을 생성할 수 있으며 이미지도 업로드 가능합니다.")
+    @Operation(summary = "Item 생성 API", description = "Item을 생성할 수 있으며 이미지도 업로드 가능합니다. (이미지 업로드는 필수 X)")
     public ApiResponse<ItemResponseDTO.ItemJoinResultDTO> createItem(Authentication authentication,
                                                    @Parameter(content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
                                                                      @RequestPart("request") @Valid ItemRequestDTO.ItemJoinRequestDTO request,

@@ -24,7 +24,7 @@ public class StrengthRestController {
 
     @GetMapping
     @Operation(
-            summary = "유저가 강점을 조회하는 API",
+            summary = "유저의 강점 조회 API",
             description = "유저가 강점을 선택하기 전에 드롭다운으로 강점들을 조회하는 API입니다."
     )
     public ApiResponse<StrengthResponseDTO.strengthListDTO> getStrengths() {
@@ -34,7 +34,7 @@ public class StrengthRestController {
 
     @PostMapping
     @Operation(
-            summary = "유저가 커스텀 강점을 생성하는 API",
+            summary = "유저의 커스텀 강점 생성 API",
             description = "유저가 직접 강점을 생성하고 선택하는 API입니다. 유저가 생성한 강점은 생성과 동시에 선택됩니다."
     )
     public ApiResponse<StrengthResponseDTO.createdStrengthResultDTO> createCustomStrength(Authentication authentication,
