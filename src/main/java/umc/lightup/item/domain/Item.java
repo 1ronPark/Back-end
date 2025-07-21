@@ -1,10 +1,15 @@
 package umc.lightup.item.domain;
 
 import jakarta.persistence.*;
+import lombok.*;
 import umc.lightup.common.BaseEntity;
 import umc.lightup.member.domain.Member;
 
 @Entity
+@Getter
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class Item extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
