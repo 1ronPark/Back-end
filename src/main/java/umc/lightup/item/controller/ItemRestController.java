@@ -32,7 +32,7 @@ public class ItemRestController {
     private final ItemCommandService itemCommandService;
     private final MemberCommandService memberCommandService;
 
-    private static final int DEFAULT_ITEM_PAGE_SIZE = 2;
+    private static final int DEFAULT_ITEM_PAGE_SIZE = 12;
 
     @GetMapping("/search")
     @Operation(summary = "전체 프로젝트 조회 API", description = "전체 프로젝트를 조회하는 API이며 페이징을 포함합니다. 요청 파라미터로 page 번호를 입력할 수 있습니다.")
