@@ -5,6 +5,8 @@ import lombok.*;
 import umc.lightup.common.BaseEntity;
 import umc.lightup.member.domain.Member;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Builder
@@ -42,4 +44,7 @@ public class Item extends BaseEntity {
 
     @Column(name = "prefer_mbti", nullable = false, length = 30)
     private String preferMbti;
+
+    @OneToMany(mappedBy = "item", fetch = FetchType.LAZY)
+    private List<ItemImage> itemImages;
 }
