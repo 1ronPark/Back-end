@@ -17,6 +17,8 @@ public class ItemRequestDTO {
         @NotBlank
         private String projectStatus;
         @NotBlank
+        private String description;
+        @NotBlank
         private String collaboration;
         @NotBlank
         private String address;
@@ -24,7 +26,5 @@ public class ItemRequestDTO {
         private boolean office;
         @NotBlank
         private String preferMbti;
-        @NotBlank
-        private String description;
     }
 }

@@ -11,8 +11,13 @@ import java.util.List;
 
 public interface ItemCommandService {
     Item createItem(Member member, ItemRequestDTO.ItemJoinRequestDTO request, MultipartFile file);
+    Item getSingleItem(Long itemId);
 
     List<ItemResponseDTO.ItemResultDTO> getAllItems(Pageable pageable);
 
     List<ItemResponseDTO.MyItemResultDTO> getMyItems(Member member);
+
+    List<ItemResponseDTO.ItemRegionResultDTO> getItemRegions(Item item);
+
+    List<ItemResponseDTO.RecruitPositionResultDTO> getItemRecruitPositions(Item item);
 }

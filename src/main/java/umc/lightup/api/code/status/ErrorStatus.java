@@ -34,7 +34,13 @@ public enum ErrorStatus implements BaseErrorCode {
     //Strength 관련 에러
     DUPLICATED_STRENGTH_NAME(HttpStatus.BAD_REQUEST, "STRENGTH4000", "이미 존재하는 강점 이름입니다."),
     STRENGTH_NOT_FOUND(HttpStatus.NOT_FOUND, "STRENGTH4001", "강점이 존재하지 않습니다."),
-    DUPLICATED_STRENGTH_SELECT(HttpStatus.BAD_REQUEST, "STRENGTH4002", "이미 선택한 강점입니다.")
+    DUPLICATED_STRENGTH_SELECT(HttpStatus.BAD_REQUEST, "STRENGTH4002", "이미 선택한 강점입니다."),
+
+    //Item 관련 에러
+    ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEM4000", "프로젝트가 존재하지 않습니다."),
+
+    //ItemImage 관련 에러
+    ITEM_IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEM_IMAGE4000", "아이템 이미지가 존재하지 않습니다.")
     ;
 
 

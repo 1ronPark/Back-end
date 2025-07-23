@@ -54,12 +54,22 @@ public class ItemRestController {
 
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @Operation(summary = "본인 프로젝트 생성 API", description = "Item을 생성할 수 있으며 이미지도 업로드 가능합니다. (이미지 업로드는 필수 X)")
-    public ApiResponse<ItemResponseDTO.ItemJoinResultDTO> createItem(Authentication authentication,
-                                                   @Parameter(content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
-                                                                     @RequestPart("request") @Valid ItemRequestDTO.ItemJoinRequestDTO request,
-                                                   @RequestPart(value = "itemImage", required = false)MultipartFile itemImage) {
+    public ApiResponse<ItemResponseDTO.ItemJoinResultDTO> createItem(
+            Authentication authentication,
+            @Parameter(content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
+            @RequestPart("request") @Valid ItemRequestDTO.ItemJoinRequestDTO request,
+            @RequestPart(value = "itemImage", required = false)MultipartFile itemImage) {
         Member member = memberCommandService.getMember(authentication.getName());
         Item item = itemCommandService.createItem(member, request, itemImage);
         return ApiResponse.onSuccess(ItemConverter.toItemJoinResultDTO(member, item));
+    }
+
+    @GetMapping("/{itemId}")
+    @Operation(summary = "특정 프로젝트 상세 조회 API", description = "특정 프로젝트를 상세 조회하는 API 입니다.")
+    public ApiResponse<ItemResponseDTO.ItemInfoDTO> getItemInfo(@PathVariable("itemId") @Min(1) Long itemId) {
+        Item findItem = itemCommandService.getSingleItem(itemId);
+        List<ItemResponseDTO.ItemRegionResultDTO> itemRegions = itemCommandService.getItemRegions(findItem);
+        List<ItemResponseDTO.RecruitPositionResultDTO> itemRecruitPositions = itemCommandService.getItemRecruitPositions(findItem);
+        return ApiResponse.onSuccess(ItemConverter.toItemInfoDTO(findItem, itemRegions, itemRecruitPositions));
     }
 }

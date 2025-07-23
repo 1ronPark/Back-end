@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import umc.lightup.member.enums.Gender;
+import umc.lightup.member.enums.Mbti;
 
 import java.util.List;
 
@@ -52,5 +54,45 @@ public class ItemResponseDTO {
     @AllArgsConstructor
     public static class MyItemResultListDTO {
         List<MyItemResultDTO> items;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ItemInfoDTO {
+        private String introduce;
+        private String itemName;
+        private String itemProfileImageUrl;
+        private String memberName;
+        private boolean gender;
+        private int age;
+        private Mbti mbti;
+        private String email;
+        private String school;
+        private List<ItemRegionResultDTO> regions;
+        private String description;
+        private List<RecruitPositionResultDTO> recruitPositions;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ItemRegionResultDTO {
+        private String siDo;
+        private String siGunGu;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RecruitPositionResultDTO {
+        private String positionName;
+        private Integer recruitNumber;
+        private String mainTasks;
+        private String preferentialTreatment;
+        private String preferMbti;
     }
 }
