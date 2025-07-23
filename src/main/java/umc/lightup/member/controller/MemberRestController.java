@@ -75,6 +75,7 @@ public class MemberRestController {
     }
 
     @PostMapping("/position")
+    @Operation(summary = "포지션 선택 API", description = "유저가 포지션을 선택하는 API 입니다.")
     public ApiResponse<MemberResponseDTO.MemberPositionResultDTO> selectMemberPosition(Authentication authentication, @RequestParam String positionName) {
         String userName = authentication.getName();
         Member member = memberCommandService.getMember(userName);
@@ -88,6 +89,7 @@ public class MemberRestController {
     }
 
     @DeleteMapping("/position")
+    @Operation(summary = "포지션 취소 API", description = "유저가 포지션 선택을 취소할 때 호출되는 API 입니다.")
     public ApiResponse<MemberResponseDTO.MemberPositionDeleteResultDTO> deleteMemberPosition(Authentication authentication, @RequestParam String positionName) {
         String userName = authentication.getName();
         Member member = memberCommandService.getMember(userName);
