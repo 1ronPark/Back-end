@@ -43,7 +43,7 @@ public class MemberViewInfo {
                 .skills(skills)
                 .strengths(strengths)
                 .regions(regions.stream()
-                        .map(r->r.getSido()+" "+r.getSigungu())
+                        .map(r->r.getSiDo()+" "+r.getSiGunGu())
                         .toList())
                 .portfolios(portfolios.stream()
                         .map(portfolio -> MemberResponseDTO.PortfolioInfoDTO.builder()

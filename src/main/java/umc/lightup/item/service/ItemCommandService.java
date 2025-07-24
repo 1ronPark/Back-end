@@ -10,7 +10,7 @@ import umc.lightup.member.domain.Member;
 import java.util.List;
 
 public interface ItemCommandService {
-    Item createItem(Member member, ItemRequestDTO.ItemJoinRequestDTO request, MultipartFile file);
+    Item createItem(Member member, ItemRequestDTO.ItemJoinRequestDTO request, MultipartFile itemProfileImage, MultipartFile itemPlanFile);
     Item getSingleItem(Long itemId);
 
     List<ItemResponseDTO.ItemResultDTO> getAllItems(Pageable pageable);

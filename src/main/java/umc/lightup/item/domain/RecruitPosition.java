@@ -37,4 +37,8 @@ public class RecruitPosition extends BaseEntity {
 
     @Column(nullable = false)
     private Integer recruitNumber;
+
+    public void assignItem(Item item) {
+        this.item = item;
+    }
 }

@@ -1,6 +1,5 @@
 package umc.lightup.item.converter;
 
-import org.springframework.data.domain.Page;
 import umc.lightup.item.domain.Item;
 import umc.lightup.item.domain.ItemImage;
 import umc.lightup.item.domain.RecruitPosition;
@@ -8,7 +7,6 @@ import umc.lightup.item.dto.ItemRequestDTO;
 import umc.lightup.item.dto.ItemResponseDTO;
 import umc.lightup.member.domain.Member;
 import umc.lightup.member.domain.MemberRegion;
-import umc.lightup.region.domain.Region;
 
 import java.util.List;
 
@@ -67,8 +65,8 @@ public class ItemConverter {
 
     public static ItemResponseDTO.ItemRegionResultDTO toItemRegionResultDTO(MemberRegion memberRegion) {
         return ItemResponseDTO.ItemRegionResultDTO.builder()
-                .siDo(memberRegion.getRegion().getSido())
-                .siGunGu(memberRegion.getRegion().getSigungu())
+                .siDo(memberRegion.getRegion().getSiDo())
+                .siGunGu(memberRegion.getRegion().getSiGunGu())
                 .build();
     }
 
@@ -87,19 +85,17 @@ public class ItemConverter {
                 .member(member)
                 .name(request.getName())
                 .introduce(request.getIntroduce())
-                .projectStatus(request.getProjectStatus())
-                .collaboration(request.getCollaboration())
-                .address(request.getAddress())
-                .office(request.isOffice())
-                .preferMbti(request.getPreferMbti())
                 .description(request.getDescription())
+                .projectStatus(request.isProjectStatus())
+                .githubLink(request.getGithubLink())
+                .extraLinks(request.getExtraLinks())
                 .build();
     }
 
-    public static ItemImage toItemImage(Item item, String imageUrl) {
+/*    public static ItemImage toItemImage(Item item, String imageUrl) {
         return ItemImage.builder()
                 .item(item)
                 .imageUrl(imageUrl)
                 .build();
-    }
+    }*/
 }

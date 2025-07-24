@@ -1,20 +1,20 @@
 package umc.lightup.region.converter;
 
-import umc.lightup.region.dto.RegionReponseDTO;
+import umc.lightup.region.dto.RegionResponseDTO;
 
 import java.util.List;
 
 public class RegionConverter {
 
-    public static RegionReponseDTO.SiDoListDTO toSiDoResultDTO(List<String> sidoList) {
-        return RegionReponseDTO.SiDoListDTO.builder()
-                .sido(sidoList)
+    public static RegionResponseDTO.SiDoListDTO toSiDoResultDTO(List<String> siDoList) {
+        return RegionResponseDTO.SiDoListDTO.builder()
+                .siDo(siDoList)
                 .build();
     }
 
-    public static RegionReponseDTO.SiGunGuListDTO toSiGunGuResultDTO(List<String> sigunguList) {
-        return RegionReponseDTO.SiGunGuListDTO.builder()
-                .sigungu(sigunguList)
+    public static RegionResponseDTO.SiGunGuListDTO toSiGunGuResultDTO(List<String> siGunGuList) {
+        return RegionResponseDTO.SiGunGuListDTO.builder()
+                .siGunGu(siGunGuList)
                 .build();
     }
 }

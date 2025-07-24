@@ -1,9 +1,17 @@
 package umc.lightup.item.dto;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import umc.lightup.position.validation.annotation.ExistPosition;
+import umc.lightup.region.validation.annotation.ExistSiDo;
+import umc.lightup.region.validation.annotation.ExistSiGunGu;
+
+import java.util.List;
 
 public class ItemRequestDTO {
 
@@ -14,17 +22,41 @@ public class ItemRequestDTO {
         private String name;
         @NotBlank
         private String introduce;
-        @NotBlank
-        private String projectStatus;
+        private String githubLink;
+        @Size(max = 2, message = "추가 링크는 2개까지 입력 가능합니다.")
+        private List<String> extraLinks;
         @NotBlank
         private String description;
-        @NotBlank
-        private String collaboration;
-        @NotBlank
-        private String address;
         @NotNull
-        private boolean office;
+        private boolean projectStatus;
+        @Size(max = 3, message = "협업 지역은 최대 3개까지 선택할 수 있습니다.")
+        @Valid
+        private List<CollaborationRegionRequestDTO> collaborationRegions;
+        @NotEmpty(message = "모집 포지션을 하나 이상 선택해야 합니다.")
+        private List<RecruitPositionRequestDTO> recruitPositions;
+    }
+
+    @Getter
+    @Setter
+    public static class CollaborationRegionRequestDTO {
         @NotBlank
+        @ExistSiDo
+        private String siDo;
+        @ExistSiGunGu
+        private String siGunGu;
+    }
+
+    @Getter
+    @Setter
+    public static class RecruitPositionRequestDTO {
+        @NotNull
+        @ExistPosition
+        private Long positionId;
+        @NotBlank
+        private String mainTasks;
+        private String preferentialTreatment;
         private String preferMbti;
+        @NotNull
+        private Integer recruitNumber;
     }
 }

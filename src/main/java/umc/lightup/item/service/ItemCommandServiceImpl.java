@@ -13,15 +13,16 @@ import umc.lightup.common.repository.UuidRepository;
 import umc.lightup.exception.handler.GeneralHandler;
 import umc.lightup.item.converter.ItemConverter;
 import umc.lightup.item.domain.Item;
-import umc.lightup.item.domain.ItemImage;
+import umc.lightup.item.domain.ItemRegion;
+import umc.lightup.item.domain.RecruitPosition;
 import umc.lightup.item.dto.ItemRequestDTO;
 import umc.lightup.item.dto.ItemResponseDTO;
-import umc.lightup.item.repository.ItemImageRepository;
 import umc.lightup.item.repository.ItemRepository;
 import umc.lightup.item.repository.RecruitPositionRepository;
 import umc.lightup.member.domain.Member;
 import umc.lightup.member.repository.MemberRegionRepository;
-import umc.lightup.member.repository.MemberRepository;
+import umc.lightup.position.domain.Position;
+import umc.lightup.position.repository.PositionRepository;
 
 import java.util.List;
 import java.util.UUID;
@@ -32,31 +33,64 @@ import java.util.UUID;
 public class ItemCommandServiceImpl implements ItemCommandService {
 
     private final ItemRepository itemRepository;
-    private final MemberRepository memberRepository;
-    private final ItemImageRepository itemImageRepository;
     private final MemberRegionRepository memberRegionRepository;
     private final RecruitPositionRepository recruitPositionRepository;
+    private final PositionRepository positionRepository;
 
     private final AmazonS3Manager s3Manager;
     private final UuidRepository uuidRepository;
 
     @Override
     @Transactional
-    public Item createItem(Member member, ItemRequestDTO.ItemJoinRequestDTO request, MultipartFile file) {
+    public Item createItem(Member member, ItemRequestDTO.ItemJoinRequestDTO request, MultipartFile itemProfileImage, MultipartFile itemPlanFile) {
         Item item = ItemConverter.toItem(request, member);
 
-        Item saveditem = itemRepository.save(item);
-
-        if (file != null) {
+        if (itemProfileImage != null) {
             String uuid = UUID.randomUUID().toString();
             Uuid savedUuid = uuidRepository.save(Uuid.builder()
                     .uuid(uuid).build());
 
-            String fileUrl = s3Manager.uploadFile(s3Manager.generateItemFileKeyName(savedUuid), file);
-            itemImageRepository.save(ItemConverter.toItemImage(item, fileUrl));
+            String itemProfileImageUrl = s3Manager.uploadFile(s3Manager.generateItemProfileImageKeyName(savedUuid), itemProfileImage);
+            item.uploadItemProfile(itemProfileImageUrl);
         }
 
-        return saveditem;
+        if (itemPlanFile != null) {
+            String uuid = UUID.randomUUID().toString();
+            Uuid savedUuid = uuidRepository.save(Uuid.builder()
+                    .uuid(uuid).build());
+
+            String itemPlanFileUrl = s3Manager.uploadFile(s3Manager.generateItemFileKeyName(savedUuid), itemPlanFile);
+            item.uploadItemPlanFile(itemPlanFileUrl);
+        }
+
+        for (ItemRequestDTO.CollaborationRegionRequestDTO dto : request.getCollaborationRegions()) {
+            ItemRegion itemRegion = ItemRegion.builder()
+                    .item(item)
+                    .siDo(dto.getSiDo())
+                    .siGunGu(dto.getSiGunGu() == null ? "전체" : dto.getSiGunGu())
+                    .build();
+
+            item.addItemRegion(itemRegion);
+        }
+
+        for (ItemRequestDTO.RecruitPositionRequestDTO dto : request.getRecruitPositions()) {
+            Long positionId = dto.getPositionId();
+            Position position = positionRepository.findById(positionId)
+                    .orElseThrow(() -> new GeneralHandler(ErrorStatus.POSITION_NOT_FOUND));
+
+            RecruitPosition recruitPosition = RecruitPosition.builder()
+                    .item(item)
+                    .position(position)
+                    .mainTasks(dto.getMainTasks())
+                    .preferentialTreatment(dto.getPreferentialTreatment())
+                    .preferMbti(dto.getPreferMbti())
+                    .recruitNumber(dto.getRecruitNumber())
+                    .build();
+
+            item.addRecruitPosition(recruitPosition);
+        }
+
+        return itemRepository.save(item);
     }
 
     @Override
@@ -65,10 +99,7 @@ public class ItemCommandServiceImpl implements ItemCommandService {
 
         return itemPage.stream()
                 .map(item -> {
-                    String itemImageUrl = item.getItemImages().stream()
-                            .findFirst()
-                            .map(ItemImage::getImageUrl)
-                            .orElse(null);
+                    String itemImageUrl = item.getItemProfileImageUrl();
 
                     return ItemConverter.toItemResultDTO(item, itemImageUrl);
                 }).toList();
@@ -80,11 +111,7 @@ public class ItemCommandServiceImpl implements ItemCommandService {
 
         return myItemList.stream()
             .map(item -> {
-                //item에 이미지 저장 방식이나 어떤 이미지를 item의 프로필 이미지로 설정할 것 인지에 따라서 수정해야할 가능성 있음
-                String itemImageUrl = item.getItemImages().stream()
-                        .findFirst()
-                        .map(ItemImage::getImageUrl)
-                        .orElse(null);
+                String itemImageUrl = item.getItemProfileImageUrl();
 
                 return ItemConverter.toMyItemResultDTO(item, itemImageUrl);
             })

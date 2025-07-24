@@ -53,14 +53,15 @@ public class ItemRestController {
     }
 
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    @Operation(summary = "본인 프로젝트 생성 API", description = "Item을 생성할 수 있으며 이미지도 업로드 가능합니다. (이미지 업로드는 필수 X)")
+    @Operation(summary = "본인 프로젝트 생성 API", description = "Item을 생성할 수 있으며 Item 프로필 이미지와 Item 기획서도 업로드 가능합니다. (요구사항이 Item 프로필 이미지, 기획서 업로드 필수)")
     public ApiResponse<ItemResponseDTO.ItemJoinResultDTO> createItem(
             Authentication authentication,
             @Parameter(content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
             @RequestPart("request") @Valid ItemRequestDTO.ItemJoinRequestDTO request,
-            @RequestPart(value = "itemImage", required = false)MultipartFile itemImage) {
+            @RequestPart(value = "itemProfileImage")MultipartFile itemProfileImage,
+            @RequestPart(value = "itemPlanFile")MultipartFile itemPlanFile) {
         Member member = memberCommandService.getMember(authentication.getName());
-        Item item = itemCommandService.createItem(member, request, itemImage);
+        Item item = itemCommandService.createItem(member, request, itemProfileImage, itemPlanFile);
         return ApiResponse.onSuccess(ItemConverter.toItemJoinResultDTO(member, item));
     }
 
