@@ -14,14 +14,22 @@ public class RegionService {
     private final RegionRepository regionRepository;
 
     public List<String> getSiDoList() {
-        return regionRepository.findDistinctSido();
+        return regionRepository.findDistinctSiDo();
     }
 
-    public List<String> getSiGunGuList(String sido) {
-        List<Region> regionList = regionRepository.findBySido(sido);
+    public List<String> getSiGunGuList(String siDo) {
+        List<Region> regionList = regionRepository.findBySiDo(siDo);
         return regionList.stream()
-                .map(Region::getSigungu)
+                .map(Region::getSiGunGu)
                 .distinct()
                 .toList();
+    }
+
+    public boolean isSiDoExist(String value) {
+        return regionRepository.existsBySiDo(value);
+    }
+
+    public boolean isSiGunGuExist(String value) {
+        return regionRepository.existsBySiGunGu(value);
     }
 }

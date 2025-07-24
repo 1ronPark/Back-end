@@ -19,4 +19,8 @@ public class PositionService {
                 .map(Position::getName)
                 .toList();
     }
+
+    public boolean isPositionExist(Long value) {
+        return positionRepository.existsById(value);
+    }
 }

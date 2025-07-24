@@ -22,6 +22,9 @@ public enum ErrorStatus implements BaseErrorCode {
     DUPLICATE_EMAIL(HttpStatus.BAD_REQUEST, "MEMBER4004", "이미 존재하는 이메일입니다."),
     DUPLICATE_PHONE_NUMBER(HttpStatus.BAD_REQUEST, "MEMBER4005", "이미 존재하는 휴대폰 번호입니다."),
     NO_CREDENTIAL(HttpStatus.INTERNAL_SERVER_ERROR, "MEMBER5000", "저장된 패스워드가 없습니다."),
+
+    //Region 관련 에러
+    REGION_NOT_FOUND(HttpStatus.NOT_FOUND, "REGION4000", "해당 지역이 존재하지 않습니다."),
   
     //Position 관련 에러
     POSITION_NOT_FOUND(HttpStatus.NOT_FOUND, "POSITION4000", "포지션이 존재하지 않습니다."),
