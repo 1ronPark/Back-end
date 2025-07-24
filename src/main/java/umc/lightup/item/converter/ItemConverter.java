@@ -87,8 +87,8 @@ public class ItemConverter {
                 .introduce(request.getIntroduce())
                 .description(request.getDescription())
                 .projectStatus(request.isProjectStatus())
-                .githubLink(request.getGithubLink())
-                .extraLinks(request.getExtraLinks())
+                .extraLink1(request.getExtraLink1())
+                .extraLink2(request.getExtraLink2())
                 .build();
     }
 

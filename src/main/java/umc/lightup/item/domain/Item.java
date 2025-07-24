@@ -28,7 +28,8 @@ public class Item extends BaseEntity {
     @Column(length = 50, nullable = false)
     private String introduce;
 
-    @Column(length = 3000, nullable = false)
+    @Lob
+    @Column(nullable = false)
     private String description;
 
     @Column(name = "project_status", nullable = false)
@@ -40,14 +41,11 @@ public class Item extends BaseEntity {
     @Column(nullable = false)
     private String itemPlanFileUrl;
 
-    @Column(name = "github_link")
-    private String githubLink;
+    @Column(name = "extra_link1")
+    private String extraLink1;
 
-    @Builder.Default
-    @ElementCollection
-    @CollectionTable(name = "item_extra_links", joinColumns = @JoinColumn(name = "item_id"))
-    @Column(name = "extra_link")
-    private List<String> extraLinks = new ArrayList<>();
+    @Column(name = "extra_link2")
+    private String extraLink2;
 
     @Builder.Default
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)

@@ -22,17 +22,16 @@ public class ItemRequestDTO {
         private String name;
         @NotBlank
         private String introduce;
-        private String githubLink;
-        @Size(max = 2, message = "추가 링크는 2개까지 입력 가능합니다.")
-        private List<String> extraLinks;
+        private String extraLink1;
+        private String extraLink2;
         @NotBlank
         private String description;
-        @NotNull
         private boolean projectStatus;
         @Size(max = 3, message = "협업 지역은 최대 3개까지 선택할 수 있습니다.")
         @Valid
         private List<CollaborationRegionRequestDTO> collaborationRegions;
         @NotEmpty(message = "모집 포지션을 하나 이상 선택해야 합니다.")
+        @Valid
         private List<RecruitPositionRequestDTO> recruitPositions;
     }
 
