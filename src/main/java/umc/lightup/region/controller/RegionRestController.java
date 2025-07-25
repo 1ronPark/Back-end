@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import umc.lightup.api.ApiResponse;
 import umc.lightup.region.converter.RegionConverter;
-import umc.lightup.region.dto.RegionReponseDTO;
+import umc.lightup.region.dto.RegionResponseDTO;
 import umc.lightup.region.service.RegionService;
 
 import java.util.List;
@@ -22,7 +22,7 @@ public class RegionRestController {
 
     @GetMapping("/sido")
     @Operation(summary = "시/도 단위 지역 조회 API", description = "시/도 단위로 지역을 조회할 수 있는 API 입니다.")
-    public ApiResponse<RegionReponseDTO.SiDoListDTO> getSiDo() {
+    public ApiResponse<RegionResponseDTO.SiDoListDTO> getSiDo() {
         List<String> siDoList = regionService.getSiDoList();
         return ApiResponse.onSuccess(RegionConverter.toSiDoResultDTO(siDoList));
     }
@@ -30,8 +30,8 @@ public class RegionRestController {
     @GetMapping("/sigungu")
     @Operation(summary = "시/군/구 단위 지역 조회 API",
             description = "시/군/구 단위로 지역을 조회할 수 있는 API 입니다. 요청 파라미터로 시/도 값을 받아 해당 시/도 하위의 시/군/구를 조회할 수 있습니다.")
-    public ApiResponse<RegionReponseDTO.SiGunGuListDTO> getSiGunGu(@RequestParam String sido) {
-        List<String> siGunGuList = regionService.getSiGunGuList(sido);
+    public ApiResponse<RegionResponseDTO.SiGunGuListDTO> getSiGunGu(@RequestParam String siDo) {
+        List<String> siGunGuList = regionService.getSiGunGuList(siDo);
         return ApiResponse.onSuccess(RegionConverter.toSiGunGuResultDTO(siGunGuList));
     }
 }

@@ -10,11 +10,14 @@ import java.util.List;
 
 public interface RegionRepository extends JpaRepository<Region, Long> {
 
-    @Query("SELECT DISTINCT r.sido FROM Region r")
-    List<String> findDistinctSido();
+    @Query("SELECT DISTINCT r.siDo FROM Region r")
+    List<String> findDistinctSiDo();
 
-    List<Region> findBySido(String sido);
+    List<Region> findBySiDo(String siDo);
 
     @Query("select r from MemberRegion mr join mr.region r where mr.member=:member")
     List<Region> findByMember(@Param("member") Member member);
+
+    boolean existsBySiDo(String siDo);
+    boolean existsBySiGunGu(String siGunGu);
 }
