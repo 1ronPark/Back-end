@@ -3,15 +3,14 @@ package umc.lightup.strength.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
-import umc.lightup.common.BaseEntity;
-import umc.lightup.member.domain.Member;
+import umc.lightup.strength.enums.StrengthType;
 
 @Entity
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class Strength extends BaseEntity {
+public class Strength {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -19,7 +18,12 @@ public class Strength extends BaseEntity {
     @Column(length = 30, nullable = false, unique = false)
     private String name;
 
-    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Column(length = 30, nullable = false)
+    private StrengthType strengthType;
+
+    //커스텀 강점 생성 기능 삭제
+/*    @Column(nullable = false)
     private boolean isCustom;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -31,5 +35,5 @@ public class Strength extends BaseEntity {
         strength.isCustom = isCustom;
         strength.owner = owner;
         return strength;
-    }
+    }*/
 }

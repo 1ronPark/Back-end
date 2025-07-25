@@ -1,8 +1,5 @@
 package umc.lightup.skill.converter;
 
-import umc.lightup.member.domain.Member;
-import umc.lightup.skill.domain.Skill;
-import umc.lightup.skill.dto.SkillRequestDTO;
 import umc.lightup.skill.dto.SkillResponseDTO;
 
 import java.util.List;
@@ -15,7 +12,8 @@ public class SkillConverter {
                 .build();
     }
 
-    public static SkillResponseDTO.createdSkillResultDTO toCreatedSkillResultDTO(String skillName, Member member) {
+    //커스텀 스킬 기능 삭제
+/*    public static SkillResponseDTO.createdSkillResultDTO toCreatedSkillResultDTO(String skillName, Member member) {
         return SkillResponseDTO.createdSkillResultDTO.builder()
                 .createdSkill(skillName)
                 .memberId(member.getId())
@@ -26,5 +24,5 @@ public class SkillConverter {
         String skillName = request.getSkillName();
 
         return Skill.createSkill(skillName, true, member);
-    }
+    }*/
 }
