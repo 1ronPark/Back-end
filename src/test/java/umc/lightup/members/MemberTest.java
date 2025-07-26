@@ -135,22 +135,22 @@ public class MemberTest {
         //Region에 Builder 넣기 싫은데...
 
         Region region1 = Region.builder()
-                .sido("시도1")
-                .sigungu("시군구1")
+                .siDo("시도1")
+                .siGunGu("시군구1")
                 .build();
         regionRepository.save(region1);
         assertSame(1L, region1.getId());
 
         Region region2 = Region.builder()
-                .sido("시도2")
-                .sigungu("시군구2")
+                .siDo("시도2")
+                .siGunGu("시군구2")
                 .build();
         regionRepository.save(region2);
         assertSame(2L, region2.getId());
 
         Region region3 = Region.builder()
-                .sido("시도3")
-                .sigungu("시군구3")
+                .siDo("시도3")
+                .siGunGu("시군구3")
                 .build();
         regionRepository.save(region3);
         assertSame(3L, region3.getId());
@@ -452,7 +452,7 @@ public class MemberTest {
         assertIterableEquals(
                 regionSet.stream().map(regionId -> {
                     Region region = regionRepository.findById(regionId).get();
-                    return region.getSido() + " " + region.getSigungu();
+                    return region.getSiDo() + " " + region.getSiGunGu();
                 }).toList(),
                 result.getRegions(),
                 "region information"); //순서도 같도록 의도한 것
@@ -545,7 +545,7 @@ public class MemberTest {
         assertIterableEquals(
                 regionSet.stream().map(regionId -> {
                     Region region = regionRepository.findById(regionId).get();
-                    return region.getSido() + " " + region.getSigungu();
+                    return region.getSiDo() + " " + region.getSiGunGu();
                 }).toList(),
                 result.getRegions(),
                 "region information"); //순서도 같도록 의도한 것
