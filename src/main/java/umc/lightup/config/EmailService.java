@@ -2,7 +2,6 @@ package umc.lightup.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.mail.Message;
-import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +39,7 @@ public class EmailService {
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
             message.setText(content, "utf-8", "html");
             javaMailSender.send(message);
-        } catch (MessagingException e) {
+        } catch (Exception e) {
             throw new GeneralHandler(ErrorStatus.EMAIL_SEND_FAIL);
         }
     }
