@@ -14,8 +14,8 @@ public interface StrengthRepository extends JpaRepository<Strength, Long> {
     @Query("select s from Strength s order by case " +
             "s.strengthType " +
             "when :skillType then 1 " +
-            "when umc.lightup.strength.enums.StrengthType.COMMON then 2" +
-            "else 3" +
+            "when umc.lightup.strength.enums.StrengthType.COMMON then 2 " +
+            "else 3 " +
             "end")
     List<Strength> findAllOrderedByStrengthType(@Param("skillType") StrengthType strengthType);
     //커스텀 강점 생성 기능 삭제

@@ -15,7 +15,7 @@ public interface SkillRepository extends JpaRepository<Skill, Long> {
     @Query("select s from Skill s order by case " +
             "s.skillType " +
             "when :skillType then 1 " +
-            "else 2" +
+            "else 2 " +
             "end")
     List<Skill> findAllOrderedBySkillType(@Param("skillType") SkillType skillType);
 

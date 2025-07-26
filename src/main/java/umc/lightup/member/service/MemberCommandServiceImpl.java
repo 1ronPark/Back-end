@@ -137,12 +137,18 @@ public class MemberCommandServiceImpl implements MemberCommandService {
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
 //        List<String> skills = skillRepository.findNameByMember(member);
 //        List<String> strengths = strengthRepository.findNameByMember(member);
+        List<String> skills = memberSkillRepository.findByMember(member).stream()
+                .map(memberSkill -> memberSkill.getSkill().getName())
+                .toList();
+        List<String> strengths = memberStrengthRepository.findByMember(member).stream()
+                .map(memberStrength -> memberStrength.getStrength().getName())
+                .toList();
         List<Region> regions = regionRepository.findByMember(member);
         List<Portfolio> portfolios = portfolioRepository.findByMember(member);
         return MemberViewInfo.builder()
                 .member(member)
-//                .skills(skills)
-//                .strengths(strengths)
+                .skills(skills)
+                .strengths(strengths)
                 .regions(regions)
                 .portfolios(portfolios)
                 .emailOpen(false)
