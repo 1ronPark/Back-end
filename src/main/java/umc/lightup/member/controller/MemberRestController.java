@@ -144,6 +144,39 @@ public class MemberRestController {
         boolean emailExist = memberCommandService.isEmailExist(email);
         return ApiResponse.onSuccess(new MemberResponseDTO.EmailExistResultDTO(emailExist));
     }
+
+    @PostMapping("/{memberId}/like")
+    @ResponseStatus(HttpStatus.NO_CONTENT) //명시적으로 쓰기 싫었는데 안 쓰니 200 OK가 나가버리네...
+    @Operation(
+            summary = "회원 좋아요 등록 API",
+            description = "회원이 다른 회원에게 좋아요를 등록하는 API입니다.",
+            security = {@SecurityRequirement(name = "JWT TOKEN")}
+    )
+    public ApiResponse<Void> addMemberLike(Authentication authentication,
+                                           @PathVariable("memberId") long memberId) {
+        //귀찮았을 뿐 사실 여기에서 존재하는 memberId인지 확인까지 하는 게 맞음, 다만 현재 코드도 Service단에서 확인을 진행해서 동작은 정상적
+        //근데 왜 이메일 확인은 자연스럽게 아무데서도 안 하고 있는 거지?
+        String email = authentication.getName();
+        Member member = memberCommandService.getMember(email);
+        memberCommandService.addMemberLike(member, memberId);
+        return ApiResponse.of(SuccessStatus._NO_CONTENT, null);
+    }
+
+    @DeleteMapping("/{memberId}/like")
+    @ResponseStatus(HttpStatus.NO_CONTENT) //명시적으로 쓰기 싫었는데 안 쓰니 200 OK가 나가버리네...
+    @Operation(
+            summary = "회원 좋아요 등록 취소 API",
+            description = "회원이 다른 회원에게 진행한 좋아요 등록을 취소하는 API입니다.",
+            security = {@SecurityRequirement(name = "JWT TOKEN")}
+    )
+    public ApiResponse<Void> removeMemberLike(Authentication authentication,
+                                              @PathVariable("memberId") long memberId) {
+        //귀찮았을 뿐 사실 여기에서 존재하는 memberId인지 확인까지 하는 게 맞음
+        String email = authentication.getName();
+        // Member member = memberCommandService.getMember(email);
+        memberCommandService.removeMemberLike(email, memberId);
+        return ApiResponse.of(SuccessStatus._NO_CONTENT, null);
+    }
   
     @PostMapping("/skills")
     @Operation(
