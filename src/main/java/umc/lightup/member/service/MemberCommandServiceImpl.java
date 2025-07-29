@@ -49,7 +49,8 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     private final RegionRepository regionRepository;
     private final PortfolioRepository portfolioRepository;
     private final MemberLikeRepository memberLikeRepository;
-  
+    private final ActivityRepository activityRepository;
+
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -132,13 +133,17 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         List<String> skills = memberSkillRepository.findSkillNameByMember(member);
         List<String> strengths = memberStrengthRepository.findStrengthNameByMember(member);
         List<Region> regions = regionRepository.findByMember(member);
+        List<String> positions = memberPositionRepository.findPositionNameByMember(member);
         List<Portfolio> portfolios = portfolioRepository.findByMember(member);
+        List<Activity> activities = activityRepository.findByMember(member);
         return MemberViewInfo.builder()
                 .member(member)
-                .skills(skills)
-                .strengths(strengths)
+                .skillNames(skills)
+                .strengthNames(strengths)
                 .regions(regions)
+                .positionNames(positions)
                 .portfolios(portfolios)
+                .activities(activities)
                 .emailOpen(false)
                 .phoneOpen(false)
                 .pictureOpen(false)
@@ -161,7 +166,53 @@ public class MemberCommandServiceImpl implements MemberCommandService {
             throw new GeneralHandler(ErrorStatus.DUPLICATE_NICKNAME);
         return memberRepository.save(request.toMember(member.getId()));
     }
-  
+
+    @Override
+    public MemberResponseDTO.MyProfileDTO getMemberProfile(Member member) {
+        return MemberViewInfo.builder()
+                .member(member)
+                .skills(memberSkillRepository.findSkillByMember(member))
+                .strengths(memberStrengthRepository.findStrengthByMember(member))
+                .regions(regionRepository.findByMember(member))
+                .positionNames(memberPositionRepository.findPositionNameByMember(member))
+                .portfolios(portfolioRepository.findByMember(member))
+                .activities(activityRepository.findByMember(member))
+                .emailOpen(true)
+                .phoneOpen(true)
+                .pictureOpen(true)
+                .build().toMyProfileDTO();
+    }
+
+    @Override
+    @Transactional
+    public MemberResponseDTO.MyProfileDTO putMemberProfile(Member member, MemberRequestDTO.ProfileChangeDto request) {
+        member.setSelfIntroduce(request.getSelfIntroduction());
+        member.setProfileTitle(request.getProfileTitle());
+        activityRepository.removeAllByMember(member);
+        memberRepository.save(member);
+        List<Activity> activities = activityRepository.saveAll(request.getActivities().stream()
+                .map(a -> Activity.builder()
+                        .member(member)
+                        .name(a.getName())
+                        .startDate(a.getStartDate())
+                        .endDate(a.getEndDate())
+                        .build())
+                .toList());
+
+        return MemberViewInfo.builder()
+                .member(member)
+                .skills(memberSkillRepository.findSkillByMember(member))
+                .strengths(memberStrengthRepository.findStrengthByMember(member))
+                .regions(regionRepository.findByMember(member))
+                .positionNames(memberPositionRepository.findPositionNameByMember(member))
+                .portfolios(portfolioRepository.findByMember(member))
+                .activities(activities)
+                .emailOpen(true)
+                .phoneOpen(true)
+                .pictureOpen(true)
+                .build().toMyProfileDTO();
+    }
+
     @Override
     @Transactional
     public String selectSkill(Long skillId, Member member) {

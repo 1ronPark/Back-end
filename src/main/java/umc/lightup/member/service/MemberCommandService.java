@@ -10,6 +10,8 @@ public interface MemberCommandService {
     Member getMember(String email);
     MemberResponseDTO.MemberInfoDTO getMember(long id, String viewerEmail);
     Member putMember(String email, MemberRequestDTO.ChangeDto request);
+    MemberResponseDTO.MyProfileDTO getMemberProfile(Member member);
+    MemberResponseDTO.MyProfileDTO putMemberProfile(Member member, MemberRequestDTO.ProfileChangeDto request);
     String selectSkill(Long skillId,Member member);
     String selectStrength(Long strengthId,Member member);
     void addMemberLike(Member fromMember, long toMemberId);

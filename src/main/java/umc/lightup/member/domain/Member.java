@@ -55,8 +55,13 @@ public class Member extends BaseEntity implements UserDetails {
     @Column(unique = true, length = 20)
     private String phoneNumber;
 
+    @Setter
     @Column(length = 80)
-    private String career;
+    private String profileTitle;
+
+    @Setter
+    @Column(columnDefinition = "TEXT")
+    private String selfIntroduce;
 
     private String profileImageUrl; // 추가, S3 필요
 

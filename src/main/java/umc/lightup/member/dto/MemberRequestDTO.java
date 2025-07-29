@@ -14,6 +14,7 @@ import umc.lightup.member.validation.annotation.ValidRole;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 public class MemberRequestDTO {
 
@@ -95,6 +96,32 @@ public class MemberRequestDTO {
                     .age((int) this.birth.until(LocalDate.now(), ChronoUnit.YEARS))
                     .build();
         }
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class ProfileChangeDto {
+//        @NotNull
+//        @Size(max = 4) //length는 0일 수 있으나 null일 수는 없음
+//        private List<Long> skillIds;
+//        @NotNull
+//        @Size(max = 4)
+//        private List<Long> strengthIds;
+//        @NotNull
+//        @Size(max = 4)
+//        private List<Long> regionIds;
+//        @NotNull
+//        @Size(max = 4)
+//        private List<PortfolioInfoDTO> portfolios;
+        @NotEmpty
+        @Size(max = 80)
+        private String profileTitle;
+        @Size(max = 3000) //Nullable
+        private String selfIntroduction;
+        private List<ActivityInfoDTO> activities;
     }
 
     @Getter

@@ -18,6 +18,8 @@ import umc.lightup.member.dto.MemberResponseDTO;
 import umc.lightup.member.service.CredentialQueryService;
 import umc.lightup.member.service.MemberCommandService;
 
+import java.util.List;
+
 import static umc.lightup.member.dto.MemberResponseDTO.memberPositionDeleteResultDTOBuilder;
 import static umc.lightup.member.dto.MemberResponseDTO.memberPositionResultDTOBuilder;
 
@@ -66,7 +68,7 @@ public class MemberRestController {
             security = { @SecurityRequirement(name = "JWT TOKEN")}
     )
     public ApiResponse<MemberResponseDTO.MemberInfoDTO> getMemberInfo(Authentication authentication,
-                                                                  @PathVariable("memberId") long id) {
+                                                                      @PathVariable("memberId") long id) {
         String email = null;
         if (authentication != null)
             email = authentication.getName();
@@ -115,6 +117,34 @@ public class MemberRestController {
         //로그아웃이 필수인 이유가 jwt에 이메일을 저장하기 때문인데, 이 때문에 A와 B가 서로의 비밀번호를 몰라도 서로 이메일을 바꾸면 A는 B 계정에, B는 A 계정에 접속할 수 있음.
         String email = authentication.getName();
         return ApiResponse.onSuccess(MemberResponseDTO.toMyInfoDTO(memberCommandService.putMember(email, request)));
+    }
+
+    @GetMapping("/me/profile")
+    @Operation(
+            summary = "회원 프로필 조회 API",
+            description = "자신의 회원 프로필을 조회하는 API입니다.",
+            security = { @SecurityRequirement(name = "JWT TOKEN")}
+    )
+    public ApiResponse<MemberResponseDTO.MyProfileDTO> getMemberProfile(
+            Authentication authentication) {
+        String email = authentication.getName();
+        Member member = memberCommandService.getMember(email);
+        return ApiResponse.onSuccess(memberCommandService.getMemberProfile(member));
+    }
+
+    @PutMapping("/me/profile")
+    @Operation(
+            summary = "회원 프로필 변경 API",
+            description = "회원 프로필을 변경하는 API입니다.",
+            security = { @SecurityRequirement(name = "JWT TOKEN")}
+    )
+    public ApiResponse<MemberResponseDTO.MyProfileDTO> changeMemberProfile(
+            Authentication authentication,
+            @RequestBody @Valid MemberRequestDTO.ProfileChangeDto request) {
+        String email = authentication.getName();
+        Member member = memberCommandService.getMember(email);
+        if (request.getActivities() == null) request.setActivities(List.of()); //nullable하니 오류 방지를 위함
+        return ApiResponse.onSuccess(memberCommandService.putMemberProfile(member, request));
     }
 
     @PostMapping("/password/change")
