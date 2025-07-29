@@ -3,6 +3,10 @@ package umc.lightup.members;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,8 +15,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import umc.lightup.api.ApiResponse;
 import umc.lightup.api.code.status.ErrorStatus;
+import umc.lightup.config.EmailService;
 import umc.lightup.member.controller.MemberRestController;
 import umc.lightup.member.domain.*;
+import umc.lightup.member.dto.EmailRequestDTO;
 import umc.lightup.member.dto.MemberRequestDTO;
 import umc.lightup.member.dto.MemberResponseDTO;
 import umc.lightup.member.enums.Mbti;
@@ -33,6 +39,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -40,6 +48,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ExtendWith(MockitoExtension.class)
+@SuppressWarnings("All") //Optional.get 경고 보기 싫어... 이렇게 쓰니 MockBean 경고도 지워지네?
 public class MemberTest {
     @Autowired
     private MockMvc mockMvc;
@@ -66,6 +76,14 @@ public class MemberTest {
     MemberRestController memberRestController;
     @Autowired
     private ObjectMapper jacksonObjectMapper;
+
+    //경고뜨는데 GPT가 그냥 쓰라네요...
+    //import에서의 경고도 지우기 위해 import 안 쓰느라 형태가 이상해졌습니다
+    @org.springframework.boot.test.mock.mockito.MockBean
+    private EmailService emailService;
+
+    @Captor
+    private ArgumentCaptor<EmailRequestDTO.PasswordInitializeDTO> dtoCaptor;
 
     @BeforeAll
     void setup() {
@@ -135,22 +153,22 @@ public class MemberTest {
         //Region에 Builder 넣기 싫은데...
 
         Region region1 = Region.builder()
-                .sido("시도1")
-                .sigungu("시군구1")
+                .siDo("시도1")
+                .siGunGu("시군구1")
                 .build();
         regionRepository.save(region1);
         assertSame(1L, region1.getId());
 
         Region region2 = Region.builder()
-                .sido("시도2")
-                .sigungu("시군구2")
+                .siDo("시도2")
+                .siGunGu("시군구2")
                 .build();
         regionRepository.save(region2);
         assertSame(2L, region2.getId());
 
         Region region3 = Region.builder()
-                .sido("시도3")
-                .sigungu("시군구3")
+                .siDo("시도3")
+                .siGunGu("시군구3")
                 .build();
         regionRepository.save(region3);
         assertSame(3L, region3.getId());
@@ -452,7 +470,7 @@ public class MemberTest {
         assertIterableEquals(
                 regionSet.stream().map(regionId -> {
                     Region region = regionRepository.findById(regionId).get();
-                    return region.getSido() + " " + region.getSigungu();
+                    return region.getSiDo() + " " + region.getSiGunGu();
                 }).toList(),
                 result.getRegions(),
                 "region information"); //순서도 같도록 의도한 것
@@ -545,7 +563,7 @@ public class MemberTest {
         assertIterableEquals(
                 regionSet.stream().map(regionId -> {
                     Region region = regionRepository.findById(regionId).get();
-                    return region.getSido() + " " + region.getSigungu();
+                    return region.getSiDo() + " " + region.getSiGunGu();
                 }).toList(),
                 result.getRegions(),
                 "region information"); //순서도 같도록 의도한 것
@@ -1047,6 +1065,87 @@ public class MemberTest {
     }
 
     @Test
+    @DisplayName("비밀번호 초기화 및 원상복귀 테스트")
+    void passwordInitializeTest() throws Exception {
+        //Given은 BeforeAll 이용
+        //When
+        mockMvc.perform(post("/api/v1/members/password/initialize")
+                        .param("email", "someone2@example.com")
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+                .andExpect(status().isNoContent());
+
+
+        //Then
+        verify(emailService).sendEmailTemplate(
+                eq("someone2@example.com"),
+                eq("[Lightup] 비밀번호 재설정 안내"),
+                eq("password-reset"),
+                dtoCaptor.capture()
+        );
+
+        EmailRequestDTO.PasswordInitializeDTO sentDto = dtoCaptor.getValue();
+        assertEquals("기본값2", sentDto.getUserName());
+        String tempPassword = sentDto.getTempPassword();
+
+        mockMvc.perform(post("/api/v1/members/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jacksonObjectMapper.writeValueAsString(MemberRequestDTO.PasswordLoginRequestDTO.builder()
+                                .email("someone2@example.com")
+                                .password("password")
+                                .build())))
+                .andExpect(status().is4xxClientError());
+
+        String loginResult = mockMvc.perform(post("/api/v1/members/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jacksonObjectMapper.writeValueAsString(MemberRequestDTO.PasswordLoginRequestDTO.builder()
+                                .email("someone2@example.com")
+                                .password(tempPassword)
+                                .build())))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        ApiResponse<MemberResponseDTO.LoginResultDTO> loginResponse = jacksonObjectMapper.readValue(loginResult,
+                new TypeReference<ApiResponse<MemberResponseDTO.LoginResultDTO>>(){});
+
+        assertEquals(2L, loginResponse.getResult().getMemberId());
+        //Token 다시 받아오기
+        String accessToken = loginResponse.getResult().getAccessToken();
+
+        //다시 돌려놓아야 다른 테스트에서 문제가 발생하지 않음
+
+        //When
+        MemberRequestDTO.PasswordChangeRequestDTO change2 =
+                MemberRequestDTO.PasswordChangeRequestDTO.builder()
+                        .prevPassword(tempPassword)
+                        .newPassword("password")
+                        .build();
+
+        String content = mockMvc.perform(post("/api/v1/members/password/change")
+                        .header("Authorization", "Bearer " + accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jacksonObjectMapper.writeValueAsString(change2)))
+                .andExpect(status().isNoContent())
+                .andReturn().getResponse().getContentAsString();
+
+        //Then
+        System.out.println("content = " + content);
+        mockMvc.perform(post("/api/v1/members/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jacksonObjectMapper.writeValueAsString(MemberRequestDTO.PasswordLoginRequestDTO.builder()
+                                .email("someone2@example.com")
+                                .password(tempPassword)
+                                .build())))
+                .andExpect(status().is4xxClientError());
+
+        mockMvc.perform(post("/api/v1/members/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jacksonObjectMapper.writeValueAsString(MemberRequestDTO.PasswordLoginRequestDTO.builder()
+                                .email("someone2@example.com")
+                                .password("password")
+                                .build())))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     @DisplayName("비밀번호 변경 실패 테스트(비밀번호 불일치)")
     void passwordChangeFailTest() throws Exception {
         //귀찮아서 이렇게 했지만 원래는 member 새로 만드는 것부터 하는 게 좋긴 함
@@ -1089,6 +1188,25 @@ public class MemberTest {
         assertAll("Password change with wrong old password",
                 () -> assertEquals(ErrorStatus.INVALID_PASSWORD.getCode(), change1Response.getCode()),
                 () -> assertEquals(ErrorStatus.INVALID_PASSWORD.getMessage(), change1Response.getMessage())
+        );
+    }
+
+    @Test
+    @DisplayName("비밀번호 초기화 실패 테스트(이메일 없음)")
+    void passwordInitializeFailTest() throws Exception {
+        String content1 = mockMvc.perform(post("/api/v1/members/password/initialize")
+                        .param("email", "noone@example.com")
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
+        ApiResponse<Void> change1Response =
+                jacksonObjectMapper.readValue(content1,
+                        new TypeReference<ApiResponse<Void>>(){});
+
+        //Then
+        assertAll("Password initialize with wrong email",
+                () -> assertEquals(ErrorStatus.MEMBER_NOT_FOUND.getCode(), change1Response.getCode()),
+                () -> assertEquals(ErrorStatus.MEMBER_NOT_FOUND.getMessage(), change1Response.getMessage())
         );
     }
 

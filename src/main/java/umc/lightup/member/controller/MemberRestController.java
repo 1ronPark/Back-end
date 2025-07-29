@@ -11,7 +11,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import umc.lightup.api.ApiResponse;
 import umc.lightup.api.code.status.SuccessStatus;
-import umc.lightup.member.domain.Credential;
 import umc.lightup.member.converter.MemberConverter;
 import umc.lightup.member.domain.Member;
 import umc.lightup.member.dto.MemberRequestDTO;
@@ -131,6 +130,17 @@ public class MemberRestController {
         credentialQueryService.updatePasswordByEmail(email, request);
         return ApiResponse.of(SuccessStatus._NO_CONTENT, null);
         //null 반환이 과연 옳은가? 물론 이 null 안 쓰려면 응답 통일 형식부터 갈아엎어야 하는 대공사가 필요하긴 함
+    }
+
+    @PostMapping("/password/initialize")
+    @ResponseStatus(HttpStatus.NO_CONTENT) //명시적으로 쓰기 싫었는데 안 쓰니 200 OK가 나가버리네...
+    @Operation(
+            summary = "비밀번호 초기화 API",
+            description = "비밀번호를 변경하는 API입니다. 사용자가 비밀번호를 잊었을 때 사용합니다."
+    )
+    public ApiResponse<Void> passwordInitialize(@RequestParam @NotBlank @Email String email) {
+        credentialQueryService.initializePasswordByEmail(email);
+        return ApiResponse.of(SuccessStatus._NO_CONTENT, null);
     }
 
     @PostMapping("/email/exist")
