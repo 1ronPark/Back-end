@@ -3,14 +3,9 @@ package umc.lightup.strength.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import umc.lightup.api.code.status.ErrorStatus;
-import umc.lightup.exception.handler.GeneralHandler;
-import umc.lightup.member.domain.Member;
-import umc.lightup.member.domain.MemberStrength;
 import umc.lightup.member.repository.MemberStrengthRepository;
-import umc.lightup.strength.converter.StrengthConverter;
 import umc.lightup.strength.domain.Strength;
-import umc.lightup.strength.dto.StrengthRequestDTO;
+import umc.lightup.strength.enums.StrengthType;
 import umc.lightup.strength.repository.StrengthRepository;
 
 import java.util.List;
@@ -23,14 +18,27 @@ public class StrengthService {
     private final StrengthRepository strengthRepository;
     private final MemberStrengthRepository memberStrengthRepository;
 
-    public List<String> getStrengthsList() {
-        List<Strength> strengths = strengthRepository.findBasicStrengths();
+    public List<String> getStrengthsList(String positionName) {
+        StrengthType strengthType = mapPositionToStrengthType(positionName);
+        List<Strength> strengths = strengthRepository.findAllOrderedByStrengthType(strengthType);
         return strengths.stream()
                 .map(Strength::getName)
                 .toList();
     }
 
-    @Transactional
+    private StrengthType mapPositionToStrengthType(String positionName) {
+        return switch (positionName) {
+            case "프론트엔드" -> StrengthType.FRONTEND;
+            case "백엔드" -> StrengthType.BACKEND;
+            case "디자인" -> StrengthType.DESIGN;
+            case "기획" -> StrengthType.PLAN;
+            case "마케팅" -> StrengthType.MARKETING;
+            default -> StrengthType.COMMON;
+        };
+    }
+
+    //커스텀 강점 생성 기능 삭제
+/*    @Transactional
     public String createStrength(StrengthRequestDTO.CreateStrengthDTO request, Member member) {
         Strength newStrength = StrengthConverter.toStrength(request, member);
 
@@ -44,5 +52,5 @@ public class StrengthService {
         MemberStrength memberStrength = MemberStrength.createMemberStrength(member, newStrength);
         memberStrengthRepository.save(memberStrength);
         return newStrength.getName();
-    }
+    }*/
 }

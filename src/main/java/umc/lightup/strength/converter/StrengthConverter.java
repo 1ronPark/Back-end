@@ -1,8 +1,5 @@
 package umc.lightup.strength.converter;
 
-import umc.lightup.member.domain.Member;
-import umc.lightup.strength.domain.Strength;
-import umc.lightup.strength.dto.StrengthRequestDTO;
 import umc.lightup.strength.dto.StrengthResponseDTO;
 
 import java.util.List;
@@ -15,7 +12,8 @@ public class StrengthConverter {
                 .build();
     }
 
-    public static StrengthResponseDTO.createdStrengthResultDTO toCreatedStrengthResultDTO(String strengthName, Member member) {
+    //커스텀 강점 생성 기능 삭제
+/*    public static StrengthResponseDTO.createdStrengthResultDTO toCreatedStrengthResultDTO(String strengthName, Member member) {
         return StrengthResponseDTO.createdStrengthResultDTO.builder()
                 .createdStrength(strengthName)
                 .memberId(member.getId())
@@ -26,5 +24,5 @@ public class StrengthConverter {
         String strengthName = request.getStrengthName();
 
         return Strength.createStrength(strengthName, true, member);
-    }
+    }*/
 }

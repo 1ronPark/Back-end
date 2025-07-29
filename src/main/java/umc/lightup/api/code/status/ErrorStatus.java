@@ -45,6 +45,12 @@ public enum ErrorStatus implements BaseErrorCode {
     //ItemImage 관련 에러
     ITEM_IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEM_IMAGE4000", "아이템 이미지가 존재하지 않습니다."),
 
+    //MemberSkill 관련 에러
+    MEMBER_SKILL_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER_SKILL4000", "유저의 스킬이 존재하지 않습니다."),
+
+    //MemberStrength 관련 에러
+    MEMBER_STRENGTH_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER_STRENGTH4000", "유저의 강점이 존재하지 않습니다."),
+
     //Email 관련 에러
     EMAIL_SEND_FAIL(HttpStatus.SERVICE_UNAVAILABLE, "EMAIL5003", "이메일 전송에 실패했습니다.")
     ;

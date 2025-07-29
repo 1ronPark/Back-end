@@ -6,10 +6,11 @@ import lombok.Setter;
 
 public class SkillRequestDTO {
 
-    @Getter
+    //커스텀 스킬 기능 삭제
+/*    @Getter
     @Setter
     public static class CreateSkillDTO {
         @NotBlank
         String skillName;
-    }
+    }*/
 }

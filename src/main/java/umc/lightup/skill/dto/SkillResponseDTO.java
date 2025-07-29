@@ -17,13 +17,14 @@ public class SkillResponseDTO {
         List<String> skills;
     }
 
-    @Builder
+    //커스텀 스킬 기능 삭제
+/*    @Builder
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class createdSkillResultDTO {
         String createdSkill;
         Long memberId;
-    }
+    }*/
 
 }
