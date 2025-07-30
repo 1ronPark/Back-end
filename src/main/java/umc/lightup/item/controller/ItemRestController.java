@@ -9,11 +9,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import umc.lightup.api.ApiResponse;
+import umc.lightup.api.code.status.SuccessStatus;
 import umc.lightup.item.converter.ItemConverter;
 import umc.lightup.item.domain.Item;
 import umc.lightup.item.dto.ItemRequestDTO;
@@ -72,5 +74,24 @@ public class ItemRestController {
         List<ItemResponseDTO.ItemRegionResultDTO> itemRegions = itemCommandService.getItemRegions(findItem);
         List<ItemResponseDTO.RecruitPositionResultDTO> itemRecruitPositions = itemCommandService.getItemRecruitPositions(findItem);
         return ApiResponse.onSuccess(ItemConverter.toItemInfoDTO(findItem, itemRegions, itemRecruitPositions));
+    }
+
+    @PostMapping("/{itemId}/like")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "프로젝트 좋아요 등록 API", description = "유저가 특정 프로젝트에 좋아요를 등록하는 API 입니다.")
+    public ApiResponse<Void> addItemLike(Authentication authentication, @PathVariable("itemId") long itemId) {
+        String email = authentication.getName();
+        Member member = memberCommandService.getMember(email);
+        itemCommandService.addItemLike(member, itemId);
+        return ApiResponse.of(SuccessStatus._NO_CONTENT, null);
+    }
+
+    @DeleteMapping("/{itemId}/like")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "프로젝트 좋아요 취소 API", description = "유저가 특정 프로젝트의 좋아요를 취소하는 API 입니다.")
+    public ApiResponse<Void> removeItemLike(Authentication authentication, @PathVariable("itemId") long itemId) {
+        String email = authentication.getName();
+        itemCommandService.removeItemLike(email, itemId);
+        return ApiResponse.of(SuccessStatus._NO_CONTENT, null);
     }
 }

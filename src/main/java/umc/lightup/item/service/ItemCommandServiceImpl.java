@@ -13,10 +13,12 @@ import umc.lightup.common.repository.UuidRepository;
 import umc.lightup.exception.handler.GeneralHandler;
 import umc.lightup.item.converter.ItemConverter;
 import umc.lightup.item.domain.Item;
+import umc.lightup.item.domain.ItemLike;
 import umc.lightup.item.domain.ItemRegion;
 import umc.lightup.item.domain.RecruitPosition;
 import umc.lightup.item.dto.ItemRequestDTO;
 import umc.lightup.item.dto.ItemResponseDTO;
+import umc.lightup.item.repository.ItemLikeRepository;
 import umc.lightup.item.repository.ItemRepository;
 import umc.lightup.item.repository.RecruitPositionRepository;
 import umc.lightup.member.domain.Member;
@@ -36,6 +38,7 @@ public class ItemCommandServiceImpl implements ItemCommandService {
     private final MemberRegionRepository memberRegionRepository;
     private final RecruitPositionRepository recruitPositionRepository;
     private final PositionRepository positionRepository;
+    private final ItemLikeRepository itemLikeRepository;
 
     private final AmazonS3Manager s3Manager;
     private final UuidRepository uuidRepository;
@@ -138,5 +141,33 @@ public class ItemCommandServiceImpl implements ItemCommandService {
         return recruitPositionRepository.findByItem(item).stream()
                 .map(ItemConverter::toRecruitPositionResultDTO)
                 .toList();
+    }
+
+    @Override
+    @Transactional
+    public void addItemLike(Member member, long itemId) {
+        Item findItem = itemRepository.findById(itemId)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.ITEM_NOT_FOUND));
+
+        if (findItem.getMember().equals(member)) {
+            throw new GeneralHandler(ErrorStatus.MY_ITEM_LIKE);
+        }
+
+        if (itemLikeRepository.existsByMemberIdAndItemId(member.getId(), itemId)) {
+            throw new GeneralHandler(ErrorStatus.ITEM_ALREADY_LIKED);
+        }
+
+        itemLikeRepository.save(ItemLike.builder()
+                .member(member)
+                .item(findItem)
+                .build());
+    }
+
+    @Override
+    @Transactional
+    public void removeItemLike(String email, long itemId) {
+        if (itemLikeRepository.removeByMemberEmailAndItemId(email, itemId) == 0) {
+            throw new GeneralHandler(ErrorStatus.ITEM_LIKE_NOT_FOUND);
+        }
     }
 }
