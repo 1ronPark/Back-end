@@ -26,19 +26,16 @@ public class Member extends BaseEntity implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 20)
+    @Column(nullable = false, length = 20)
     private String name;
 
     @Column(unique = true, length = 20)
     private String nickname; // 추가
 
-    @Column(nullable = false)
     private Boolean gender; // 수정
 
-    @Column(nullable = false)
     private Integer age;
 
-    @Column(nullable = false)
     private LocalDate birth;
 
     @Enumerated(EnumType.STRING)
@@ -55,7 +52,7 @@ public class Member extends BaseEntity implements UserDetails {
     @Column(length = 30)
     private String school;
 
-    @Column(unique = true, nullable = false, length = 20)
+    @Column(unique = true, length = 20)
     private String phoneNumber;
 
     @Column(length = 80)
