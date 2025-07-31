@@ -1,0 +1,13 @@
+package umc.lightup.member.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import umc.lightup.member.domain.MemberLike;
+
+@Repository
+public interface MemberLikeRepository extends JpaRepository<MemberLike, Long> {
+    boolean existsByFromMemberIdAndToMemberId(long fromMemberId, long toMemberId); //아니 이게 되는 줄 몰랐었네...
+    int removeByFromMemberIdAndToMemberId(long fromMemberId, long toMemberId); //아니 이게 되는 줄 몰랐었네...
+    boolean existsByFromMemberEmailAndToMemberId(String fromMemberEmail, long toMemberId); //아니 이게 되는 줄 몰랐었네...
+    int removeByFromMemberEmailAndToMemberId(String fromMemberEmail, long toMemberId); //아니 이게 되는 줄 몰랐었네...
+}

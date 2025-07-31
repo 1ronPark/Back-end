@@ -71,6 +71,8 @@ public class MemberTest {
     @Autowired
     StrengthRepository strengthRepository;
     @Autowired
+    MemberLikeRepository memberLikeRepository;
+    @Autowired
     MemberCommandService memberCommandService;
     @Autowired
     MemberRestController memberRestController;
@@ -399,6 +401,94 @@ public class MemberTest {
                 () -> assertNull(result.getPhoneNumber()),
                 () -> assertNull(result.getProfileImageUrl())
         );
+
+        //When
+        mockMvc.perform(post("/api/v1/members/2/like")
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isNoContent());
+
+        //Then
+        assertAll("member like register with single member with just adding",
+                () -> assertTrue(memberLikeRepository.existsByFromMemberIdAndToMemberId(3L, 2L)),
+                () -> assertFalse(memberLikeRepository.existsByFromMemberIdAndToMemberId(3L, 1L)));
+
+        //중복 좋아요 에러 테스트
+        //When
+        String errorContent1 = mockMvc.perform(post("/api/v1/members/2/like")
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
+        ApiResponse<Void> error1Response =
+                jacksonObjectMapper.readValue(errorContent1,
+                        new TypeReference<ApiResponse<Void>>(){});
+
+        //Then
+        assertAll("Duplicated Member like register",
+                () -> assertEquals(ErrorStatus.ALREADY_LIKED.getCode(), error1Response.getCode()),
+                () -> assertEquals(ErrorStatus.ALREADY_LIKED.getMessage(), error1Response.getMessage())
+        );
+
+        //중복 좋아요 에러 테스트
+        //When
+        String errorContent2 = mockMvc.perform(delete("/api/v1/members/1/like")
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
+        ApiResponse<Void> error2Response =
+                jacksonObjectMapper.readValue(errorContent2,
+                        new TypeReference<ApiResponse<Void>>(){});
+
+        //Then
+        assertAll("Duplicated Member like register",
+                () -> assertEquals(ErrorStatus.LIKE_NOT_FOUND.getCode(), error2Response.getCode()),
+                () -> assertEquals(ErrorStatus.LIKE_NOT_FOUND.getMessage(), error2Response.getMessage())
+        );
+
+        //When
+        mockMvc.perform(delete("/api/v1/members/2/like")
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isNoContent());
+        mockMvc.perform(post("/api/v1/members/1/like")
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isNoContent());
+
+        //Then
+        assertAll("member like register with single member after change",
+                () -> assertFalse(memberLikeRepository.existsByFromMemberIdAndToMemberId(3L, 2L)),
+                () -> assertTrue(memberLikeRepository.existsByFromMemberIdAndToMemberId(3L, 1L)));
+
+        //확실한 비교를 위해 다른 Member로도 로그인 해서 확인
+        String loginResult2 = mockMvc.perform(post("/api/v1/members/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jacksonObjectMapper.writeValueAsString(MemberRequestDTO.PasswordLoginRequestDTO.builder()
+                                .email("someone2@example.com")
+                                .password("password")
+                                .build())))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        ApiResponse<MemberResponseDTO.LoginResultDTO> loginResponse2 =
+                jacksonObjectMapper.readValue(loginResult2,
+                        new TypeReference<ApiResponse<MemberResponseDTO.LoginResultDTO>>(){});
+        assertEquals(2L, loginResponse2.getResult().getMemberId());
+        String accessToken2 = loginResponse2.getResult().getAccessToken();
+
+        //When
+        mockMvc.perform(post("/api/v1/members/3/like")
+                        .header("Authorization", "Bearer " + accessToken2))
+                .andExpect(status().isNoContent());
+        mockMvc.perform(post("/api/v1/members/1/like")
+                        .header("Authorization", "Bearer " + accessToken2))
+                .andExpect(status().isNoContent());
+        //Then
+        assertAll("member like register with multiple members",
+                () -> assertFalse(memberLikeRepository.existsByFromMemberIdAndToMemberId(3L, 2L)),
+                () -> assertTrue(memberLikeRepository.existsByFromMemberIdAndToMemberId(3L, 1L)),
+                () -> assertTrue(memberLikeRepository.existsByFromMemberIdAndToMemberId(2L, 3L)),
+                () -> assertTrue(memberLikeRepository.existsByFromMemberIdAndToMemberId(2L, 1L)),
+                () -> assertFalse(memberLikeRepository.existsByFromMemberIdAndToMemberId(1L, 2L)),
+                () -> assertFalse(memberLikeRepository.existsByFromMemberIdAndToMemberId(1L, 3L))
+        );
+
     }
 
     @Test
@@ -1264,5 +1354,115 @@ public class MemberTest {
         mockMvc.perform(post("/api/v1/members/email/exist")
                         .param("email", "jdnosfajdn"))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("자기 자신 좋아요 에러 테스트")
+    void memberSelfLikeErrorTest() throws Exception {
+        //Given
+        String loginResult = mockMvc.perform(post("/api/v1/members/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jacksonObjectMapper.writeValueAsString(MemberRequestDTO.PasswordLoginRequestDTO.builder()
+                                .email("someone@example.com")
+                                .password("password")
+                                .build())))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        ApiResponse<MemberResponseDTO.LoginResultDTO> loginResponse =
+                jacksonObjectMapper.readValue(loginResult,
+                        new TypeReference<ApiResponse<MemberResponseDTO.LoginResultDTO>>(){});
+
+        assertEquals(1L, loginResponse.getResult().getMemberId());
+        String accessToken = loginResponse.getResult().getAccessToken();
+
+
+        //When
+        String content = mockMvc.perform(post("/api/v1/members/1/like")
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
+        ApiResponse<Void> response1 =
+                jacksonObjectMapper.readValue(content,
+                        new TypeReference<ApiResponse<Void>>(){});
+
+        //Then
+        assertAll("Member Self Like result",
+                () -> assertEquals(ErrorStatus.SELF_LIKE.getCode(), response1.getCode()),
+                () -> assertEquals(ErrorStatus.SELF_LIKE.getMessage(), response1.getMessage())
+        );
+
+
+        //When
+        content = mockMvc.perform(delete("/api/v1/members/1/like")
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
+        ApiResponse<Void> response2 =
+                jacksonObjectMapper.readValue(content,
+                        new TypeReference<ApiResponse<Void>>(){});
+
+        //Then
+        assertAll("Member Self Like remove result",
+                () -> assertEquals(ErrorStatus.LIKE_NOT_FOUND.getCode(), response2.getCode()),
+                () -> assertEquals(ErrorStatus.LIKE_NOT_FOUND.getMessage(), response2.getMessage())
+        );
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 멤버의 좋아요 에러 테스트")
+    void memberLikeToNonExistErrorTest() throws Exception {
+        //Given
+        String loginResult = mockMvc.perform(post("/api/v1/members/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jacksonObjectMapper.writeValueAsString(MemberRequestDTO.PasswordLoginRequestDTO.builder()
+                                .email("someone2@example.com")
+                                .password("password")
+                                .build())))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        ApiResponse<MemberResponseDTO.LoginResultDTO> loginResponse =
+                jacksonObjectMapper.readValue(loginResult,
+                        new TypeReference<ApiResponse<MemberResponseDTO.LoginResultDTO>>(){});
+
+        assertEquals(2L, loginResponse.getResult().getMemberId());
+        String accessToken = loginResponse.getResult().getAccessToken();
+
+        //When
+        String content = mockMvc.perform(post("/api/v1/members/" + Long.MAX_VALUE + "/like")
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
+        ApiResponse<Void> response1 =
+                jacksonObjectMapper.readValue(content,
+                        new TypeReference<ApiResponse<Void>>(){});
+
+        //Then
+        assertAll("Member Like to not existing member result",
+                () -> assertEquals(ErrorStatus.MEMBER_NOT_FOUND.getCode(), response1.getCode()),
+                () -> assertEquals(ErrorStatus.MEMBER_NOT_FOUND.getMessage(), response1.getMessage())
+        );
+
+        //When
+        content = mockMvc.perform(delete("/api/v1/members/" + Long.MAX_VALUE + "/like")
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
+        ApiResponse<Void> response2 =
+                jacksonObjectMapper.readValue(content,
+                        new TypeReference<ApiResponse<Void>>(){});
+
+        //Then
+        assertAll("Member Like removeto not existing member result",
+                () -> assertEquals(ErrorStatus.LIKE_NOT_FOUND.getCode(), response2.getCode()),
+                () -> assertEquals(ErrorStatus.LIKE_NOT_FOUND.getMessage(), response2.getMessage())
+        );
+    }
+
+    @Test
+    @DisplayName("로그인 없이 좋아요 시 에러 테스트")
+    void memberLikeWithoutLoginErrorTest() throws Exception {
+        //When
+        mockMvc.perform(post("/api/v1/members/1/like"))
+                .andExpect(status().is4xxClientError());
     }
 }
