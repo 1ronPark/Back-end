@@ -18,6 +18,7 @@ import umc.lightup.api.ApiResponse;
 import umc.lightup.api.code.status.SuccessStatus;
 import umc.lightup.item.converter.ItemConverter;
 import umc.lightup.item.domain.Item;
+import umc.lightup.item.domain.ItemApply;
 import umc.lightup.item.dto.ItemRequestDTO;
 import umc.lightup.item.dto.ItemResponseDTO;
 import umc.lightup.item.service.ItemCommandService;
@@ -95,5 +96,14 @@ public class ItemRestController {
         String email = authentication.getName();
         itemCommandService.removeItemLike(email, itemId);
         return ApiResponse.of(SuccessStatus._NO_CONTENT, null);
+    }
+
+    @PostMapping("/{itemId}/apply")
+    @Operation(summary = "프로젝트 지원 API", description = "유저가 프로젝트에 지원 요청을 보내는 API 입니다.")
+    public ApiResponse<ItemResponseDTO.ItemApplyResultDTO> applyItem(Authentication authentication, @PathVariable("itemId") long itemId) {
+        Member member = memberCommandService.getMember(authentication.getName());
+        Item item = itemCommandService.getSingleItem(itemId);
+        ItemApply itemApply = itemCommandService.applyItem(member, item);
+        return ApiResponse.onSuccess(ItemConverter.toItemApplyResultDTO(itemApply));
     }
 }

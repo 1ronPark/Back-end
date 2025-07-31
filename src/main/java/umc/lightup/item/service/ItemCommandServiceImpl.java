@@ -15,10 +15,8 @@ import umc.lightup.item.converter.ItemConverter;
 import umc.lightup.item.domain.*;
 import umc.lightup.item.dto.ItemRequestDTO;
 import umc.lightup.item.dto.ItemResponseDTO;
-import umc.lightup.item.repository.ItemLikeRepository;
-import umc.lightup.item.repository.ItemRepository;
-import umc.lightup.item.repository.ItemViewHistoryRepository;
-import umc.lightup.item.repository.RecruitPositionRepository;
+import umc.lightup.item.enums.ItemApplyStatus;
+import umc.lightup.item.repository.*;
 import umc.lightup.member.domain.Member;
 import umc.lightup.member.repository.MemberRegionRepository;
 import umc.lightup.position.domain.Position;
@@ -40,6 +38,7 @@ public class ItemCommandServiceImpl implements ItemCommandService {
     private final PositionRepository positionRepository;
     private final ItemLikeRepository itemLikeRepository;
     private final ItemViewHistoryRepository itemViewHistoryRepository;
+    private final ItemApplyRepository itemApplyRepository;
 
     private final AmazonS3Manager s3Manager;
     private final UuidRepository uuidRepository;
@@ -187,5 +186,20 @@ public class ItemCommandServiceImpl implements ItemCommandService {
                     .viewedAt(LocalDateTime.now())
                     .build());
         }
+    }
+
+    @Override
+    @Transactional
+    public ItemApply applyItem(Member member, Item item) {
+        if (itemApplyRepository.existsByMemberAndItem(member, item)) {
+            throw new GeneralHandler(ErrorStatus.DUPLICATE_ITEM_APPLY);
+        }
+
+        return itemApplyRepository.save(ItemApply.builder()
+                .member(member)
+                .item(item)
+                .status(ItemApplyStatus.PENDING)
+                .appliedAt(LocalDateTime.now())
+                .build());
     }
 }
