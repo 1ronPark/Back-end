@@ -149,10 +149,10 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     @Transactional
     public Member putMember(String email, MemberRequestDTO.ChangeDto request) {
         Member member = getMember(email);
-        if (!member.getEmail().equals(request.getEmail()) &&
+        if (!request.getEmail().equals(member.getEmail()) &&
                 isEmailExist(request.getEmail()))
             throw new GeneralHandler(ErrorStatus.DUPLICATE_EMAIL);
-        if (!member.getPhoneNumber().equals(request.getPhoneNumber()) &&
+        if (!request.getPhoneNumber().equals(member.getPhoneNumber()) &&
                 isPhoneNumberExist(request.getPhoneNumber()))
             throw new GeneralHandler(ErrorStatus.DUPLICATE_PHONE_NUMBER);
         if (member.getNickname() != null &&

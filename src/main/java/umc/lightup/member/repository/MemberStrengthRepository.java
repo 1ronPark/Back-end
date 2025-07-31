@@ -12,7 +12,7 @@ import java.util.List;
 
 @Repository
 public interface MemberStrengthRepository extends JpaRepository<MemberStrength, Long> {
-    @Query("select s.name from MemberStrength ms join ms.strength s where s.name = :member")
+    @Query("select s.name from MemberStrength ms join ms.strength s where ms.member = :member")
     List<String> findStrengthNameByMember(@Param("member") Member member);
     boolean existsByMemberAndStrength(Member member, Strength skill);
 }

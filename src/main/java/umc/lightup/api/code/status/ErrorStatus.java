@@ -21,6 +21,7 @@ public enum ErrorStatus implements BaseErrorCode {
     DUPLICATE_NICKNAME(HttpStatus.BAD_REQUEST, "MEMBER4003", "이미 존재하는 닉네임입니다."),
     DUPLICATE_EMAIL(HttpStatus.BAD_REQUEST, "MEMBER4004", "이미 존재하는 이메일입니다."),
     DUPLICATE_PHONE_NUMBER(HttpStatus.BAD_REQUEST, "MEMBER4005", "이미 존재하는 휴대폰 번호입니다."),
+    INVALID_ROLE(HttpStatus.BAD_REQUEST, "MEMBER4006", "올바른 Role이 아닙니다. LEADER, TEAMMATE 중 하나를 선택해 주세요."),
     NO_CREDENTIAL(HttpStatus.INTERNAL_SERVER_ERROR, "MEMBER5000", "저장된 패스워드가 없습니다."),
 
     //MemberLike 관련 에러

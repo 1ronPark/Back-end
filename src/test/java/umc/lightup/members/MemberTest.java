@@ -28,8 +28,10 @@ import umc.lightup.member.service.MemberCommandService;
 import umc.lightup.region.domain.Region;
 import umc.lightup.region.repository.RegionRepository;
 import umc.lightup.skill.domain.Skill;
+import umc.lightup.skill.enums.SkillType;
 import umc.lightup.skill.repository.SkillRepository;
 import umc.lightup.strength.domain.Strength;
+import umc.lightup.strength.enums.StrengthType;
 import umc.lightup.strength.repository.StrengthRepository;
 
 import java.time.LocalDate;
@@ -92,61 +94,81 @@ public class MemberTest {
         Member member1 = memberCommandService.joinMember(MemberRequestDTO.JoinDto.builder()
                 .name("기본값1")
                 .nickname("닉네임1")
-                .gender(true)
-                .birth(LocalDate.of(1980, Month.AUGUST, 1))
-                .role(Role.LEADER)
-                .mbti(Mbti.ENFJ)
                 .email("someone@example.com")
-                .phoneNumber("010-5555-6666")
                 .password("password")
                 .build());
         assertSame(1L, member1.getId());
 
+        member1 = memberCommandService.putMember("someone@example.com",
+                MemberRequestDTO.ChangeDto.builder()
+                        .name("기본값1")
+                        .nickname("닉네임1")
+                        .gender(true)
+                        .birth(LocalDate.of(1980, Month.AUGUST, 1))
+                        .role(Role.LEADER)
+                        .mbti(Mbti.ENFJ)
+                        .email("someone@example.com")
+                        .phoneNumber("010-5555-6666")
+                        .build());
+
         Member member2 = memberCommandService.joinMember(MemberRequestDTO.JoinDto.builder()
                 .name("기본값2")
                 .nickname("닉네임2")
-                .gender(false)
-                .birth(LocalDate.of(2000, Month.JANUARY, 1))
-                .role(Role.TEAMMATE)
-                .mbti(Mbti.ISTP)
                 .email("someone2@example.com")
-                .phoneNumber("010-2222-2222")
                 .password("password")
                 .build());
         assertSame(2L, member2.getId());
 
+        member2 = memberCommandService.putMember("someone2@example.com",
+                MemberRequestDTO.ChangeDto.builder()
+                        .name("기본값2")
+                        .nickname("닉네임2")
+                        .gender(false)
+                        .birth(LocalDate.of(2000, Month.JANUARY, 1))
+                        .role(Role.TEAMMATE)
+                        .mbti(Mbti.ISTP)
+                        .email("someone2@example.com")
+                        .phoneNumber("010-2222-2222")
+                        .build());
+
         Skill skill1 = Skill.builder()
                 .name("스킬1")
+                .skillType(SkillType.BACKEND)
                 .build();
         skillRepository.save(skill1);
         assertSame(1L, skill1.getId());
 
         Skill skill2 = Skill.builder()
                 .name("스킬2")
+                .skillType(SkillType.FRONTEND)
                 .build();
         skillRepository.save(skill2);
         assertSame(2L, skill2.getId());
 
         Skill skill3 = Skill.builder()
                 .name("스킬3")
+                .skillType(SkillType.DESIGN)
                 .build();
         skillRepository.save(skill3);
         assertSame(3L, skill3.getId());
 
         Strength strength1 = Strength.builder()
                 .name("강점1")
+                .strengthType(StrengthType.PLAN)
                 .build();
         strengthRepository.save(strength1);
         assertSame(1L, strength1.getId());
 
         Strength strength2 = Strength.builder()
                 .name("강점2")
+                .strengthType(StrengthType.MARKETING)
                 .build();
         strengthRepository.save(strength2);
         assertSame(2L, strength2.getId());
 
         Strength strength3 = Strength.builder()
                 .name("강점3")
+                .strengthType(StrengthType.COMMON)
                 .build();
         strengthRepository.save(strength3);
         assertSame(3L, strength3.getId());
@@ -198,12 +220,7 @@ public class MemberTest {
         MemberRequestDTO.JoinDto joinDto = MemberRequestDTO.JoinDto.builder()
                 .name("이름2")
                 .nickname("닉네임2")
-                .gender(true)
-                .birth(LocalDate.of(2006, Month.DECEMBER, 31))
-                .role(Role.LEADER)
-                .mbti(Mbti.INTJ)
                 .email("someone5@example.com")
-                .phoneNumber("02-000-5555")
                 .password("password")
                 .build();
 
@@ -227,7 +244,7 @@ public class MemberTest {
 
 
     /**
-     * 휴대전화 형식 외 회원가입 테스트에서 응답을 받기 위한 임시 클래스
+     * 휴대전화 형식 외 회원수정 테스트에서 응답을 받기 위한 임시 클래스
      */
     static class PhoneCheck {
         private String phoneNumber;
@@ -242,26 +259,43 @@ public class MemberTest {
     }
 
     @Test
-    @DisplayName("휴대전화 형식 외 회원가입 테스트")
-    void joinPhonePatternTest() throws Exception {
-
+    @DisplayName("휴대전화 형식 외 회원수정 테스트")
+    void putPhonePatternTest() throws Exception {
         //Given
-        MemberRequestDTO.JoinDto joinDto = MemberRequestDTO.JoinDto.builder()
+        //귀찮아서 이렇게 했지만 원래는 member 새로 만드는 것부터 하는 게 좋긴 함
+        String loginResult = mockMvc.perform(post("/api/v1/members/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jacksonObjectMapper.writeValueAsString(MemberRequestDTO.PasswordLoginRequestDTO.builder()
+                                .email("someone2@example.com")
+                                .password("password")
+                                .build())))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        ApiResponse<MemberResponseDTO.LoginResultDTO> loginResponse =
+                jacksonObjectMapper.readValue(loginResult,
+                        new TypeReference<ApiResponse<MemberResponseDTO.LoginResultDTO>>() {
+                        });
+
+        assertEquals(2L, loginResponse.getResult().getMemberId());
+
+        String accessToken = loginResponse.getResult().getAccessToken();
+
+        MemberRequestDTO.ChangeDto changeDto = MemberRequestDTO.ChangeDto.builder()
                 .name("이름2")
                 .nickname("닉네임4")
                 .gender(true)
                 .birth(LocalDate.of(2006, Month.DECEMBER, 31))
                 .role(Role.LEADER)
                 .mbti(Mbti.INTJ)
-                .email("someone5@example.com")
+                .email("someone2@example.com")
                 .phoneNumber("jewnhfdwnshed")
-                .password("password")
                 .build();
 
         //When
-        String content = mockMvc.perform(post("/api/v1/members/join")
+        String content = mockMvc.perform(put("/api/v1/members/me")
+                        .header("Authorization", "Bearer " + accessToken)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(jacksonObjectMapper.writeValueAsString(joinDto)))
+                        .content(jacksonObjectMapper.writeValueAsString(changeDto)))
 
                 //Then
                 .andExpect(status().isBadRequest())
@@ -275,8 +309,92 @@ public class MemberTest {
         assertNotNull(response.getResult().getPhoneNumber());
     }
 
+
     /**
-     * 4개 테스트 때려박았는데, 원래 이게 좋은 방식은 아닌 걸로 알고 있음
+     * 지정된 Role 이외 회원수정 테스트에서 응답을 받기 위한 임시 클래스
+     */
+    static class RoleCheck {
+        private String role;
+
+        public String getRole() {
+            return role;
+        }
+
+        public void setRole(String role) {
+            this.role = role;
+        }
+    }
+
+    @Test
+    @DisplayName("지정된 Role 이외 회원수정 테스트")
+    void putRoleValidationTest() throws Exception {
+        //Given
+        //귀찮아서 이렇게 했지만 원래는 member 새로 만드는 것부터 하는 게 좋긴 함
+        String loginResult = mockMvc.perform(post("/api/v1/members/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jacksonObjectMapper.writeValueAsString(MemberRequestDTO.PasswordLoginRequestDTO.builder()
+                                .email("someone2@example.com")
+                                .password("password")
+                                .build())))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        ApiResponse<MemberResponseDTO.LoginResultDTO> loginResponse =
+                jacksonObjectMapper.readValue(loginResult,
+                        new TypeReference<ApiResponse<MemberResponseDTO.LoginResultDTO>>() {
+                        });
+
+        assertEquals(2L, loginResponse.getResult().getMemberId());
+
+        String accessToken = loginResponse.getResult().getAccessToken();
+
+        MemberRequestDTO.ChangeDto changeDto = MemberRequestDTO.ChangeDto.builder()
+                .name("이름2")
+                .nickname("닉네임4")
+                .gender(true)
+                .birth(LocalDate.of(2006, Month.DECEMBER, 31))
+                .role(Role.ADMIN)
+                .mbti(Mbti.INTJ)
+                .email("someone2@example.com")
+                .phoneNumber("010-2222-2222")
+                .build();
+
+        //When
+        String content = mockMvc.perform(put("/api/v1/members/me")
+                        .header("Authorization", "Bearer " + accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jacksonObjectMapper.writeValueAsString(changeDto)))
+
+                //Then
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
+        System.out.println(content);
+
+        ApiResponse<RoleCheck> response =
+                jacksonObjectMapper.readValue(content,
+                        new TypeReference<ApiResponse<RoleCheck>>(){});
+        assertNotNull(response.getResult().getRole());
+
+        //Given
+        changeDto.setRole(Role.PROVISION);
+
+        //When
+        content = mockMvc.perform(put("/api/v1/members/me")
+                        .header("Authorization", "Bearer " + accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jacksonObjectMapper.writeValueAsString(changeDto)))
+
+                //Then
+                .andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
+        System.out.println(content);
+
+        response = jacksonObjectMapper.readValue(content,
+                        new TypeReference<ApiResponse<RoleCheck>>(){});
+        assertNotNull(response.getResult().getRole());
+    }
+
+    /**
+     * 6개 테스트 때려박았는데, 원래 이게 좋은 방식은 아닌 걸로 알고 있음
      */
     @Test
     @DisplayName("전체적인 API 테스트")
@@ -296,12 +414,7 @@ public class MemberTest {
         MemberRequestDTO.JoinDto joinDto = MemberRequestDTO.JoinDto.builder()
                 .name(name3)
                 .nickname(nickname3)
-                .gender(gender3)
-                .birth(birth3)
-                .role(role3)
-                .mbti(mbti3)
                 .email(email3)
-                .phoneNumber(phoneNumber3)
                 .password(password3)
                 .build();
 
@@ -357,20 +470,62 @@ public class MemberTest {
 
         //Then
         int age3 = (int) birth3.until(before, ChronoUnit.YEARS);
-        assertAll("MyInfo check",
+        assertAll("MyInfo check before first change",
                 () -> assertEquals(3L, myInfoResponse.getResult().getId()),
                 () -> assertEquals(name3, myInfoResponse.getResult().getName()),
                 () -> assertEquals(nickname3, myInfoResponse.getResult().getNickname()),
-                () -> assertEquals(gender3, myInfoResponse.getResult().isGender()),
-                () -> assertEquals(age3, myInfoResponse.getResult().getAge()),
-                () -> assertEquals(birth3, myInfoResponse.getResult().getBirth()),
-                () -> assertEquals(role3, myInfoResponse.getResult().getRole()),
-                () -> assertEquals(mbti3, myInfoResponse.getResult().getMbti()),
+                () -> assertEquals(null, myInfoResponse.getResult().getGender()),
+                () -> assertEquals(null, myInfoResponse.getResult().getAge()),
+                () -> assertEquals(null, myInfoResponse.getResult().getBirth()),
+                () -> assertEquals(Role.PROVISION, myInfoResponse.getResult().getRole()),
+                () -> assertEquals(null, myInfoResponse.getResult().getMbti()),
                 () -> assertEquals(email3, myInfoResponse.getResult().getEmail()),
-                () -> assertEquals(phoneNumber3, myInfoResponse.getResult().getPhoneNumber()),
+                () -> assertEquals(null, myInfoResponse.getResult().getPhoneNumber()),
                 () -> assertNull(myInfoResponse.getResult().getSchool()),
                 () -> assertNull(myInfoResponse.getResult().getCareer()),
                 () -> assertNull(myInfoResponse.getResult().getProfileImageUrl())
+        );
+
+        //Given
+        MemberRequestDTO.ChangeDto changeDto = MemberRequestDTO.ChangeDto.builder()
+                .name(name3)
+                .nickname(nickname3)
+                .gender(gender3)
+                .birth(birth3)
+                .role(role3)
+                .mbti(mbti3)
+                .email(email3)
+                .phoneNumber(phoneNumber3)
+                .build();
+
+        //When
+        String putContent = mockMvc.perform(put("/api/v1/members/me")
+                        .header("Authorization", "Bearer " + accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jacksonObjectMapper.writeValueAsString(changeDto)))
+
+                //Then
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        ApiResponse<MemberResponseDTO.MyInfoDTO> putResponse =
+                jacksonObjectMapper.readValue(putContent,
+                        new TypeReference<ApiResponse<MemberResponseDTO.MyInfoDTO>>(){});
+
+        //Then
+        assertAll("MyInfo check after first change",
+                () -> assertEquals(3L, putResponse.getResult().getId()),
+                () -> assertEquals(name3, putResponse.getResult().getName()),
+                () -> assertEquals(nickname3, putResponse.getResult().getNickname()),
+                () -> assertEquals(gender3, putResponse.getResult().getGender()),
+                () -> assertEquals(age3, putResponse.getResult().getAge()),
+                () -> assertEquals(birth3, putResponse.getResult().getBirth()),
+                () -> assertEquals(role3, putResponse.getResult().getRole()),
+                () -> assertEquals(mbti3, putResponse.getResult().getMbti()),
+                () -> assertEquals(email3, putResponse.getResult().getEmail()),
+                () -> assertEquals(phoneNumber3, putResponse.getResult().getPhoneNumber()),
+                () -> assertNull(putResponse.getResult().getSchool()),
+                () -> assertNull(putResponse.getResult().getCareer()),
+                () -> assertNull(putResponse.getResult().getProfileImageUrl())
         );
 
         //When
@@ -388,7 +543,7 @@ public class MemberTest {
                 () -> assertEquals(name3, result.getName()),
                 () -> assertEquals(nickname3, result.getNickname()),
                 () -> assertEquals(age3, result.getAge()),
-                () -> assertEquals(gender3, result.isGender()),
+                () -> assertEquals(gender3, result.getGender()),
                 () -> assertEquals(role3, result.getRole()),
                 () -> assertEquals(mbti3, result.getMbti()),
                 () -> assertNull(result.getCareer()),
@@ -540,7 +695,7 @@ public class MemberTest {
                 () -> assertEquals(member.getName(), result.getName()),
                 () -> assertEquals(member.getNickname(), result.getNickname()),
                 () -> assertEquals(member.getAge(), result.getAge()),
-                () -> assertEquals(member.getGender(), result.isGender()),
+                () -> assertEquals(member.getGender(), result.getGender()),
                 () -> assertEquals(member.getRole(), result.getRole()),
                 () -> assertEquals(member.getMbti(), result.getMbti()),
                 () -> assertEquals(member.getCareer(), result.getCareer()),
@@ -633,7 +788,7 @@ public class MemberTest {
                 () -> assertEquals(member.getName(), result.getName()),
                 () -> assertEquals(member.getNickname(), result.getNickname()),
                 () -> assertEquals(member.getAge(), result.getAge()),
-                () -> assertEquals(member.getGender(), result.isGender()),
+                () -> assertEquals(member.getGender(), result.getGender()),
                 () -> assertEquals(member.getRole(), result.getRole()),
                 () -> assertEquals(member.getMbti(), result.getMbti()),
                 () -> assertEquals(member.getCareer(), result.getCareer()),
@@ -716,12 +871,7 @@ public class MemberTest {
         MemberRequestDTO.JoinDto joinDto = MemberRequestDTO.JoinDto.builder()
                 .name(name4)
                 .nickname(nickname4)
-                .gender(gender4)
-                .birth(birth4)
-                .role(role4)
-                .mbti(mbti4)
                 .email(email4)
-                .phoneNumber(phoneNumber4)
                 .password(password4)
                 .build();
 
@@ -777,20 +927,20 @@ public class MemberTest {
                 () -> assertEquals(4L, myInfoResponseResult.getId()),
                 () -> assertEquals(name4, myInfoResponseResult.getName()),
                 () -> assertEquals(nickname4, myInfoResponseResult.getNickname()),
-                () -> assertEquals(gender4, myInfoResponseResult.isGender()),
-                () -> assertEquals(age4, myInfoResponseResult.getAge()),
-                () -> assertEquals(birth4, myInfoResponseResult.getBirth()),
-                () -> assertEquals(role4, myInfoResponseResult.getRole()),
-                () -> assertEquals(mbti4, myInfoResponseResult.getMbti()),
+                () -> assertEquals(null, myInfoResponseResult.getGender()),
+                () -> assertEquals(null, myInfoResponseResult.getAge()),
+                () -> assertEquals(null, myInfoResponseResult.getBirth()),
+                () -> assertEquals(Role.PROVISION, myInfoResponseResult.getRole()),
+                () -> assertEquals(null, myInfoResponseResult.getMbti()),
                 () -> assertEquals(email4, myInfoResponseResult.getEmail()),
-                () -> assertEquals(phoneNumber4, myInfoResponseResult.getPhoneNumber()),
+                () -> assertEquals(null, myInfoResponseResult.getPhoneNumber()),
                 () -> assertNull(myInfoResponseResult.getSchool()),
                 () -> assertNull(myInfoResponseResult.getCareer()),
                 () -> assertNull(myInfoResponseResult.getProfileImageUrl())
         );
 
         //When
-        //변경사항 없음
+        //초기 설정
         MemberRequestDTO.ChangeDto change1 = MemberRequestDTO.ChangeDto.builder()
                 .name(name4)
                 .nickname(nickname4)
@@ -821,7 +971,7 @@ public class MemberTest {
                 () -> assertEquals(4L, change1ResponseResult.getId()),
                 () -> assertEquals(name4, change1ResponseResult.getName()),
                 () -> assertEquals(nickname4, change1ResponseResult.getNickname()),
-                () -> assertEquals(gender4, change1ResponseResult.isGender()),
+                () -> assertEquals(gender4, change1ResponseResult.getGender()),
                 () -> assertEquals(age4, change1ResponseResult.getAge()),
                 () -> assertEquals(birth4, change1ResponseResult.getBirth()),
                 () -> assertEquals(role4, change1ResponseResult.getRole()),
@@ -831,6 +981,37 @@ public class MemberTest {
                 () -> assertNull(change1ResponseResult.getSchool()),
                 () -> assertNull(change1ResponseResult.getCareer()),
                 () -> assertNull(change1ResponseResult.getProfileImageUrl())
+        );
+
+        change1Result = mockMvc.perform(put("/api/v1/members/me")
+                        .header("Authorization", "Bearer " + accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jacksonObjectMapper.writeValueAsString(change1))
+                )
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        change1Response =
+                jacksonObjectMapper.readValue(change1Result,
+                        new TypeReference<ApiResponse<MemberResponseDTO.MyInfoDTO>>() {
+                        });
+
+        //Then
+        //변경사항 없음
+        MemberResponseDTO.MyInfoDTO change1_1ResponseResult = change1Response.getResult();
+        assertAll("MyInfo check without change",
+                () -> assertEquals(4L, change1_1ResponseResult.getId()),
+                () -> assertEquals(name4, change1_1ResponseResult.getName()),
+                () -> assertEquals(nickname4, change1_1ResponseResult.getNickname()),
+                () -> assertEquals(gender4, change1_1ResponseResult.getGender()),
+                () -> assertEquals(age4, change1_1ResponseResult.getAge()),
+                () -> assertEquals(birth4, change1_1ResponseResult.getBirth()),
+                () -> assertEquals(role4, change1_1ResponseResult.getRole()),
+                () -> assertEquals(mbti4, change1_1ResponseResult.getMbti()),
+                () -> assertEquals(email4, change1_1ResponseResult.getEmail()),
+                () -> assertEquals(phoneNumber4, change1_1ResponseResult.getPhoneNumber()),
+                () -> assertNull(change1_1ResponseResult.getSchool()),
+                () -> assertNull(change1_1ResponseResult.getCareer()),
+                () -> assertNull(change1_1ResponseResult.getProfileImageUrl())
         );
 
 
@@ -868,7 +1049,7 @@ public class MemberTest {
                 () -> assertEquals(4L, change2ResponseResult.getId()),
                 () -> assertEquals("name4", change2ResponseResult.getName()),
                 () -> assertEquals(nickname4, change2ResponseResult.getNickname()),
-                () -> assertEquals(false, change2ResponseResult.isGender()),
+                () -> assertEquals(false, change2ResponseResult.getGender()),
                 () -> assertEquals(changedAge, change2ResponseResult.getAge()),
                 () -> assertEquals(changedBirth, change2ResponseResult.getBirth()),
                 () -> assertEquals(Role.TEAMMATE, change2ResponseResult.getRole()),
@@ -912,7 +1093,7 @@ public class MemberTest {
                 () -> assertEquals(4L, change3ResponseResult.getId()),
                 () -> assertEquals(name4, change3ResponseResult.getName()),
                 () -> assertNull(change3ResponseResult.getNickname()),
-                () -> assertEquals(gender4, change3ResponseResult.isGender()),
+                () -> assertEquals(gender4, change3ResponseResult.getGender()),
                 () -> assertEquals(age4, change3ResponseResult.getAge()),
                 () -> assertEquals(birth4, change3ResponseResult.getBirth()),
                 () -> assertEquals(role4, change3ResponseResult.getRole()),
@@ -969,7 +1150,7 @@ public class MemberTest {
         MemberRequestDTO.ChangeDto change1 = MemberRequestDTO.ChangeDto.builder()
                 .name(myInfoResponseResult.getName())
                 .nickname("닉네임1")
-                .gender(myInfoResponseResult.isGender())
+                .gender(myInfoResponseResult.getGender())
                 .birth(myInfoResponseResult.getBirth())
                 .role(myInfoResponseResult.getRole())
                 .mbti(myInfoResponseResult.getMbti())
@@ -1001,7 +1182,7 @@ public class MemberTest {
         MemberRequestDTO.ChangeDto change2 = MemberRequestDTO.ChangeDto.builder()
                 .name(myInfoResponseResult.getName())
                 .nickname(myInfoResponseResult.getNickname())
-                .gender(myInfoResponseResult.isGender())
+                .gender(myInfoResponseResult.getGender())
                 .birth(myInfoResponseResult.getBirth())
                 .role(myInfoResponseResult.getRole())
                 .mbti(myInfoResponseResult.getMbti())
@@ -1033,7 +1214,7 @@ public class MemberTest {
         MemberRequestDTO.ChangeDto change3 = MemberRequestDTO.ChangeDto.builder()
                 .name(myInfoResponseResult.getName())
                 .nickname(myInfoResponseResult.getNickname())
-                .gender(myInfoResponseResult.isGender())
+                .gender(myInfoResponseResult.getGender())
                 .birth(myInfoResponseResult.getBirth())
                 .role(myInfoResponseResult.getRole())
                 .mbti(myInfoResponseResult.getMbti())
