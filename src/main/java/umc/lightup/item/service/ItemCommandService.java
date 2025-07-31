@@ -12,6 +12,8 @@ import java.util.List;
 public interface ItemCommandService {
     Item createItem(Member member, ItemRequestDTO.ItemJoinRequestDTO request, MultipartFile itemProfileImage, MultipartFile itemPlanFile);
     Item getSingleItem(Long itemId);
+    void addItemLike(Member member, long itemId);
+    void removeItemLike(String email, long itemId);
 
     List<ItemResponseDTO.ItemResultDTO> getAllItems(Pageable pageable);
 
