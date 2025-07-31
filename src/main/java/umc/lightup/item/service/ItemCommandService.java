@@ -14,6 +14,7 @@ public interface ItemCommandService {
     Item getSingleItem(Long itemId);
     void addItemLike(Member member, long itemId);
     void removeItemLike(String email, long itemId);
+    void updateItemHistory(Member member, Item item);
 
     List<ItemResponseDTO.ItemResultDTO> getAllItems(Pageable pageable);
 
