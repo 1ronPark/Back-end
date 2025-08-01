@@ -12,21 +12,21 @@ import umc.lightup.common.Uuid;
 import umc.lightup.common.repository.UuidRepository;
 import umc.lightup.exception.handler.GeneralHandler;
 import umc.lightup.item.converter.ItemConverter;
-import umc.lightup.item.domain.Item;
-import umc.lightup.item.domain.ItemLike;
-import umc.lightup.item.domain.ItemRegion;
-import umc.lightup.item.domain.RecruitPosition;
+import umc.lightup.item.domain.*;
 import umc.lightup.item.dto.ItemRequestDTO;
 import umc.lightup.item.dto.ItemResponseDTO;
 import umc.lightup.item.repository.ItemLikeRepository;
 import umc.lightup.item.repository.ItemRepository;
+import umc.lightup.item.repository.ItemViewHistoryRepository;
 import umc.lightup.item.repository.RecruitPositionRepository;
 import umc.lightup.member.domain.Member;
 import umc.lightup.member.repository.MemberRegionRepository;
 import umc.lightup.position.domain.Position;
 import umc.lightup.position.repository.PositionRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -39,6 +39,7 @@ public class ItemCommandServiceImpl implements ItemCommandService {
     private final RecruitPositionRepository recruitPositionRepository;
     private final PositionRepository positionRepository;
     private final ItemLikeRepository itemLikeRepository;
+    private final ItemViewHistoryRepository itemViewHistoryRepository;
 
     private final AmazonS3Manager s3Manager;
     private final UuidRepository uuidRepository;
@@ -168,6 +169,23 @@ public class ItemCommandServiceImpl implements ItemCommandService {
     public void removeItemLike(String email, long itemId) {
         if (itemLikeRepository.removeByMemberEmailAndItemId(email, itemId) == 0) {
             throw new GeneralHandler(ErrorStatus.ITEM_LIKE_NOT_FOUND);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void updateItemHistory(Member member, Item item) {
+        Optional<ItemViewHistory> optionalHistory = itemViewHistoryRepository.findByMemberAndItem(member, item);
+
+        if (optionalHistory.isPresent()) {
+            ItemViewHistory itemViewHistory = optionalHistory.get();
+            itemViewHistory.updateViewedAt();
+        } else {
+            itemViewHistoryRepository.save(ItemViewHistory.builder()
+                    .member(member)
+                    .item(item)
+                    .viewedAt(LocalDateTime.now())
+                    .build());
         }
     }
 }

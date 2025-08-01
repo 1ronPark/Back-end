@@ -53,6 +53,9 @@ public enum ErrorStatus implements BaseErrorCode {
     ITEM_ALREADY_LIKED(HttpStatus.BAD_REQUEST, "ITEMLIKE4001", "이미 좋아요를 누른 프로젝트입니다."),
     ITEM_LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEMLIKE4002", "좋아요가 존재하지 않습니다."),
 
+    //ItemViewHistory 관련 에러
+    ITEM_VIEW_HISTORY_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEMVIEWHISTORY4000", "프로젝트 조회 내역이 존재하지 않습니다."),
+
     //ItemImage 관련 에러
     ITEM_IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEM_IMAGE4000", "아이템 이미지가 존재하지 않습니다."),
 
