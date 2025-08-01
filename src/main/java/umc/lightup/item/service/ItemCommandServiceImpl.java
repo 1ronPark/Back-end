@@ -15,6 +15,7 @@ import umc.lightup.item.converter.ItemConverter;
 import umc.lightup.item.domain.*;
 import umc.lightup.item.dto.ItemRequestDTO;
 import umc.lightup.item.dto.ItemResponseDTO;
+import umc.lightup.item.enums.CategoryType;
 import umc.lightup.item.enums.ItemApplyStatus;
 import umc.lightup.item.repository.*;
 import umc.lightup.member.domain.Member;
@@ -64,6 +65,16 @@ public class ItemCommandServiceImpl implements ItemCommandService {
 
             String itemPlanFileUrl = s3Manager.uploadFile(s3Manager.generateItemFileKeyName(savedUuid), itemPlanFile);
             item.uploadItemPlanFile(itemPlanFileUrl);
+        }
+
+        for (ItemRequestDTO.ItemCategoryRequestDTO dto : request.getItemCategories()) {
+            CategoryType categoryType = CategoryType.toCategoryType(dto.getItemCategory());
+            ItemCategory itemCategory = ItemCategory.builder()
+                    .item(item)
+                    .categoryType(categoryType)
+                    .build();
+
+            item.addItemCategory(itemCategory);
         }
 
         for (ItemRequestDTO.CollaborationRegionRequestDTO dto : request.getCollaborationRegions()) {
