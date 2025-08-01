@@ -62,6 +62,9 @@ public enum ErrorStatus implements BaseErrorCode {
     //ItemImage 관련 에러
     ITEM_IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEM_IMAGE4000", "아이템 이미지가 존재하지 않습니다."),
 
+    //ItemCategory 관련 에러
+    ITEM_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEMCATEGORY4000", "해당 아이템 카테고리가 존재하지 않습니다."),
+
     //MemberSkill 관련 에러
     MEMBER_SKILL_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER_SKILL4000", "유저의 스킬이 존재하지 않습니다."),
 

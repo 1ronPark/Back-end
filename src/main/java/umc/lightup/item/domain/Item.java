@@ -32,6 +32,10 @@ public class Item extends BaseEntity {
     @Column(nullable = false)
     private String description;
 
+    @Builder.Default
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    private List<ItemCategory> itemCategories = new ArrayList<>();
+
     @Column(name = "project_status", nullable = false)
     private boolean projectStatus;
 
@@ -68,6 +72,11 @@ public class Item extends BaseEntity {
     public Item uploadItemPlanFile(String itemPlanFileUrl) {
         this.itemPlanFileUrl = itemPlanFileUrl;
         return this;
+    }
+
+    public void addItemCategory(ItemCategory itemCategory) {
+        this.itemCategories.add(itemCategory);
+        itemCategory.assignItem(this);
     }
 
     public void addItemRegion(ItemRegion itemRegion) {
