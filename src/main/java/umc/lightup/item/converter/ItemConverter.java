@@ -1,6 +1,7 @@
 package umc.lightup.item.converter;
 
 import umc.lightup.item.domain.Item;
+import umc.lightup.item.domain.ItemApply;
 import umc.lightup.item.domain.ItemImage;
 import umc.lightup.item.domain.RecruitPosition;
 import umc.lightup.item.dto.ItemRequestDTO;
@@ -89,6 +90,13 @@ public class ItemConverter {
                 .projectStatus(request.isProjectStatus())
                 .extraLink1(request.getExtraLink1())
                 .extraLink2(request.getExtraLink2())
+                .build();
+    }
+
+    public static ItemResponseDTO.ItemApplyResultDTO toItemApplyResultDTO (ItemApply itemApply) {
+        return ItemResponseDTO.ItemApplyResultDTO.builder()
+                .appliedAt(itemApply.getAppliedAt())
+                .message(itemApply.getItem().getName() + "에 지원했어요")
                 .build();
     }
 

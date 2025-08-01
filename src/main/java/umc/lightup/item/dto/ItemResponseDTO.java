@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import umc.lightup.member.enums.Gender;
 import umc.lightup.member.enums.Mbti;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class ItemResponseDTO {
@@ -94,5 +95,14 @@ public class ItemResponseDTO {
         private String mainTasks;
         private String preferentialTreatment;
         private String preferMbti;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ItemApplyResultDTO {
+        private LocalDateTime appliedAt;
+        private String message;
     }
 }
