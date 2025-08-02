@@ -1,7 +1,9 @@
 package umc.lightup.member.dto;
 
 import lombok.*;
+import umc.lightup.member.converter.MemberConverter;
 import umc.lightup.member.domain.Member;
+import umc.lightup.member.domain.MemberRegion;
 import umc.lightup.member.domain.Portfolio;
 import umc.lightup.region.domain.Region;
 
@@ -22,7 +24,7 @@ public class MemberViewInfo {
     private Member member;
     private List<String> skills;
     private List<String> strengths;
-    private List<Region> regions;
+    private List<MemberRegion> regions;
     private List<Portfolio> portfolios;
     private boolean emailOpen = false;
     private boolean phoneOpen = false;
@@ -42,8 +44,11 @@ public class MemberViewInfo {
 
                 .skills(skills)
                 .strengths(strengths)
-                .regions(regions.stream()
+                /*.regions(regions.stream()
                         .map(r->r.getSiDo()+" "+r.getSiGunGu())
+                        .toList())*/
+                .regions(regions.stream()
+                        .map(MemberConverter::toSingleRegionResultDTO)
                         .toList())
                 .portfolios(portfolios.stream()
                         .map(portfolio -> MemberResponseDTO.PortfolioInfoDTO.builder()

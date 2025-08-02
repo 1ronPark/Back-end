@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import umc.lightup.api.code.status.ErrorStatus;
 import umc.lightup.config.JwtTokenProvider;
 import umc.lightup.exception.handler.GeneralHandler;
+import umc.lightup.member.converter.MemberConverter;
 import umc.lightup.member.domain.*;
 import umc.lightup.member.dto.MemberRequestDTO;
 import umc.lightup.member.dto.MemberResponseDTO;
@@ -26,6 +27,7 @@ import umc.lightup.strength.repository.StrengthRepository;
 import umc.lightup.position.domain.Position;
 import umc.lightup.position.repository.PositionRepository;
 
+import java.util.ArrayList;
 import java.util.Collections;
 
 import umc.lightup.member.repository.*;
@@ -43,6 +45,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     private final MemberPositionRepository memberPositionRepository;
     private final MemberSkillRepository memberSkillRepository;
     private final MemberStrengthRepository memberStrengthRepository;
+    private final MemberRegionRepository memberRegionRepository;
     private final PositionRepository positionRepository;
     private final SkillRepository skillRepository;
     private final StrengthRepository strengthRepository;
@@ -131,7 +134,9 @@ public class MemberCommandServiceImpl implements MemberCommandService {
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
         List<String> skills = memberSkillRepository.findSkillNameByMember(member);
         List<String> strengths = memberStrengthRepository.findStrengthNameByMember(member);
-        List<Region> regions = regionRepository.findByMember(member);
+//        List<Region> regions = regionRepository.findByMember(member);
+        List<MemberRegion> regions = memberRegionRepository.findByMember(member);
+
         List<Portfolio> portfolios = portfolioRepository.findByMember(member);
         return MemberViewInfo.builder()
                 .member(member)
@@ -190,6 +195,23 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         memberStrengthRepository.save(memberStrength);
 
         return foundStrength.getName();
+    }
+
+    @Override
+    @Transactional
+    public List<MemberResponseDTO.singleRegionResultDTO> selectRegions(Member member, MemberRequestDTO.MemberRegionListRequestDTO request) {
+        List<MemberResponseDTO.singleRegionResultDTO> resultDTOList = new ArrayList<>();
+        for (MemberRequestDTO.MemberRegionRequestDTO dto : request.getMemberRegions()) {
+            MemberRegion memberRegion = MemberRegion.builder()
+                    .member(member)
+                    .siDo(dto.getSiDo())
+                    .siGunGu(dto.getSiGunGu() == null ? "전체" : dto.getSiGunGu())
+                    .build();
+
+            member.addMemberRegion(memberRegion);
+            resultDTOList.add(MemberConverter.toSingleRegionResultDTO(memberRegion));
+        }
+        return resultDTOList;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package umc.lightup.member.dto;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -11,9 +12,12 @@ import umc.lightup.member.enums.Role;
 import umc.lightup.member.validation.annotation.UniqueEmail;
 import umc.lightup.member.validation.annotation.UniqueNickname;
 import umc.lightup.member.validation.annotation.ValidRole;
+import umc.lightup.region.validation.annotation.ExistSiDo;
+import umc.lightup.region.validation.annotation.ExistSiGunGu;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 public class MemberRequestDTO {
 
@@ -144,5 +148,23 @@ public class MemberRequestDTO {
         @NotNull
         private Long strengthId;
      
+    }
+
+    @Getter
+    @Setter
+    public static class MemberRegionListRequestDTO {
+        @Size(max = 3, message = "지역은 최대 3개까지 선택할 수 있습니다.")
+        @Valid
+        private List<MemberRegionRequestDTO> memberRegions;
+    }
+
+    @Getter
+    @Setter
+    public static class MemberRegionRequestDTO {
+        @NotBlank
+        @ExistSiDo
+        private String siDo;
+        @ExistSiGunGu
+        private String siGunGu;
     }
 }
