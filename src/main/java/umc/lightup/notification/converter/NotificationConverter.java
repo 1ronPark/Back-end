@@ -4,7 +4,6 @@ import org.springframework.data.domain.Page;
 import umc.lightup.notification.domain.Notification;
 import umc.lightup.notification.dto.NotificationResponseDTO;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,6 +28,19 @@ public class NotificationConverter {
             .totalElements(notificationList.getTotalElements())
             .listSize(notificationListDTO.size())
             .notificationList(notificationListDTO)
+            .build();
+  }
+
+  public static NotificationResponseDTO.NotificationDeleteDTO notificationDeleteDTO(Notification notification){
+    return NotificationResponseDTO.NotificationDeleteDTO.builder()
+            .notificationId(notification.getId())
+            .message(notification.getMessage())
+            .build();
+  }
+
+  public static NotificationResponseDTO.SSETestDTO sseTestDTO(String message){
+    return NotificationResponseDTO.SSETestDTO.builder()
+            .message(message)
             .build();
   }
 }
