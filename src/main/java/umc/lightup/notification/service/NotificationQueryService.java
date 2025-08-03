@@ -12,5 +12,5 @@ public interface NotificationQueryService {
   NotificationResponseDTO.SSETestDTO testSend(long id, String message);
   Page<Notification> getNotificationList(Member member, Integer page, Integer size);
 
-  void send(long receiverId, Notification notification);
+  void sendToClient(SseEmitter emitter, String id, Object data);
 }

@@ -1,7 +1,10 @@
 package umc.lightup.notification.converter;
 
 import org.springframework.data.domain.Page;
+import umc.lightup.member.domain.Member;
 import umc.lightup.notification.domain.Notification;
+import umc.lightup.notification.dto.NotificationEventRequestDTO;
+import umc.lightup.notification.dto.NotificationEventResponseDTO;
 import umc.lightup.notification.dto.NotificationResponseDTO;
 
 import java.util.List;
@@ -34,6 +37,33 @@ public class NotificationConverter {
   public static NotificationResponseDTO.NotificationDeleteDTO notificationDeleteDTO(Notification notification){
     return NotificationResponseDTO.NotificationDeleteDTO.builder()
             .notificationId(notification.getId())
+            .message(notification.getMessage())
+            .build();
+  }
+
+  public static NotificationResponseDTO.NotificationPatchDTO notificationPatchDTO(Notification notification){
+    return NotificationResponseDTO.NotificationPatchDTO.builder()
+            .notificationId(notification.getId())
+            .message(notification.getMessage())
+            .isRead(notification.getIsRead())
+            .build();
+  }
+
+  public static Notification notificationEventDTO(Member sender, Member receiver, NotificationEventRequestDTO.NotificationEventDTO notificationEventDTO){
+    return Notification.builder()
+            .sender(sender)
+            .receiver(receiver)
+            .type(notificationEventDTO.getNotificationType())
+            .message(notificationEventDTO.getMessage())
+            .referenceType(notificationEventDTO.getReferenceType())
+            .referenceId(notificationEventDTO.getReferenceId())
+            .isRead(false)
+            .build();
+  }
+
+  public static NotificationEventResponseDTO.NotificationEventDTO notificationEventDTO(Member recevier, Notification notification){
+    return NotificationEventResponseDTO.NotificationEventDTO.builder()
+            .receiverId(recevier.getId())
             .message(notification.getMessage())
             .build();
   }

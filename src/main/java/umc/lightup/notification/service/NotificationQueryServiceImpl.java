@@ -90,16 +90,7 @@ public class NotificationQueryServiceImpl implements NotificationQueryService {
   }
 
   @Override
-  public void send(long receiverId, Notification notification){
-    String id = receiverId + "_" + System.currentTimeMillis();
-
-    Map<String, SseEmitter> sseEmitters = emitterRepository.findAllById(id);
-    sseEmitters.forEach((key, emitter) -> {
-      sendToClient(emitter, id, notification);
-    });
-  }
-
-  private void sendToClient(SseEmitter emitter, String id, Object data) {
+  public void sendToClient(SseEmitter emitter, String id, Object data) {
     try {
       emitter.send(SseEmitter.event()
               .id(id)

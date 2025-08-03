@@ -45,6 +45,16 @@ public class NotificationResponseDTO {
   @Getter
   @NoArgsConstructor
   @AllArgsConstructor
+  public static class NotificationPatchDTO{
+    Long notificationId;
+    String message;
+    Boolean isRead;
+  }
+
+  @Builder
+  @Getter
+  @NoArgsConstructor
+  @AllArgsConstructor
   public static class SSETestDTO {
     String message;
   }

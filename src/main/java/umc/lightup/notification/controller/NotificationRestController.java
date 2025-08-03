@@ -46,7 +46,7 @@ public class NotificationRestController {
   @DeleteMapping("/{notificationId}")
   @Operation(
           summary = "알림 지우기 API",
-          description = "읽은 알림을 지우기 위한 API 입니다. notificationId를 보내면 삭제됩니다. ",
+          description = "알림을 지우기 위한 API 입니다. notificationId를 보내면 삭제됩니다. ",
           security = { @SecurityRequirement(name = "JWT TOKEN")}
   )
   @ApiResponses({
@@ -55,6 +55,20 @@ public class NotificationRestController {
   public ApiResponse<NotificationResponseDTO.NotificationDeleteDTO> deletNotification(@NotNull @PathVariable(name = "notificationId") long notificationId){
     Notification notification = notificationCommandService.deleteNotification(notificationId);
     return ApiResponse.onSuccess(NotificationConverter.notificationDeleteDTO(notification));
+  }
+
+  @PatchMapping("/{notificationId}")
+  @Operation(
+          summary = "알림 읽은 상태 전환 API",
+          description = "알림을 읽은 상태로 전환하기 위한 API 입니다. notificationId를 보내면 읽은 알림으로 처리됩니다.",
+          security = { @SecurityRequirement(name = "JWT TOKEN")}
+  )
+  @ApiResponses({
+          @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
+  })
+  public ApiResponse<NotificationResponseDTO.NotificationPatchDTO> patchNotification(@NotNull @PathVariable(name = "notificationId") long notificationId){
+    Notification notification = notificationCommandService.updateNotification(notificationId);
+    return ApiResponse.onSuccess(NotificationConverter.notificationPatchDTO(notification));
   }
 
 
