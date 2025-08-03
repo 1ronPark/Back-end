@@ -1476,8 +1476,8 @@ public class MemberTest {
 
         //Then
         assertAll("Password initialize with wrong email",
-                () -> assertEquals(ErrorStatus.MEMBER_NOT_FOUND.getCode(), change1Response.getCode()),
-                () -> assertEquals(ErrorStatus.MEMBER_NOT_FOUND.getMessage(), change1Response.getMessage())
+                () -> assertEquals(ErrorStatus.CREDENTIAL_NOT_FOUND.getCode(), change1Response.getCode()),
+                () -> assertEquals(ErrorStatus.CREDENTIAL_NOT_FOUND.getMessage(), change1Response.getMessage())
         );
     }
 

@@ -2,6 +2,7 @@ package umc.lightup.member.dto;
 
 import lombok.*;
 import umc.lightup.member.domain.Member;
+import umc.lightup.member.enums.CredentialType;
 import umc.lightup.member.enums.Mbti;
 import umc.lightup.member.enums.Role;
 
@@ -70,7 +71,25 @@ public class MemberResponseDTO {
         private String phoneNumber;
         private String profileImageUrl;
     }
-    
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CredentialInfoResultDTO {
+        private List<CredentialInfoDTO> credentials;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CredentialInfoDTO {
+        private CredentialType credentialType;
+        private LocalDateTime createdAt;
+        private LocalDateTime updatedAt;
+    }
+
     @Getter
     @Builder
     @NoArgsConstructor

@@ -24,6 +24,15 @@ public enum ErrorStatus implements BaseErrorCode {
     INVALID_ROLE(HttpStatus.BAD_REQUEST, "MEMBER4006", "올바른 Role이 아닙니다. LEADER, TEAMMATE 중 하나를 선택해 주세요."),
     NO_CREDENTIAL(HttpStatus.INTERNAL_SERVER_ERROR, "MEMBER5000", "저장된 패스워드가 없습니다."),
 
+    // Credential 관련 에러
+    CREDENTIAL_NOT_FOUND(HttpStatus.BAD_REQUEST, "CREDENTIAL4000", "해당 형태의 로그인 정보를 찾을 수 없습니다."),
+    ALREADY_SIGNED_IN_EMAIL(HttpStatus.BAD_REQUEST, "CREDENTIAL4001", "이미 동일한 이메일로 가입된 회원이 있습니다."),
+    CREDENTIAL_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "CREDENTIAL4002", "이미 해당 방법으로 소셜로그인이 연결되어 있습니다."),
+    CREDENTIAL_ALREADY_USED(HttpStatus.BAD_REQUEST, "CREDENTIAL4003", "이미 다른 계정에 소셜로그인이 연결되어 있습니다."),
+    ONLY_CREDENTIAL_REMAIN(HttpStatus.BAD_REQUEST, "CREDENTIAL4004", "현재 유일한 로그인 방법이 하나밖에 없습니다. 로그인 방법을 지우면 로그인이 불가합니다."),
+    INVALID_AUTH_CODE(HttpStatus.BAD_REQUEST, "CREDENTIAL4005", "auth code가 올바르지 않습니다."),
+    AUTH_NOT_GRANTED(HttpStatus.BAD_REQUEST, "CREDENTIAL4006", "소셜로그인의 권한이 부족합니다. 필요한 모든 권한 제공에 동의했는지 확인해 주세요."),
+
     //MemberLike 관련 에러
     ALREADY_LIKED(HttpStatus.BAD_REQUEST, "MEMBER4100", "이미 좋아요 한 회원입니다. 좋아요를 취소하려면 Delete Method로 요청을 보내 주세요."),
     LIKE_NOT_FOUND(HttpStatus.BAD_REQUEST, "MEMBER4101", "좋아요하지 않은 회원입니다. 좋아요를 하려면 Post Method로 요청을 보내 주세요."),
