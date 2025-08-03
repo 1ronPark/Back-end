@@ -9,12 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import umc.lightup.api.code.status.ErrorStatus;
 import umc.lightup.config.JwtTokenProvider;
 import umc.lightup.exception.handler.GeneralHandler;
-import umc.lightup.member.domain.Credential;
-import umc.lightup.member.domain.Member;
-import umc.lightup.member.domain.MemberSkill;
-import umc.lightup.member.domain.MemberStrength;
-import umc.lightup.member.domain.MemberPosition;
-import umc.lightup.member.domain.Portfolio;
+import umc.lightup.member.domain.*;
 import umc.lightup.member.dto.MemberRequestDTO;
 import umc.lightup.member.dto.MemberResponseDTO;
 import umc.lightup.member.dto.MemberViewInfo;
@@ -36,8 +31,6 @@ import java.util.Collections;
 import umc.lightup.member.repository.*;
 import umc.lightup.region.domain.Region;
 import umc.lightup.region.repository.RegionRepository;
-import umc.lightup.skill.repository.SkillRepository;
-import umc.lightup.strength.repository.StrengthRepository;
 
 import java.util.List;
 
@@ -55,6 +48,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     private final StrengthRepository strengthRepository;
     private final RegionRepository regionRepository;
     private final PortfolioRepository portfolioRepository;
+    private final MemberLikeRepository memberLikeRepository;
   
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
@@ -135,8 +129,8 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         // 한 번에 반환하기 위해 DTO 반환을 사용했는데 좋은 설계 방식인지는 한번 고민할 필요가 있음
         Member member = memberRepository.findById(id)
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
-        List<String> skills = skillRepository.findNameByMember(member);
-        List<String> strengths = strengthRepository.findNameByMember(member);
+        List<String> skills = memberSkillRepository.findSkillNameByMember(member);
+        List<String> strengths = memberStrengthRepository.findStrengthNameByMember(member);
         List<Region> regions = regionRepository.findByMember(member);
         List<Portfolio> portfolios = portfolioRepository.findByMember(member);
         return MemberViewInfo.builder()
@@ -155,10 +149,10 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     @Transactional
     public Member putMember(String email, MemberRequestDTO.ChangeDto request) {
         Member member = getMember(email);
-        if (!member.getEmail().equals(request.getEmail()) &&
+        if (!request.getEmail().equals(member.getEmail()) &&
                 isEmailExist(request.getEmail()))
             throw new GeneralHandler(ErrorStatus.DUPLICATE_EMAIL);
-        if (!member.getPhoneNumber().equals(request.getPhoneNumber()) &&
+        if (!request.getPhoneNumber().equals(member.getPhoneNumber()) &&
                 isPhoneNumberExist(request.getPhoneNumber()))
             throw new GeneralHandler(ErrorStatus.DUPLICATE_PHONE_NUMBER);
         if (member.getNickname() != null &&
@@ -196,6 +190,29 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         memberStrengthRepository.save(memberStrength);
 
         return foundStrength.getName();
+    }
+
+    @Override
+    @Transactional
+    public void addMemberLike(Member fromMember, long toMemberId) {
+        if (fromMember.getId() == toMemberId)
+            throw new GeneralHandler(ErrorStatus.SELF_LIKE);
+        Member toMember = memberRepository.findById(toMemberId) //아 괜히 검색쿼리 더 날리고 싶지 않은데
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        if (memberLikeRepository.existsByFromMemberIdAndToMemberId(fromMember.getId(), toMemberId))
+            throw new GeneralHandler(ErrorStatus.ALREADY_LIKED);
+        memberLikeRepository.save(MemberLike.builder()
+                .fromMember(fromMember)
+                .toMember(toMember)
+                .build());
+    }
+
+    @Override
+    @Transactional
+    public void removeMemberLike(String fromMemberEmail, long toMemberId) {
+        if (memberLikeRepository.removeByFromMemberEmailAndToMemberId(fromMemberEmail, toMemberId) == 0)
+            //데이터를 지우면서 지운 row의 수가 0은 아닌지 확인(1이어야 함)
+            throw new GeneralHandler(ErrorStatus.LIKE_NOT_FOUND);
     }
 
     @Override

@@ -14,9 +14,9 @@ public class Region {
     private Long id;
 
     @Column(nullable = false, length = 20)
-    private String sido;
+    private String siDo;
 
     @Column(nullable = false, length = 30)
-    private String sigungu;
+    private String siGunGu;
 
 }

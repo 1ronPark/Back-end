@@ -1,15 +1,12 @@
 package umc.lightup.member.domain;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import umc.lightup.common.BaseEntity;
-import umc.lightup.skill.domain.Skill;
 import umc.lightup.strength.domain.Strength;
 
 @Entity
+@Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)

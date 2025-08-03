@@ -33,6 +33,9 @@ public class AmazonConfig {
     @Value("${cloud.aws.s3.path.profileImage}")
     private String profileImagePath;
 
+    @Value("${cloud.aws.s3.path.itemProfileImage}")
+    private String itemProfileImagePath;
+
     @Value("${cloud.aws.s3.path.itemFile}")
     private String itemFilePath;
 

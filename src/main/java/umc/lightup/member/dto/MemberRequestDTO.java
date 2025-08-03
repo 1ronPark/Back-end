@@ -10,7 +10,7 @@ import umc.lightup.member.enums.Mbti;
 import umc.lightup.member.enums.Role;
 import umc.lightup.member.validation.annotation.UniqueEmail;
 import umc.lightup.member.validation.annotation.UniqueNickname;
-import umc.lightup.member.validation.annotation.UniquePhoneNumber;
+import umc.lightup.member.validation.annotation.ValidRole;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -27,24 +27,10 @@ public class MemberRequestDTO {
         private String name;
         @UniqueNickname
         private String nickname;
-        @NotNull
-        private Boolean gender;
-        @NotNull
-        @Past
-        private LocalDate birth;
-        @NotNull
-        private Role role;
-        @NotNull
-        private Mbti mbti;
         @NotEmpty
         @Email
         @UniqueEmail
         private String email;
-        private String school;
-        @NotEmpty
-        @UniquePhoneNumber
-        @Pattern(regexp = "0[1-8]\\d{0,1}-\\d{3,4}-\\d{4,5}")
-        private String phoneNumber;
         @NotEmpty
         private String password;
 
@@ -52,14 +38,8 @@ public class MemberRequestDTO {
             return Member.builder()
                     .name(this.name)
                     .nickname(this.nickname)
-                    .gender(this.gender)
-                    .birth(this.birth)
-                    .role(this.role)
-                    .mbti(this.mbti)
+                    .role(Role.PROVISION)
                     .email(this.email)
-                    .school(this.school)
-                    .phoneNumber(this.phoneNumber)
-                    .age((int) this.birth.until(LocalDate.now(), ChronoUnit.YEARS))
                     .build();
         }
 
@@ -88,6 +68,7 @@ public class MemberRequestDTO {
         @Past
         private LocalDate birth;
         @NotNull
+        @ValidRole
         private Role role;
         @NotNull
         private Mbti mbti;

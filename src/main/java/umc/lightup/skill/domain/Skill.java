@@ -3,15 +3,14 @@ package umc.lightup.skill.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
-import umc.lightup.common.BaseEntity;
-import umc.lightup.member.domain.Member;
+import umc.lightup.skill.enums.SkillType;
 
 @Getter
 @Entity
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class Skill extends BaseEntity {
+public class Skill {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -19,7 +18,12 @@ public class Skill extends BaseEntity {
     @Column(length = 30, nullable = false, unique = false)
     private String name;
 
-    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Column(length = 30, nullable = false)
+    private SkillType skillType;
+
+    //커스텀 스킬 생성 기능 삭제
+/*    @Column(nullable = false)
     private boolean isCustom;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -31,5 +35,5 @@ public class Skill extends BaseEntity {
         skill.isCustom = isCustom;
         skill.owner = owner;
         return skill;
-    }
+    }*/
 }

@@ -12,6 +12,8 @@ public interface MemberCommandService {
     Member putMember(String email, MemberRequestDTO.ChangeDto request);
     String selectSkill(Long skillId,Member member);
     String selectStrength(Long strengthId,Member member);
+    void addMemberLike(Member fromMember, long toMemberId);
+    void removeMemberLike(String fromMemberEmail, long toMemberId);
     boolean isNicknameExist(String nickname);
     boolean isEmailExist(String email);
     boolean isPhoneNumberExist(String phoneNumber);

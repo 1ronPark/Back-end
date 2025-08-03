@@ -21,10 +21,19 @@ public enum ErrorStatus implements BaseErrorCode {
     DUPLICATE_NICKNAME(HttpStatus.BAD_REQUEST, "MEMBER4003", "이미 존재하는 닉네임입니다."),
     DUPLICATE_EMAIL(HttpStatus.BAD_REQUEST, "MEMBER4004", "이미 존재하는 이메일입니다."),
     DUPLICATE_PHONE_NUMBER(HttpStatus.BAD_REQUEST, "MEMBER4005", "이미 존재하는 휴대폰 번호입니다."),
+    INVALID_ROLE(HttpStatus.BAD_REQUEST, "MEMBER4006", "올바른 Role이 아닙니다. LEADER, TEAMMATE 중 하나를 선택해 주세요."),
     NO_CREDENTIAL(HttpStatus.INTERNAL_SERVER_ERROR, "MEMBER5000", "저장된 패스워드가 없습니다."),
 
     //Notification 관련 에러
     NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "NOTIFICATION4001", "해당 알림이 존재하지 않습니다. "),
+  
+    //MemberLike 관련 에러
+    ALREADY_LIKED(HttpStatus.BAD_REQUEST, "MEMBER4100", "이미 좋아요 한 회원입니다. 좋아요를 취소하려면 Delete Method로 요청을 보내 주세요."),
+    LIKE_NOT_FOUND(HttpStatus.BAD_REQUEST, "MEMBER4101", "좋아요하지 않은 회원입니다. 좋아요를 하려면 Post Method로 요청을 보내 주세요."),
+    SELF_LIKE(HttpStatus.BAD_REQUEST, "MEMBER4102", "회원 자신에 대한 좋아요 요청입니다."),
+
+    //Region 관련 에러
+    REGION_NOT_FOUND(HttpStatus.NOT_FOUND, "REGION4000", "해당 지역이 존재하지 않습니다."),
   
     //Position 관련 에러
     POSITION_NOT_FOUND(HttpStatus.NOT_FOUND, "POSITION4000", "포지션이 존재하지 않습니다."),
@@ -37,7 +46,36 @@ public enum ErrorStatus implements BaseErrorCode {
     //Strength 관련 에러
     DUPLICATED_STRENGTH_NAME(HttpStatus.BAD_REQUEST, "STRENGTH4000", "이미 존재하는 강점 이름입니다."),
     STRENGTH_NOT_FOUND(HttpStatus.NOT_FOUND, "STRENGTH4001", "강점이 존재하지 않습니다."),
-    DUPLICATED_STRENGTH_SELECT(HttpStatus.BAD_REQUEST, "STRENGTH4002", "이미 선택한 강점입니다.")
+    DUPLICATED_STRENGTH_SELECT(HttpStatus.BAD_REQUEST, "STRENGTH4002", "이미 선택한 강점입니다."),
+
+    //Item 관련 에러
+    ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEM4000", "프로젝트가 존재하지 않습니다."),
+
+    //ItemLike 관련 에러
+    MY_ITEM_LIKE(HttpStatus.BAD_REQUEST, "ITEMLIKE4000", "자신의 프로젝트에는 좋아요를 누를 수 없습니다."),
+    ITEM_ALREADY_LIKED(HttpStatus.BAD_REQUEST, "ITEMLIKE4001", "이미 좋아요를 누른 프로젝트입니다."),
+    ITEM_LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEMLIKE4002", "좋아요가 존재하지 않습니다."),
+
+    //ItemApply 관련 에러
+    DUPLICATE_ITEM_APPLY(HttpStatus.BAD_REQUEST, "ITEMAPPLY4000", "이미 지원한 프로젝트입니다."),
+
+    //ItemViewHistory 관련 에러
+    ITEM_VIEW_HISTORY_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEMVIEWHISTORY4000", "프로젝트 조회 내역이 존재하지 않습니다."),
+
+    //ItemImage 관련 에러
+    ITEM_IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEM_IMAGE4000", "아이템 이미지가 존재하지 않습니다."),
+
+    //ItemCategory 관련 에러
+    ITEM_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEMCATEGORY4000", "해당 아이템 카테고리가 존재하지 않습니다."),
+
+    //MemberSkill 관련 에러
+    MEMBER_SKILL_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER_SKILL4000", "유저의 스킬이 존재하지 않습니다."),
+
+    //MemberStrength 관련 에러
+    MEMBER_STRENGTH_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER_STRENGTH4000", "유저의 강점이 존재하지 않습니다."),
+
+    //Email 관련 에러
+    EMAIL_SEND_FAIL(HttpStatus.SERVICE_UNAVAILABLE, "EMAIL5003", "이메일 전송에 실패했습니다.")
     ;
 
 
