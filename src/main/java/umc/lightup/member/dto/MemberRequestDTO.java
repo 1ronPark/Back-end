@@ -110,7 +110,7 @@ public class MemberRequestDTO {
         @NotBlank(message = "패스워드는 필수입니다.")
         private String password;
     }
-  
+
     @Getter
     @Setter
     @Builder
@@ -122,6 +122,16 @@ public class MemberRequestDTO {
 
         @NotBlank(message = "새로운 패스워드는 필수입니다.")
         private String newPassword;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class PasswordCheckRequestDTO {
+        @NotBlank(message = "패스워드는 필수입니다.")
+        private String password;
     }
 
     @Getter
