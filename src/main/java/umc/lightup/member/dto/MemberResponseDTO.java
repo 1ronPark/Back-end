@@ -64,7 +64,7 @@ public class MemberResponseDTO {
         private String school;
         private List<String> skills;
         private List<String> strengths;
-        private List<String> regions;
+        private List<singleRegionResultDTO> regions;
         private List<PortfolioInfoDTO> portfolios;
         private String email;
         private String phoneNumber;
@@ -123,6 +123,24 @@ public class MemberResponseDTO {
     public static class selectStrengthResultDTO {
         String strengthName;
         String memberName;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class selectRegionResultsDTO {
+        private List<singleRegionResultDTO> regions;
+    }
+
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class singleRegionResultDTO {
+        String siDo;
+        String siGunGu;
     }
 
     public static LoginResultDTO.LoginResultDTOBuilder loginResultDTOBuilder() {

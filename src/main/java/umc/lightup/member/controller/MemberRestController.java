@@ -18,6 +18,8 @@ import umc.lightup.member.dto.MemberResponseDTO;
 import umc.lightup.member.service.CredentialQueryService;
 import umc.lightup.member.service.MemberCommandService;
 
+import java.util.List;
+
 import static umc.lightup.member.dto.MemberResponseDTO.memberPositionDeleteResultDTOBuilder;
 import static umc.lightup.member.dto.MemberResponseDTO.memberPositionResultDTOBuilder;
 
@@ -214,5 +216,16 @@ public class MemberRestController {
 
         String strengthName = memberCommandService.selectStrength(strengthId, member);
         return ApiResponse.onSuccess(MemberConverter.toSelectStrengthResultDTO(strengthName, member));
+    }
+
+
+    @PostMapping("/regions")
+    @Operation(summary = "유저 선호 지역 선택 API", description = "유저가 선호 지역을 선택하는 API입니다.")
+    public ApiResponse<MemberResponseDTO.selectRegionResultsDTO> selectRegions(Authentication authentication, @RequestBody @Valid MemberRequestDTO.MemberRegionListRequestDTO request) {
+        String email = authentication.getName();
+        Member member = memberCommandService.getMember(email);
+
+        List<MemberResponseDTO.singleRegionResultDTO> resultDTOList = memberCommandService.selectRegions(member, request);
+        return ApiResponse.onSuccess(MemberConverter.toSelectRegionResultsDTO(resultDTOList));
     }
 }
