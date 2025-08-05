@@ -6,7 +6,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import umc.lightup.api.code.status.ErrorStatus;
+import umc.lightup.aws.s3.AmazonS3Manager;
+import umc.lightup.common.Uuid;
+import umc.lightup.common.repository.UuidRepository;
 import umc.lightup.config.JwtTokenProvider;
 import umc.lightup.exception.handler.GeneralHandler;
 import umc.lightup.member.converter.MemberConverter;
@@ -33,6 +37,7 @@ import java.util.Collections;
 import umc.lightup.member.repository.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -53,6 +58,8 @@ public class MemberCommandServiceImpl implements MemberCommandService {
 
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
+    private final AmazonS3Manager amazonS3Manager;
+    private final UuidRepository uuidRepository;
 
 
     @Override
@@ -211,6 +218,20 @@ public class MemberCommandServiceImpl implements MemberCommandService {
                 .phoneOpen(true)
                 .pictureOpen(true)
                 .build().toMyProfileDTO();
+    }
+
+    @Override
+    @Transactional
+    public String saveMemberProfileImage(Member member, MultipartFile profileImage) {
+        //삭제가 가능하면 관련 로직 시행
+        String uuid = UUID.randomUUID().toString();
+        Uuid savedUuid = uuidRepository.save(Uuid.builder()
+                .uuid(uuid).build());
+        String generatedName = amazonS3Manager.generateProfileImageKeyName(savedUuid);
+        String profileImageUrl = amazonS3Manager.uploadFile(generatedName, profileImage);
+        member.setProfileImageUrl(profileImageUrl);
+        memberRepository.save(member);
+        return profileImageUrl;
     }
 
     @Override

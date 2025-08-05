@@ -1,5 +1,6 @@
 package umc.lightup.member.service;
 
+import org.springframework.web.multipart.MultipartFile;
 import umc.lightup.member.domain.Member;
 import umc.lightup.member.dto.MemberRequestDTO;
 import umc.lightup.member.dto.MemberResponseDTO;
@@ -14,6 +15,7 @@ public interface MemberCommandService {
     Member putMember(String email, MemberRequestDTO.ChangeDto request);
     MemberResponseDTO.MyProfileDTO getMemberProfile(Member member);
     MemberResponseDTO.MyProfileDTO putMemberProfile(Member member, MemberRequestDTO.ProfileChangeDto request);
+    String saveMemberProfileImage(Member member, MultipartFile profileImage);
     String selectSkill(Long skillId,Member member);
     String selectStrength(Long strengthId,Member member);
     List<MemberResponseDTO.singleRegionResultDTO> selectRegions(Member member, MemberRequestDTO.MemberRegionListRequestDTO request);

@@ -64,6 +64,7 @@ public class Member extends BaseEntity implements UserDetails {
     @Column(columnDefinition = "TEXT")
     private String selfIntroduce;
 
+    @Setter
     private String profileImageUrl; // 추가, S3 필요
 
     @Builder.Default

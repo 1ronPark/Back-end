@@ -125,6 +125,14 @@ public class MemberResponseDTO {
     public static class EmailExistResultDTO{
         boolean exist;
     }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ProfileImageSaveResultDTO {
+        String profileImageUrl;
+    }
   
     @Getter
     @Builder

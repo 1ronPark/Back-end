@@ -5,9 +5,12 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import umc.lightup.api.ApiResponse;
 import umc.lightup.api.code.status.SuccessStatus;
 import umc.lightup.member.converter.MemberConverter;
@@ -16,6 +19,7 @@ import umc.lightup.member.dto.MemberRequestDTO;
 import umc.lightup.member.dto.MemberResponseDTO;
 import umc.lightup.member.service.CredentialQueryService;
 import umc.lightup.member.service.MemberCommandService;
+import umc.lightup.member.validation.annotation.ImageFile;
 
 import java.util.List;
 
@@ -144,6 +148,23 @@ public class MemberRestController {
         Member member = memberCommandService.getMember(email);
         if (request.getActivities() == null) request.setActivities(List.of()); //nullable하니 오류 방지를 위함
         return ApiResponse.onSuccess(memberCommandService.putMemberProfile(member, request));
+    }
+
+    @PostMapping(value = "/me/profile/image/edit", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @Operation(
+            summary = "회원 프로필 사진 변경 API",
+            description = "회원 프로필 사진을 변경하는 API입니다. 프로필 사진 업로드가 필요합니다.",
+            security = { @SecurityRequirement(name = "JWT TOKEN")}
+    )
+    public ApiResponse<MemberResponseDTO.ProfileImageSaveResultDTO> changeMemberImage(
+            Authentication authentication,
+            @RequestPart(value = "profileImage") @NotNull @ImageFile MultipartFile profileImage) {
+        Member member = memberCommandService.getMember(authentication.getName());
+        String profileImageUrl = memberCommandService.saveMemberProfileImage(member, profileImage);
+        return ApiResponse.onSuccess(
+                MemberResponseDTO.ProfileImageSaveResultDTO.builder()
+                        .profileImageUrl(profileImageUrl)
+                        .build());
     }
 
     @PostMapping("/password/change")
