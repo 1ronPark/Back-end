@@ -26,6 +26,7 @@ import umc.lightup.position.repository.PositionRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -108,14 +109,20 @@ public class ItemCommandServiceImpl implements ItemCommandService {
     }
 
     @Override
-    public List<ItemResponseDTO.ItemResultDTO> getAllItems(Pageable pageable) {
+    public Set<Long> findItemLikes(long memberId) {
+        return itemLikeRepository.findItemIdsLikedByMemberId(memberId);
+    }
+
+    @Override
+    public List<ItemResponseDTO.ItemResultDTO> getAllItems(Pageable pageable, Set<Long> likedItemIds) {
         Page<Item> itemPage = itemRepository.findAll(pageable);
 
         return itemPage.stream()
                 .map(item -> {
                     String itemImageUrl = item.getItemProfileImageUrl();
+                    boolean liked = likedItemIds != null && likedItemIds.contains(item.getId());
 
-                    return ItemConverter.toItemResultDTO(item, itemImageUrl);
+                    return ItemConverter.toItemResultDTO(item, itemImageUrl, liked);
                 }).toList();
     }
 
@@ -136,6 +143,11 @@ public class ItemCommandServiceImpl implements ItemCommandService {
     public Item getSingleItem(Long itemId) {
         return itemRepository.findById(itemId)
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.ITEM_NOT_FOUND));
+    }
+
+    @Override
+    public boolean getItemLike(long memberId, long itemId) {
+        return itemLikeRepository.existsByMemberIdAndItemId(memberId, itemId);
     }
 
     @Override

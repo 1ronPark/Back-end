@@ -29,6 +29,7 @@ public class ItemResponseDTO {
         String itemName;
         String memberName;
         String itemImageUrl;
+        private boolean likedByCurrentUser;
     }
 
     @Getter
@@ -74,6 +75,7 @@ public class ItemResponseDTO {
         private List<ItemRegionResultDTO> regions;
         private String description;
         private List<RecruitPositionResultDTO> recruitPositions;
+        private boolean likedByCurrentUser;
     }
 
     @Getter

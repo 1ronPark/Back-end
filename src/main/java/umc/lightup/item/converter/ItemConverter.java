@@ -16,11 +16,12 @@ public class ItemConverter {
                 .build();
     }
 
-    public static ItemResponseDTO.ItemResultDTO toItemResultDTO(Item item, String itemImageUrl) {
+    public static ItemResponseDTO.ItemResultDTO toItemResultDTO(Item item, String itemImageUrl, boolean itemLike) {
         return ItemResponseDTO.ItemResultDTO.builder()
                 .itemName(item.getName())
                 .memberName(item.getMember().getName())
                 .itemImageUrl(itemImageUrl)
+                .likedByCurrentUser(itemLike)
                 .build();
     }
 
@@ -44,7 +45,7 @@ public class ItemConverter {
                 .build();
     }
 
-    public static ItemResponseDTO.ItemInfoDTO toItemInfoDTO(Item item, List<ItemResponseDTO.ItemRegionResultDTO> itemRegionResultDTOList, List<ItemResponseDTO.RecruitPositionResultDTO> recruitPositionResultDTOList) {
+    public static ItemResponseDTO.ItemInfoDTO toItemInfoDTO(Item item, List<ItemResponseDTO.ItemRegionResultDTO> itemRegionResultDTOList, List<ItemResponseDTO.RecruitPositionResultDTO> recruitPositionResultDTOList, boolean itemLike) {
         return ItemResponseDTO.ItemInfoDTO.builder()
                 .introduce(item.getIntroduce())
                 .itemName(item.getName())
@@ -58,13 +59,14 @@ public class ItemConverter {
                 .regions(itemRegionResultDTOList)
                 .description(item.getDescription())
                 .recruitPositions(recruitPositionResultDTOList)
+                .likedByCurrentUser(itemLike)
                 .build();
     }
 
     public static ItemResponseDTO.ItemRegionResultDTO toItemRegionResultDTO(MemberRegion memberRegion) {
         return ItemResponseDTO.ItemRegionResultDTO.builder()
-                .siDo(memberRegion.getRegion().getSiDo())
-                .siGunGu(memberRegion.getRegion().getSiGunGu())
+                .siDo(memberRegion.getSiDo())
+                .siGunGu(memberRegion.getSiGunGu())
                 .build();
     }
 
