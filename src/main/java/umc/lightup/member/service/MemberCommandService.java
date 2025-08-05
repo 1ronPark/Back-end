@@ -13,8 +13,11 @@ public interface MemberCommandService {
     MemberResponseDTO.MemberInfoDTO getMember(long id, String viewerEmail);
     Member putMember(String email, MemberRequestDTO.ChangeDto request);
     String selectSkill(Long skillId,Member member);
+    void removeMemberSkill(Long skillId, Long memberId);
     String selectStrength(Long strengthId,Member member);
+    void removeMemberStrength(Long strengthId, Long memberId);
     List<MemberResponseDTO.singleRegionResultDTO> selectRegions(Member member, MemberRequestDTO.MemberRegionListRequestDTO request);
+    void removeMemberRegion(Long memberRegionId, Long memberId);
     void addMemberLike(Member fromMember, long toMemberId);
     void removeMemberLike(String fromMemberEmail, long toMemberId);
     boolean isNicknameExist(String nickname);
