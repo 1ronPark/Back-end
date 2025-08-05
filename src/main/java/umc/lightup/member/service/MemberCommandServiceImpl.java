@@ -223,7 +223,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     @Override
     @Transactional
     public String saveMemberProfileImage(Member member, MultipartFile profileImage) {
-        //삭제가 가능하면 관련 로직 시행
+        //삭제가 가능하면 진행하는 게 좋긴 함
         String uuid = UUID.randomUUID().toString();
         Uuid savedUuid = uuidRepository.save(Uuid.builder()
                 .uuid(uuid).build());
@@ -232,6 +232,37 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         member.setProfileImageUrl(profileImageUrl);
         memberRepository.save(member);
         return profileImageUrl;
+    }
+
+    @Override
+    @Transactional
+    public Portfolio savePortfolio(Member member, String name, MultipartFile portfolioFile) {
+        String uuid = UUID.randomUUID().toString();
+        Uuid savedUuid = uuidRepository.save(Uuid.builder()
+                .uuid(uuid).build());
+        String generatedName = amazonS3Manager.generatePortFolioKeyName(savedUuid);
+        String profileImageUrl = amazonS3Manager.uploadFile(generatedName, portfolioFile);
+        return savePortfolio(member, name, profileImageUrl);
+    }
+
+    @Override
+    @Transactional
+    public Portfolio savePortfolio(Member member, String name, String portfolioLink) {
+        Portfolio portfolio = Portfolio.builder()
+                .name(name)
+                .fileUrl(portfolioLink)
+                .member(member)
+                .build();
+        return portfolioRepository.save(portfolio);
+    }
+
+    @Override
+    @Transactional
+    public void removePortfolio(String memberEmail, long portFolioId) {
+        //삭제가 가능하면 진행하는 게 좋긴 함
+        if (portfolioRepository.removeByIdAndMemberEmail(portFolioId, memberEmail) == 0)
+            //데이터를 지우면서 지운 row의 수가 0은 아닌지 확인(1이어야 함)
+            throw new GeneralHandler(ErrorStatus.PORTFOLIO_NOT_FOUND);
     }
 
     @Override

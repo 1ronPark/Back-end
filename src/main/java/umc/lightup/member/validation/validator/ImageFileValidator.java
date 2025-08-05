@@ -2,10 +2,12 @@ package umc.lightup.member.validation.validator;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import umc.lightup.api.code.status.ErrorStatus;
 import umc.lightup.member.validation.annotation.ImageFile;
 
+@Component
 public class ImageFileValidator implements ConstraintValidator<ImageFile, MultipartFile> {
     @Override
     public void initialize(ImageFile constraintAnnotation) {

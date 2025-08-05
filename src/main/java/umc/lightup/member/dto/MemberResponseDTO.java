@@ -68,7 +68,7 @@ public class MemberResponseDTO {
         private List<StrengthResultWithIdDTO> strengths; //수정을 위한 ID 반환 필요할 수도 있음
         private List<RegionResultWithIdDTO> regions; //수정을 위한 ID 반환 필요할 수도 있음
         private List<String> positions; //이건 수정도 String으로 진행하니 이렇게 둠
-        private List<PortfolioInfoDTO> portfolios;
+        private List<PortfolioInfoWithIdDTO> portfolios;
         private String selfIntroduce;
         private List<ActivityInfoDTO> activities;
     }
@@ -132,6 +132,17 @@ public class MemberResponseDTO {
     @AllArgsConstructor
     public static class ProfileImageSaveResultDTO {
         String profileImageUrl;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @EqualsAndHashCode
+    public static class PortfolioInfoWithIdDTO {
+        private long id;
+        private String name;
+        private String fileUrl;
     }
   
     @Getter

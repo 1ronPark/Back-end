@@ -48,4 +48,8 @@ public class AmazonS3Manager {
     public String generateProfileImageKeyName(Uuid uuid) {
         return amazonConfig.getProfileImagePath() + '/' + uuid.getUuid();
     }
+
+    public String generatePortFolioKeyName(Uuid uuid) {
+        return amazonConfig.getPortfolioPath() + '/' + uuid.getUuid();
+    }
 }

@@ -166,6 +166,21 @@ public class MemberRequestDTO {
 
     @Getter
     @Setter
+    public static class PortFolioNameRequestDTO {
+        @NotEmpty
+        @Size(max = 30)
+        private String name;
+    }
+
+    @Getter
+    @Setter
+    public static class PortFolioRequestDTO {
+        @NotNull
+        private Long portfolioId;
+    }
+
+    @Getter
+    @Setter
     public static class MemberPositionRequestDTO {
         @NotEmpty
         private String position;

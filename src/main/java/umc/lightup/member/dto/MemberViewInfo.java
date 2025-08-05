@@ -136,7 +136,9 @@ public class MemberViewInfo {
                                 .build())
                         .toList())
                 .positions(positionNames)
-                .portfolios(getPortfolioInfoDTOs())
+                .portfolios(portfolios.stream()
+                        .map(MemberConverter::toPortfolioInfoWithIdDTO)
+                        .toList())
                 .activities(getActivityInfoDTOs())
                 .build();
     }
