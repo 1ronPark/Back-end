@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import umc.lightup.api.code.status.ErrorStatus;
 import umc.lightup.config.JwtTokenProvider;
 import umc.lightup.exception.handler.GeneralHandler;
+import umc.lightup.member.converter.MemberConverter;
 import umc.lightup.member.domain.*;
 import umc.lightup.member.dto.MemberRequestDTO;
 import umc.lightup.member.dto.MemberResponseDTO;
@@ -26,11 +27,10 @@ import umc.lightup.strength.repository.StrengthRepository;
 import umc.lightup.position.domain.Position;
 import umc.lightup.position.repository.PositionRepository;
 
+import java.util.ArrayList;
 import java.util.Collections;
 
 import umc.lightup.member.repository.*;
-import umc.lightup.region.domain.Region;
-import umc.lightup.region.repository.RegionRepository;
 
 import java.util.List;
 
@@ -43,10 +43,10 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     private final MemberPositionRepository memberPositionRepository;
     private final MemberSkillRepository memberSkillRepository;
     private final MemberStrengthRepository memberStrengthRepository;
+    private final MemberRegionRepository memberRegionRepository;
     private final PositionRepository positionRepository;
     private final SkillRepository skillRepository;
     private final StrengthRepository strengthRepository;
-    private final RegionRepository regionRepository;
     private final PortfolioRepository portfolioRepository;
     private final MemberLikeRepository memberLikeRepository;
     private final ActivityRepository activityRepository;
@@ -132,8 +132,8 @@ public class MemberCommandServiceImpl implements MemberCommandService {
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
         List<String> skills = memberSkillRepository.findSkillNameByMember(member);
         List<String> strengths = memberStrengthRepository.findStrengthNameByMember(member);
-        List<Region> regions = regionRepository.findByMember(member);
         List<String> positions = memberPositionRepository.findPositionNameByMember(member);
+        List<MemberRegion> regions = memberRegionRepository.findByMember(member);
         List<Portfolio> portfolios = portfolioRepository.findByMember(member);
         List<Activity> activities = activityRepository.findByMember(member);
         return MemberViewInfo.builder()
@@ -173,7 +173,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
                 .member(member)
                 .skills(memberSkillRepository.findSkillByMember(member))
                 .strengths(memberStrengthRepository.findStrengthByMember(member))
-                .regions(regionRepository.findByMember(member))
+                .regions(memberRegionRepository.findByMember(member))
                 .positionNames(memberPositionRepository.findPositionNameByMember(member))
                 .portfolios(portfolioRepository.findByMember(member))
                 .activities(activityRepository.findByMember(member))
@@ -203,7 +203,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
                 .member(member)
                 .skills(memberSkillRepository.findSkillByMember(member))
                 .strengths(memberStrengthRepository.findStrengthByMember(member))
-                .regions(regionRepository.findByMember(member))
+                .regions(memberRegionRepository.findByMember(member))
                 .positionNames(memberPositionRepository.findPositionNameByMember(member))
                 .portfolios(portfolioRepository.findByMember(member))
                 .activities(activities)
@@ -241,6 +241,23 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         memberStrengthRepository.save(memberStrength);
 
         return foundStrength.getName();
+    }
+
+    @Override
+    @Transactional
+    public List<MemberResponseDTO.singleRegionResultDTO> selectRegions(Member member, MemberRequestDTO.MemberRegionListRequestDTO request) {
+        List<MemberResponseDTO.singleRegionResultDTO> resultDTOList = new ArrayList<>();
+        for (MemberRequestDTO.MemberRegionRequestDTO dto : request.getMemberRegions()) {
+            MemberRegion memberRegion = MemberRegion.builder()
+                    .member(member)
+                    .siDo(dto.getSiDo())
+                    .siGunGu(dto.getSiGunGu() == null ? "전체" : dto.getSiGunGu())
+                    .build();
+
+            member.addMemberRegion(memberRegion);
+            resultDTOList.add(MemberConverter.toSingleRegionResultDTO(memberRegion));
+        }
+        return resultDTOList;
     }
 
     @Override

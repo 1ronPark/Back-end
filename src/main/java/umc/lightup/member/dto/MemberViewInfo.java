@@ -1,10 +1,11 @@
 package umc.lightup.member.dto;
 
 import lombok.*;
+import umc.lightup.member.converter.MemberConverter;
 import umc.lightup.member.domain.Activity;
 import umc.lightup.member.domain.Member;
+import umc.lightup.member.domain.MemberRegion;
 import umc.lightup.member.domain.Portfolio;
-import umc.lightup.region.domain.Region;
 import umc.lightup.skill.domain.Skill;
 import umc.lightup.strength.domain.Strength;
 
@@ -34,7 +35,7 @@ public class MemberViewInfo {
     @Builder.Default
     private List<Strength> strengths = List.of();
     @Builder.Default
-    private List<Region> regions = List.of();
+    private List<MemberRegion> regions = List.of();
     @Builder.Default
     private List<Portfolio> portfolios = List.of();
     @Builder.Default
@@ -63,7 +64,9 @@ public class MemberViewInfo {
                 .skills(skillNames)
                 .strengths(strengthNames)
                 .positions(positionNames)
-                .regions(getRegionAsList())
+                .regions(regions.stream()
+                        .map(MemberConverter::toSingleRegionResultDTO)
+                        .toList())
                 .portfolios(getPortfolioInfoDTOs())
                 .activities(getActivityInfoDTOs())
 
@@ -111,9 +114,27 @@ public class MemberViewInfo {
                 .mbti(member.getMbti())
                 .profileImageUrl(member.getProfileImageUrl())
                 .selfIntroduce(member.getSelfIntroduce())
-                .skills(skills)
-                .strengths(strengths)
-                .regions(regions)
+                .skills(skills.stream()
+                        .map(s->MemberResponseDTO.SkillResultWithIdDTO.builder()
+                                .id(s.getId())
+                                .name(s.getName())
+                                .skillType(s.getSkillType())
+                                .build())
+                        .toList())
+                .strengths(strengths.stream()
+                        .map(s->MemberResponseDTO.StrengthResultWithIdDTO.builder()
+                                .id(s.getId())
+                                .name(s.getName())
+                                .strengthType(s.getStrengthType())
+                                .build())
+                        .toList())
+                .regions(regions.stream()
+                        .map(r-> MemberResponseDTO.RegionResultWithIdDTO.builder()
+                                .id(r.getId())
+                                .siDo(r.getSiDo())
+                                .siGunGu(r.getSiGunGu())
+                                .build())
+                        .toList())
                 .positions(positionNames)
                 .portfolios(getPortfolioInfoDTOs())
                 .activities(getActivityInfoDTOs())

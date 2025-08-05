@@ -63,8 +63,8 @@ public class ItemConverter {
 
     public static ItemResponseDTO.ItemRegionResultDTO toItemRegionResultDTO(MemberRegion memberRegion) {
         return ItemResponseDTO.ItemRegionResultDTO.builder()
-                .siDo(memberRegion.getRegion().getSiDo())
-                .siGunGu(memberRegion.getRegion().getSiGunGu())
+                .siDo(memberRegion.getSiDo())
+                .siGunGu(memberRegion.getSiGunGu())
                 .build();
     }
 

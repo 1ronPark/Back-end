@@ -15,8 +15,8 @@ public interface RegionRepository extends JpaRepository<Region, Long> {
 
     List<Region> findBySiDo(String siDo);
 
-    @Query("select r from MemberRegion mr join mr.region r where mr.member=:member")
-    List<Region> findByMember(@Param("member") Member member);
+/*    @Query("select r from MemberRegion mr join mr.region r where mr.member=:member")
+    List<Region> findByMember(@Param("member") Member member);*/
 
     boolean existsBySiDo(String siDo);
     boolean existsBySiGunGu(String siGunGu);
