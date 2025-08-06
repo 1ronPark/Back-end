@@ -48,7 +48,7 @@ public class ItemConverter {
                 .build();
     }
 
-    public static ItemResponseDTO.ItemInfoDTO toItemInfoDTO(Item item, List<ItemResponseDTO.ItemRegionResultDTO> itemRegionResultDTOList, List<ItemResponseDTO.RecruitPositionResultDTO> recruitPositionResultDTOList, boolean itemLike) {
+    public static ItemResponseDTO.ItemInfoDTO toItemInfoDTO(Item item, List<ItemResponseDTO.ItemRegionResultDTO> itemRegionResultDTOList, List<ItemResponseDTO.RecruitPositionResultDTO> recruitPositionResultDTOList, List<ItemResponseDTO.ItemCommentResultDTO> itemCommentResultDTOList, boolean itemLike) {
         return ItemResponseDTO.ItemInfoDTO.builder()
                 .introduce(item.getIntroduce())
                 .itemName(item.getName())
@@ -62,6 +62,7 @@ public class ItemConverter {
                 .regions(itemRegionResultDTOList)
                 .description(item.getDescription())
                 .recruitPositions(recruitPositionResultDTOList)
+                .itemComments(itemCommentResultDTOList)
                 .likedByCurrentUser(itemLike)
                 .build();
     }
@@ -104,9 +105,11 @@ public class ItemConverter {
 
     public static ItemResponseDTO.ItemCommentResultDTO toItemCommentResultDTO (ItemComment itemComment) {
         return ItemResponseDTO.ItemCommentResultDTO.builder()
+                .itemCommentId(itemComment.getId())
                 .authorName(itemComment.getCommentMember().getName())
                 .authorProfileImageURL(itemComment.getCommentMember().getProfileImageUrl())
                 .content(itemComment.getContent())
+                .updatedAt(itemComment.getUpdatedAt())
                 .build();
     }
 

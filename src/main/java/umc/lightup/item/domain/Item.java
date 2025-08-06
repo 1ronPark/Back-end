@@ -63,6 +63,9 @@ public class Item extends BaseEntity {
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
     private List<ItemImage> itemImages = new ArrayList<>();
 
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    private List<ItemComment> itemComments = new ArrayList<>();
+
     //프로젝트에 프로젝트 프로필 이미지, 기획서를 제외하고 사진을 추가로 업로드 할 수 있게 하려면 itemImages도 필요함
     public Item uploadItemProfile(String itemProfileImageUrl) {
         this.itemProfileImageUrl = itemProfileImageUrl;

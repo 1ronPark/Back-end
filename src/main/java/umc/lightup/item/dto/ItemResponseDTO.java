@@ -79,6 +79,7 @@ public class ItemResponseDTO {
         private List<ItemRegionResultDTO> regions;
         private String description;
         private List<RecruitPositionResultDTO> recruitPositions;
+        private List<ItemCommentResultDTO> itemComments;
         private boolean likedByCurrentUser;
     }
 
@@ -117,8 +118,10 @@ public class ItemResponseDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ItemCommentResultDTO {
+        private Long itemCommentId;
         private String authorName;
         private String authorProfileImageURL;
         private String content;
+        private LocalDateTime updatedAt;
     }
 }

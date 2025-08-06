@@ -32,4 +32,6 @@ public interface ItemCommandService {
     List<ItemResponseDTO.ItemRegionResultDTO> getItemRegions(Item item);
 
     List<ItemResponseDTO.RecruitPositionResultDTO> getItemRecruitPositions(Item item);
+
+    List<ItemResponseDTO.ItemCommentResultDTO> getItemComments(Item item);
 }

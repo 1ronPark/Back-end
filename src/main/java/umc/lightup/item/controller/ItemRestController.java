@@ -85,9 +85,10 @@ public class ItemRestController {
         Item findItem = itemCommandService.getSingleItem(itemId);
         List<ItemResponseDTO.ItemRegionResultDTO> itemRegions = itemCommandService.getItemRegions(findItem);
         List<ItemResponseDTO.RecruitPositionResultDTO> itemRecruitPositions = itemCommandService.getItemRecruitPositions(findItem);
+        List<ItemResponseDTO.ItemCommentResultDTO> itemComments = itemCommandService.getItemComments(findItem);
         boolean itemLike = itemCommandService.getItemLike(member.getId(), findItem.getId());
         itemCommandService.updateItemHistory(member, findItem);
-        return ApiResponse.onSuccess(ItemConverter.toItemInfoDTO(findItem, itemRegions, itemRecruitPositions, itemLike));
+        return ApiResponse.onSuccess(ItemConverter.toItemInfoDTO(findItem, itemRegions, itemRecruitPositions, itemComments, itemLike));
     }
 
     @PostMapping("/{itemId}/like")

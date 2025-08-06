@@ -249,4 +249,11 @@ public class ItemCommandServiceImpl implements ItemCommandService {
             throw new GeneralHandler(ErrorStatus.ITEM_COMMENT_NOT_FOUND);
         }
     }
+
+    @Override
+    public List<ItemResponseDTO.ItemCommentResultDTO> getItemComments(Item item) {
+        return item.getItemComments().stream()
+                .map(ItemConverter::toItemCommentResultDTO)
+                .toList();
+    }
 }
