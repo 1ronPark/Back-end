@@ -33,6 +33,7 @@ public class ItemResponseDTO {
         private String itemImageUrl;
         private LocalDate updatedAt;
         private boolean recruitStatus;
+        private int commentCount;
         private boolean likedByCurrentUser;
     }
 
@@ -80,6 +81,7 @@ public class ItemResponseDTO {
         private String description;
         private List<RecruitPositionResultDTO> recruitPositions;
         private List<ItemCommentResultDTO> itemComments;
+        private int commentCount;
         private boolean likedByCurrentUser;
     }
 

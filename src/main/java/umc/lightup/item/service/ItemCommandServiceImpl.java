@@ -122,8 +122,9 @@ public class ItemCommandServiceImpl implements ItemCommandService {
                 .map(item -> {
                     String itemImageUrl = item.getItemProfileImageUrl();
                     boolean liked = likedItemIds != null && likedItemIds.contains(item.getId());
+                    int commentCount = itemCommentRepository.countByItemId(item.getId());
 
-                    return ItemConverter.toItemResultDTO(item, itemImageUrl, liked);
+                    return ItemConverter.toItemResultDTO(item, itemImageUrl, commentCount, liked);
                 }).toList();
     }
 
@@ -261,5 +262,10 @@ public class ItemCommandServiceImpl implements ItemCommandService {
         return item.getItemComments().stream()
                 .map(ItemConverter::toItemCommentResultDTO)
                 .toList();
+    }
+
+    @Override
+    public int countComments(Long itemId) {
+        return itemCommentRepository.countByItemId(itemId);
     }
 }

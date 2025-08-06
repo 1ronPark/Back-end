@@ -28,6 +28,7 @@ public interface ItemCommandService {
     ItemComment createItemComment(Member member, Long itemId, ItemRequestDTO.ItemCommentRequestDTO request);
     void removeItemComment(Member member, Long commentId);
     Set<Long> findItemLikes(long memberId);
+    int countComments(Long itemId);
 
     List<ItemResponseDTO.ItemResultDTO> getAllItems(Pageable pageable, @Nullable Set<Long> likedItemIds);
 
