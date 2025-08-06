@@ -82,7 +82,7 @@ public class ItemRestController {
     @Operation(summary = "특정 프로젝트 상세 조회 API", description = "특정 프로젝트를 상세 조회하는 API 입니다.")
     public ApiResponse<ItemResponseDTO.ItemInfoDTO> getItemInfo(Authentication authentication, @PathVariable("itemId") @Min(1) Long itemId) {
         Member member = memberCommandService.getMember(authentication.getName());
-        Item findItem = itemCommandService.getSingleItem(itemId);
+        Item findItem = itemCommandService.getSingleItemWithComments(itemId);
         List<ItemResponseDTO.ItemRegionResultDTO> itemRegions = itemCommandService.getItemRegions(findItem);
         List<ItemResponseDTO.RecruitPositionResultDTO> itemRecruitPositions = itemCommandService.getItemRecruitPositions(findItem);
         List<ItemResponseDTO.ItemCommentResultDTO> itemComments = itemCommandService.getItemComments(findItem);

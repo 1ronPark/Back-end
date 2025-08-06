@@ -147,6 +147,12 @@ public class ItemCommandServiceImpl implements ItemCommandService {
     }
 
     @Override
+    public Item getSingleItemWithComments(Long itemId) {
+        return itemRepository.findByIdWithComments(itemId)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.ITEM_NOT_FOUND));
+    }
+
+    @Override
     public boolean getItemLike(long memberId, long itemId) {
         return itemLikeRepository.existsByMemberIdAndItemId(memberId, itemId);
     }
