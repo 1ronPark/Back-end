@@ -71,6 +71,9 @@ public enum ErrorStatus implements BaseErrorCode {
     //MemberStrength 관련 에러
     MEMBER_STRENGTH_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER_STRENGTH4000", "유저의 강점이 존재하지 않습니다."),
 
+    //MemberRegion 관련 에러
+    MEMBER_REGION_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER_REGION4000", "선택 지역이 존재하지 않습니다."),
+
     //Email 관련 에러
     EMAIL_SEND_FAIL(HttpStatus.SERVICE_UNAVAILABLE, "EMAIL5003", "이메일 전송에 실패했습니다.")
     ;
