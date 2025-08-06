@@ -8,7 +8,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import umc.lightup.AppConfig;
 import umc.lightup.common.BaseEntity;
-import umc.lightup.member.enums.Mbti;
 import umc.lightup.member.enums.Role;
 import umc.lightup.member.service.CredentialQueryService;
 
@@ -43,9 +42,15 @@ public class Member extends BaseEntity implements UserDetails {
     @Column(length = 8)
     private Role role;
 
-    @Enumerated(EnumType.STRING)
-    @Column(length = 4)
-    private Mbti mbti;
+    /**
+     * E +8,
+     * N +4,
+     * F +2,
+     * P +1,
+     * 총 0(ISTJ)~15(ENFP)로 표현
+     * */
+    @Column(columnDefinition = "BIT(4)")
+    private Byte mbti;
 
     @Column(unique = true, nullable = false, length = 30)
     private String email;

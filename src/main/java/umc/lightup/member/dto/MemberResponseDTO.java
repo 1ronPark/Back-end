@@ -99,6 +99,33 @@ public class MemberResponseDTO {
         private String phoneNumber;
         private String profileImageUrl;
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class MemberInfoListDTO {
+        List<MemberInfoSimpleDTO> members;
+        int totalPages;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class MemberInfoSimpleDTO {
+        private long id;
+        private String name;
+        private String nickname;
+        private Boolean gender;
+        private Mbti mbti;
+        private String selfIntroduce;
+        private List<String> skills;
+        private List<String> strengths;
+        private List<singleRegionResultDTO> regions;
+        private List<String> positions;
+        private String profileImageUrl;
+    }
     
     @Getter
     @Builder
@@ -236,7 +263,7 @@ public class MemberResponseDTO {
                 .nickname(member.getNickname())
                 .age(member.getAge())
                 .role(member.getRole())
-                .mbti(member.getMbti())
+                .mbti(Mbti.fromByte(member.getMbti()))
                 .birth(member.getBirth())
                 .gender(member.getGender())
                 .school(member.getSchool())

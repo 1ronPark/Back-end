@@ -217,6 +217,25 @@ public class MemberRestController {
         return ApiResponse.of(SuccessStatus._NO_CONTENT, null);
     }
 
+
+
+    @PostMapping("/search")
+    @Operation(
+            summary = "회원 검색 API",
+            description = "회원 프로필을 검색하는 API입니다.",
+            security = { @SecurityRequirement(name = "JWT TOKEN")}
+    )
+    public ApiResponse<MemberResponseDTO.MemberInfoListDTO> searchMember(
+            Authentication authentication,
+            @RequestBody MemberRequestDTO.MemberSearchRequestDTO request) {
+        Member member = null;
+        if (authentication != null) {
+            String email = authentication.getName();
+            member = memberCommandService.getMember(email);
+        }
+        return ApiResponse.onSuccess(memberCommandService.searchMember(member, request));
+    }
+
     @PostMapping("/password/change")
     @Operation(
             summary = "비밀번호 변경 API",

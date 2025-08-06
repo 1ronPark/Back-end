@@ -266,6 +266,13 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     }
 
     @Override
+    public MemberResponseDTO.MemberInfoListDTO searchMember(
+            Member member,
+            MemberRequestDTO.MemberSearchRequestDTO options) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
     @Transactional
     public String selectSkill(Long skillId, Member member) {
         Skill foundSkill = skillRepository.findById(skillId)

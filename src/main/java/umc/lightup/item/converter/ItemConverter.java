@@ -5,6 +5,7 @@ import umc.lightup.item.dto.ItemRequestDTO;
 import umc.lightup.item.dto.ItemResponseDTO;
 import umc.lightup.member.domain.Member;
 import umc.lightup.member.domain.MemberRegion;
+import umc.lightup.member.enums.Mbti;
 
 import java.util.List;
 
@@ -53,7 +54,7 @@ public class ItemConverter {
                 .memberName(item.getMember().getName())
                 .gender(item.getMember().getGender())
                 .age(item.getMember().getAge())
-                .mbti(item.getMember().getMbti())
+                .mbti(Mbti.fromByte(item.getMember().getMbti()))
                 .email(item.getMember().getEmail())
                 .school(item.getMember().getSchool())
                 .regions(itemRegionResultDTOList)
