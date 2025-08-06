@@ -35,6 +35,7 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/api/v1/members/me",
+                                "/api/v1/members/me/**",
                                 "/api/v1/members/password/change",
                                 "/api/v1/members/*/like")
                         .authenticated()

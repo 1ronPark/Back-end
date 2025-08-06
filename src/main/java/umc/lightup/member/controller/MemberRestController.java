@@ -1,22 +1,28 @@
 package umc.lightup.member.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import umc.lightup.api.ApiResponse;
 import umc.lightup.api.code.status.SuccessStatus;
 import umc.lightup.member.converter.MemberConverter;
 import umc.lightup.member.domain.Member;
+import umc.lightup.member.domain.Portfolio;
 import umc.lightup.member.dto.MemberRequestDTO;
 import umc.lightup.member.dto.MemberResponseDTO;
+import umc.lightup.member.dto.PortfolioInfoDTO;
 import umc.lightup.member.service.CredentialQueryService;
 import umc.lightup.member.service.MemberCommandService;
+import umc.lightup.member.validation.annotation.ImageFile;
+import umc.lightup.member.validation.annotation.ReadableDocumentFile;
 
 import java.util.List;
 
@@ -68,7 +74,7 @@ public class MemberRestController {
             security = { @SecurityRequirement(name = "JWT TOKEN")}
     )
     public ApiResponse<MemberResponseDTO.MemberInfoDTO> getMemberInfo(Authentication authentication,
-                                                                  @PathVariable("memberId") long id) {
+                                                                      @PathVariable("memberId") long id) {
         String email = null;
         if (authentication != null)
             email = authentication.getName();
@@ -117,6 +123,98 @@ public class MemberRestController {
         //로그아웃이 필수인 이유가 jwt에 이메일을 저장하기 때문인데, 이 때문에 A와 B가 서로의 비밀번호를 몰라도 서로 이메일을 바꾸면 A는 B 계정에, B는 A 계정에 접속할 수 있음.
         String email = authentication.getName();
         return ApiResponse.onSuccess(MemberResponseDTO.toMyInfoDTO(memberCommandService.putMember(email, request)));
+    }
+
+    @GetMapping("/me/profile")
+    @Operation(
+            summary = "회원 프로필 조회 API",
+            description = "자신의 회원 프로필을 조회하는 API입니다.",
+            security = { @SecurityRequirement(name = "JWT TOKEN")}
+    )
+    public ApiResponse<MemberResponseDTO.MyProfileDTO> getMemberProfile(
+            Authentication authentication) {
+        String email = authentication.getName();
+        Member member = memberCommandService.getMember(email);
+        return ApiResponse.onSuccess(memberCommandService.getMemberProfile(member));
+    }
+
+    @PutMapping("/me/profile")
+    @Operation(
+            summary = "회원 프로필 변경 API",
+            description = "회원 프로필을 변경하는 API입니다.",
+            security = { @SecurityRequirement(name = "JWT TOKEN")}
+    )
+    public ApiResponse<MemberResponseDTO.MyProfileDTO> changeMemberProfile(
+            Authentication authentication,
+            @RequestBody @Valid MemberRequestDTO.ProfileChangeDto request) {
+        String email = authentication.getName();
+        Member member = memberCommandService.getMember(email);
+        if (request.getActivities() == null) request.setActivities(List.of()); //nullable하니 오류 방지를 위함
+        return ApiResponse.onSuccess(memberCommandService.putMemberProfile(member, request));
+    }
+
+    @PostMapping(value = "/me/profile/image/edit", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @Operation(
+            summary = "회원 프로필 사진 변경 API",
+            description = "회원 프로필 사진을 변경하는 API입니다. 프로필 사진 업로드가 필요합니다. 사진 파일만 업로드가 가능합니다.",
+            security = { @SecurityRequirement(name = "JWT TOKEN")}
+    )
+    public ApiResponse<MemberResponseDTO.ProfileImageSaveResultDTO> changeMemberImage(
+            Authentication authentication,
+            @RequestPart(value = "profileImage") @NotNull @ImageFile MultipartFile profileImage) {
+        Member member = memberCommandService.getMember(authentication.getName());
+        String profileImageUrl = memberCommandService.saveMemberProfileImage(member, profileImage);
+        return ApiResponse.onSuccess(
+                MemberResponseDTO.ProfileImageSaveResultDTO.builder()
+                        .profileImageUrl(profileImageUrl)
+                        .build());
+    }
+
+    @PostMapping(value = "/me/profile/portfolio/file", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @Operation(
+            summary = "회원 프로필의 포트폴리오 등록 API",
+            description = "회원 프로필의 포트폴리오를 파일로 등록하는 API입니다. 포트폴리오 파일 업로드가 필요합니다. 이름은 최대 30자까지만 입력할 수 있습니다.",
+            security = { @SecurityRequirement(name = "JWT TOKEN")}
+    )
+    public ApiResponse<MemberResponseDTO.PortfolioInfoWithIdDTO> portFolioFileRegister(
+            Authentication authentication,
+            // 아니 이걸 DTO로 안 받고 바로 String으로 받으면 에러나네...
+            @Parameter(content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
+            @RequestPart("request") @Valid MemberRequestDTO.PortFolioNameRequestDTO request,
+            @RequestPart(value = "portfolioFile") @NotNull @ReadableDocumentFile MultipartFile portfolioFile) {
+        Member member = memberCommandService.getMember(authentication.getName());
+        Portfolio saved = memberCommandService.savePortfolio(member, request.getName(), portfolioFile);
+        return ApiResponse.onSuccess(MemberConverter.toPortfolioInfoWithIdDTO(saved));
+    }
+
+    @PostMapping(value = "/me/profile/portfolio/link")
+    @Operation(
+            summary = "회원 프로필의 포트폴리오 등록 API",
+            description = "회원 프로필의 포트폴리오를 링크로 등록하는 API입니다. 유효한 링크인지는 확인하지 않습니다. 이름은 최대 30자까지만 입력할 수 있습니다.",
+            security = { @SecurityRequirement(name = "JWT TOKEN")}
+    )
+    public ApiResponse<MemberResponseDTO.PortfolioInfoWithIdDTO> portFolioLinkRegister(
+            Authentication authentication,
+            @RequestBody @Valid PortfolioInfoDTO portfolioInfo) {
+        Member member = memberCommandService.getMember(authentication.getName());
+        Portfolio saved = memberCommandService.savePortfolio(member,
+                portfolioInfo.getName(),
+                portfolioInfo.getFileUrl());
+        return ApiResponse.onSuccess(MemberConverter.toPortfolioInfoWithIdDTO(saved));
+    }
+
+    @DeleteMapping(value = "/me/profile/portfolio")
+    @Operation(
+            summary = "회원 프로필의 포트폴리오 삭제 API",
+            description = "회원 프로필의 포트폴리오를 삭제하는 API입니다.",
+            security = { @SecurityRequirement(name = "JWT TOKEN")}
+    )
+    public ApiResponse<MemberResponseDTO.ProfileImageSaveResultDTO> removePortFolio(
+            Authentication authentication,
+            @RequestBody @Valid MemberRequestDTO.PortFolioRequestDTO portfolioRequestDTO) {
+        String email = authentication.getName();
+        memberCommandService.removePortfolio(email, portfolioRequestDTO.getPortfolioId());
+        return ApiResponse.of(SuccessStatus._NO_CONTENT, null);
     }
 
     @PostMapping("/password/change")

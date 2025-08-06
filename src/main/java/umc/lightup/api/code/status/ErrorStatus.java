@@ -22,12 +22,17 @@ public enum ErrorStatus implements BaseErrorCode {
     DUPLICATE_EMAIL(HttpStatus.BAD_REQUEST, "MEMBER4004", "이미 존재하는 이메일입니다."),
     DUPLICATE_PHONE_NUMBER(HttpStatus.BAD_REQUEST, "MEMBER4005", "이미 존재하는 휴대폰 번호입니다."),
     INVALID_ROLE(HttpStatus.BAD_REQUEST, "MEMBER4006", "올바른 Role이 아닙니다. LEADER, TEAMMATE 중 하나를 선택해 주세요."),
+    NOT_IMAGE(HttpStatus.BAD_REQUEST, "MEMBER4008", "이미지 파일이 아닙니다."), //MEMBER4007 에러를 만들었던 기억이 있는데 왜 없지?
     NO_CREDENTIAL(HttpStatus.INTERNAL_SERVER_ERROR, "MEMBER5000", "저장된 패스워드가 없습니다."),
 
     //MemberLike 관련 에러
     ALREADY_LIKED(HttpStatus.BAD_REQUEST, "MEMBER4100", "이미 좋아요 한 회원입니다. 좋아요를 취소하려면 Delete Method로 요청을 보내 주세요."),
     LIKE_NOT_FOUND(HttpStatus.BAD_REQUEST, "MEMBER4101", "좋아요하지 않은 회원입니다. 좋아요를 하려면 Post Method로 요청을 보내 주세요."),
     SELF_LIKE(HttpStatus.BAD_REQUEST, "MEMBER4102", "회원 자신에 대한 좋아요 요청입니다."),
+
+    //PortFolio 관련 에러
+    NOT_READABLE_FILE(HttpStatus.BAD_REQUEST, "MEMBER4200", "읽을 수 있는 파일 형태가 아닙니다."),
+    PORTFOLIO_NOT_FOUND(HttpStatus.BAD_REQUEST, "MEMBER4201", "포트폴리오를 찾을 수 없습니다."),
 
     //Region 관련 에러
     REGION_NOT_FOUND(HttpStatus.NOT_FOUND, "REGION4000", "해당 지역이 존재하지 않습니다."),

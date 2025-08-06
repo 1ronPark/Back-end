@@ -6,7 +6,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import umc.lightup.api.code.status.ErrorStatus;
+import umc.lightup.aws.s3.AmazonS3Manager;
+import umc.lightup.common.Uuid;
+import umc.lightup.common.repository.UuidRepository;
 import umc.lightup.config.JwtTokenProvider;
 import umc.lightup.exception.handler.GeneralHandler;
 import umc.lightup.member.converter.MemberConverter;
@@ -31,10 +35,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import umc.lightup.member.repository.*;
-import umc.lightup.region.domain.Region;
-import umc.lightup.region.repository.RegionRepository;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -49,12 +52,14 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     private final PositionRepository positionRepository;
     private final SkillRepository skillRepository;
     private final StrengthRepository strengthRepository;
-    private final RegionRepository regionRepository;
     private final PortfolioRepository portfolioRepository;
     private final MemberLikeRepository memberLikeRepository;
-  
+    private final ActivityRepository activityRepository;
+
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
+    private final AmazonS3Manager amazonS3Manager;
+    private final UuidRepository uuidRepository;
 
 
     @Override
@@ -134,16 +139,18 @@ public class MemberCommandServiceImpl implements MemberCommandService {
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
         List<String> skills = memberSkillRepository.findSkillNameByMember(member);
         List<String> strengths = memberStrengthRepository.findStrengthNameByMember(member);
-//        List<Region> regions = regionRepository.findByMember(member);
+        List<String> positions = memberPositionRepository.findPositionNameByMember(member);
         List<MemberRegion> regions = memberRegionRepository.findByMember(member);
-
         List<Portfolio> portfolios = portfolioRepository.findByMember(member);
+        List<Activity> activities = activityRepository.findByMember(member);
         return MemberViewInfo.builder()
                 .member(member)
-                .skills(skills)
-                .strengths(strengths)
+                .skillNames(skills)
+                .strengthNames(strengths)
                 .regions(regions)
+                .positionNames(positions)
                 .portfolios(portfolios)
+                .activities(activities)
                 .emailOpen(false)
                 .phoneOpen(false)
                 .pictureOpen(false)
@@ -166,7 +173,98 @@ public class MemberCommandServiceImpl implements MemberCommandService {
             throw new GeneralHandler(ErrorStatus.DUPLICATE_NICKNAME);
         return memberRepository.save(request.toMember(member.getId()));
     }
-  
+
+    @Override
+    public MemberResponseDTO.MyProfileDTO getMemberProfile(Member member) {
+        return MemberViewInfo.builder()
+                .member(member)
+                .skills(memberSkillRepository.findSkillByMember(member))
+                .strengths(memberStrengthRepository.findStrengthByMember(member))
+                .regions(memberRegionRepository.findByMember(member))
+                .positionNames(memberPositionRepository.findPositionNameByMember(member))
+                .portfolios(portfolioRepository.findByMember(member))
+                .activities(activityRepository.findByMember(member))
+                .emailOpen(true)
+                .phoneOpen(true)
+                .pictureOpen(true)
+                .build().toMyProfileDTO();
+    }
+
+    @Override
+    @Transactional
+    public MemberResponseDTO.MyProfileDTO putMemberProfile(Member member, MemberRequestDTO.ProfileChangeDto request) {
+        member.setSelfIntroduce(request.getSelfIntroduction());
+        member.setProfileTitle(request.getProfileTitle());
+        activityRepository.removeAllByMember(member);
+        memberRepository.save(member);
+        List<Activity> activities = activityRepository.saveAll(request.getActivities().stream()
+                .map(a -> Activity.builder()
+                        .member(member)
+                        .name(a.getName())
+                        .startDate(a.getStartDate())
+                        .endDate(a.getEndDate())
+                        .build())
+                .toList());
+
+        return MemberViewInfo.builder()
+                .member(member)
+                .skills(memberSkillRepository.findSkillByMember(member))
+                .strengths(memberStrengthRepository.findStrengthByMember(member))
+                .regions(memberRegionRepository.findByMember(member))
+                .positionNames(memberPositionRepository.findPositionNameByMember(member))
+                .portfolios(portfolioRepository.findByMember(member))
+                .activities(activities)
+                .emailOpen(true)
+                .phoneOpen(true)
+                .pictureOpen(true)
+                .build().toMyProfileDTO();
+    }
+
+    @Override
+    @Transactional
+    public String saveMemberProfileImage(Member member, MultipartFile profileImage) {
+        //삭제가 가능하면 진행하는 게 좋긴 함
+        String uuid = UUID.randomUUID().toString();
+        Uuid savedUuid = uuidRepository.save(Uuid.builder()
+                .uuid(uuid).build());
+        String generatedName = amazonS3Manager.generateProfileImageKeyName(savedUuid);
+        String profileImageUrl = amazonS3Manager.uploadFile(generatedName, profileImage);
+        member.setProfileImageUrl(profileImageUrl);
+        memberRepository.save(member);
+        return profileImageUrl;
+    }
+
+    @Override
+    @Transactional
+    public Portfolio savePortfolio(Member member, String name, MultipartFile portfolioFile) {
+        String uuid = UUID.randomUUID().toString();
+        Uuid savedUuid = uuidRepository.save(Uuid.builder()
+                .uuid(uuid).build());
+        String generatedName = amazonS3Manager.generatePortFolioKeyName(savedUuid);
+        String profileImageUrl = amazonS3Manager.uploadFile(generatedName, portfolioFile);
+        return savePortfolio(member, name, profileImageUrl);
+    }
+
+    @Override
+    @Transactional
+    public Portfolio savePortfolio(Member member, String name, String portfolioLink) {
+        Portfolio portfolio = Portfolio.builder()
+                .name(name)
+                .fileUrl(portfolioLink)
+                .member(member)
+                .build();
+        return portfolioRepository.save(portfolio);
+    }
+
+    @Override
+    @Transactional
+    public void removePortfolio(String memberEmail, long portFolioId) {
+        //삭제가 가능하면 진행하는 게 좋긴 함
+        if (portfolioRepository.removeByIdAndMemberEmail(portFolioId, memberEmail) == 0)
+            //데이터를 지우면서 지운 row의 수가 0은 아닌지 확인(1이어야 함)
+            throw new GeneralHandler(ErrorStatus.PORTFOLIO_NOT_FOUND);
+    }
+
     @Override
     @Transactional
     public String selectSkill(Long skillId, Member member) {

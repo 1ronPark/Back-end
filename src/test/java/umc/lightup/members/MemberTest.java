@@ -21,6 +21,7 @@ import umc.lightup.member.domain.*;
 import umc.lightup.member.dto.EmailRequestDTO;
 import umc.lightup.member.dto.MemberRequestDTO;
 import umc.lightup.member.dto.MemberResponseDTO;
+import umc.lightup.member.dto.PortfolioInfoDTO;
 import umc.lightup.member.enums.Mbti;
 import umc.lightup.member.enums.Role;
 import umc.lightup.member.repository.*;
@@ -482,7 +483,7 @@ public class MemberTest {
                 () -> assertEquals(email3, myInfoResponse.getResult().getEmail()),
                 () -> assertEquals(null, myInfoResponse.getResult().getPhoneNumber()),
                 () -> assertNull(myInfoResponse.getResult().getSchool()),
-                () -> assertNull(myInfoResponse.getResult().getCareer()),
+                () -> assertNull(myInfoResponse.getResult().getSelfIntroduce()),
                 () -> assertNull(myInfoResponse.getResult().getProfileImageUrl())
         );
 
@@ -546,7 +547,7 @@ public class MemberTest {
                 () -> assertEquals(gender3, result.getGender()),
                 () -> assertEquals(role3, result.getRole()),
                 () -> assertEquals(mbti3, result.getMbti()),
-                () -> assertNull(result.getCareer()),
+                () -> assertNull(result.getSelfIntroduce()),
                 () -> assertNull(result.getSchool()),
                 () -> assertIterableEquals(List.of(), result.getSkills()),
                 () -> assertIterableEquals(List.of(), result.getStrengths()),
@@ -698,7 +699,7 @@ public class MemberTest {
                 () -> assertEquals(member.getGender(), result.getGender()),
                 () -> assertEquals(member.getRole(), result.getRole()),
                 () -> assertEquals(member.getMbti(), result.getMbti()),
-                () -> assertEquals(member.getCareer(), result.getCareer()),
+                () -> assertEquals(member.getSelfIntroduce(), result.getSelfIntroduce()),
                 () -> assertEquals(member.getSchool(), result.getSchool())
         );
 
@@ -721,7 +722,7 @@ public class MemberTest {
                 "region information"); //순서도 같도록 의도한 것
 
         assertIterableEquals(
-                portfolioSet.stream().map(portfolio -> MemberResponseDTO.PortfolioInfoDTO.builder()
+                portfolioSet.stream().map(portfolio -> PortfolioInfoDTO.builder()
                         .name(portfolio.getName())
                         .fileUrl(portfolio.getFileUrl())
                         .build()).toList(),
@@ -791,7 +792,7 @@ public class MemberTest {
                 () -> assertEquals(member.getGender(), result.getGender()),
                 () -> assertEquals(member.getRole(), result.getRole()),
                 () -> assertEquals(member.getMbti(), result.getMbti()),
-                () -> assertEquals(member.getCareer(), result.getCareer()),
+                () -> assertEquals(member.getSelfIntroduce(), result.getSelfIntroduce()),
                 () -> assertEquals(member.getSchool(), result.getSchool())
         );
 
@@ -814,7 +815,7 @@ public class MemberTest {
                 "region information"); //순서도 같도록 의도한 것
 
         assertIterableEquals(
-                portfolioSet.stream().map(portfolio -> MemberResponseDTO.PortfolioInfoDTO.builder()
+                portfolioSet.stream().map(portfolio -> PortfolioInfoDTO.builder()
                         .name(portfolio.getName())
                         .fileUrl(portfolio.getFileUrl())
                         .build()).toList(),
@@ -935,7 +936,7 @@ public class MemberTest {
                 () -> assertEquals(email4, myInfoResponseResult.getEmail()),
                 () -> assertEquals(null, myInfoResponseResult.getPhoneNumber()),
                 () -> assertNull(myInfoResponseResult.getSchool()),
-                () -> assertNull(myInfoResponseResult.getCareer()),
+                () -> assertNull(myInfoResponseResult.getSelfIntroduce()),
                 () -> assertNull(myInfoResponseResult.getProfileImageUrl())
         );
 
@@ -979,7 +980,7 @@ public class MemberTest {
                 () -> assertEquals(email4, change1ResponseResult.getEmail()),
                 () -> assertEquals(phoneNumber4, change1ResponseResult.getPhoneNumber()),
                 () -> assertNull(change1ResponseResult.getSchool()),
-                () -> assertNull(change1ResponseResult.getCareer()),
+                () -> assertNull(change1ResponseResult.getSelfIntroduce()),
                 () -> assertNull(change1ResponseResult.getProfileImageUrl())
         );
 
@@ -1057,7 +1058,7 @@ public class MemberTest {
                 () -> assertEquals(email4, change2ResponseResult.getEmail()),
                 () -> assertEquals(phoneNumber4, change2ResponseResult.getPhoneNumber()),
                 () -> assertNull(change2ResponseResult.getSchool()),
-                () -> assertNull(change2ResponseResult.getCareer()),
+                () -> assertNull(change2ResponseResult.getSelfIntroduce()),
                 () -> assertNull(change2ResponseResult.getProfileImageUrl())
         );
 
@@ -1101,7 +1102,7 @@ public class MemberTest {
                 () -> assertEquals("newEmail@example.com", change3ResponseResult.getEmail()),
                 () -> assertEquals("010-1111-2222", change3ResponseResult.getPhoneNumber()),
                 () -> assertNull(change3ResponseResult.getSchool()),
-                () -> assertNull(change3ResponseResult.getCareer()),
+                () -> assertNull(change3ResponseResult.getSelfIntroduce()),
                 () -> assertNull(change3ResponseResult.getProfileImageUrl())
         );
 

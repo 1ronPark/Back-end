@@ -2,6 +2,7 @@ package umc.lightup.member.converter;
 
 import umc.lightup.member.domain.Member;
 import umc.lightup.member.domain.MemberRegion;
+import umc.lightup.member.domain.Portfolio;
 import umc.lightup.member.dto.MemberResponseDTO;
 
 import java.util.List;
@@ -32,6 +33,14 @@ public class MemberConverter {
         return MemberResponseDTO.singleRegionResultDTO.builder()
                 .siDo(memberRegion.getSiDo())
                 .siGunGu(memberRegion.getSiGunGu())
+                .build();
+    }
+
+    public static MemberResponseDTO.PortfolioInfoWithIdDTO toPortfolioInfoWithIdDTO(Portfolio portfolio) {
+        return MemberResponseDTO.PortfolioInfoWithIdDTO.builder()
+                .id(portfolio.getId())
+                .name(portfolio.getName())
+                .fileUrl(portfolio.getFileUrl())
                 .build();
     }
 }
