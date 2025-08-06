@@ -102,6 +102,14 @@ public class ItemConverter {
                 .build();
     }
 
+    public static ItemResponseDTO.ItemCommentResultDTO toItemCommentResultDTO (ItemComment itemComment) {
+        return ItemResponseDTO.ItemCommentResultDTO.builder()
+                .authorName(itemComment.getCommentMember().getName())
+                .authorProfileImageURL(itemComment.getCommentMember().getProfileImageUrl())
+                .content(itemComment.getContent())
+                .build();
+    }
+
 /*    public static ItemImage toItemImage(Item item, String imageUrl) {
         return ItemImage.builder()
                 .item(item)

@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 import umc.lightup.item.domain.Item;
 import umc.lightup.item.domain.ItemApply;
+import umc.lightup.item.domain.ItemComment;
 import umc.lightup.item.dto.ItemRequestDTO;
 import umc.lightup.item.dto.ItemResponseDTO;
 import umc.lightup.member.domain.Member;
@@ -20,6 +21,7 @@ public interface ItemCommandService {
     void addItemLike(Member member, long itemId);
     void removeItemLike(String email, long itemId);
     void updateItemHistory(Member member, Item item);
+    ItemComment createItemComment(Member member, Long itemId, ItemRequestDTO.ItemCommentRequestDTO request);
     Set<Long> findItemLikes(long memberId);
 
     List<ItemResponseDTO.ItemResultDTO> getAllItems(Pageable pageable, @Nullable Set<Long> likedItemIds);

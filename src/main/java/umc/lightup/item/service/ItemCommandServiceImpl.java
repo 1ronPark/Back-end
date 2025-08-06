@@ -41,6 +41,7 @@ public class ItemCommandServiceImpl implements ItemCommandService {
     private final ItemLikeRepository itemLikeRepository;
     private final ItemViewHistoryRepository itemViewHistoryRepository;
     private final ItemApplyRepository itemApplyRepository;
+    private final ItemCommentRepository itemCommentRepository;
 
     private final AmazonS3Manager s3Manager;
     private final UuidRepository uuidRepository;
@@ -224,5 +225,20 @@ public class ItemCommandServiceImpl implements ItemCommandService {
                 .status(ItemApplyStatus.PENDING)
                 .appliedAt(LocalDateTime.now())
                 .build());
+    }
+
+    @Override
+    @Transactional
+    public ItemComment createItemComment(Member member, Long itemId, ItemRequestDTO.ItemCommentRequestDTO request) {
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.ITEM_NOT_FOUND));
+
+        ItemComment createdItemComment = ItemComment.builder()
+                .content(request.getContent())
+                .commentMember(member)
+                .item(item)
+                .build();
+
+        return itemCommentRepository.save(createdItemComment);
     }
 }

@@ -18,6 +18,7 @@ import umc.lightup.api.code.status.SuccessStatus;
 import umc.lightup.item.converter.ItemConverter;
 import umc.lightup.item.domain.Item;
 import umc.lightup.item.domain.ItemApply;
+import umc.lightup.item.domain.ItemComment;
 import umc.lightup.item.dto.ItemRequestDTO;
 import umc.lightup.item.dto.ItemResponseDTO;
 import umc.lightup.item.service.ItemCommandService;
@@ -113,5 +114,15 @@ public class ItemRestController {
         Item item = itemCommandService.getSingleItem(itemId);
         ItemApply itemApply = itemCommandService.applyItem(member, item);
         return ApiResponse.onSuccess(ItemConverter.toItemApplyResultDTO(itemApply));
+    }
+
+    @PostMapping("/{itemId}/comments")
+    @Operation(summary = "프로젝트 댓글 작성 API", description = "특정 프로젝트 상세 조회 페이지에서 댓글을 작성할 수 있는 API입니다.")
+    public ApiResponse<ItemResponseDTO.ItemCommentResultDTO> writeItemComment(Authentication authentication, @PathVariable("itemId") Long itemId, @RequestBody ItemRequestDTO.ItemCommentRequestDTO request) {
+        String email = authentication.getName();
+        Member member = memberCommandService.getMember(email);
+
+        ItemComment itemComment = itemCommandService.createItemComment(member, itemId, request);
+        return ApiResponse.onSuccess(ItemConverter.toItemCommentResultDTO(itemComment));
     }
 }

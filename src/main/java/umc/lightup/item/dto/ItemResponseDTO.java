@@ -111,4 +111,14 @@ public class ItemResponseDTO {
         private LocalDateTime appliedAt;
         private String message;
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ItemCommentResultDTO {
+        private String authorName;
+        private String authorProfileImageURL;
+        private String content;
+    }
 }
