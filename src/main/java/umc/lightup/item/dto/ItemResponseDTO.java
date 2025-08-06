@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import umc.lightup.member.enums.Gender;
 import umc.lightup.member.enums.Mbti;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -17,8 +18,8 @@ public class ItemResponseDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ItemJoinResultDTO {
-        Long memberId;
-        String itemName;
+        private Long memberId;
+        private String itemName;
     }
 
     @Getter
@@ -26,9 +27,12 @@ public class ItemResponseDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ItemResultDTO {
-        String itemName;
-        String memberName;
-        String itemImageUrl;
+        private Long itemId;
+        private String itemName;
+        private String memberName;
+        private String itemImageUrl;
+        private LocalDate updatedAt;
+        private boolean recruitStatus;
         private boolean likedByCurrentUser;
     }
 
@@ -37,7 +41,7 @@ public class ItemResponseDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ItemResultListDTO {
-        List<ItemResultDTO> items;
+        private List<ItemResultDTO> items;
     }
 
     @Getter
@@ -45,9 +49,9 @@ public class ItemResponseDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class MyItemResultDTO {
-        String itemName;
-        String introduce;
-        String itemImageUrl;
+        private String itemName;
+        private String introduce;
+        private String itemImageUrl;
     }
 
     @Getter
@@ -55,7 +59,7 @@ public class ItemResponseDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class MyItemResultListDTO {
-        List<MyItemResultDTO> items;
+        private List<MyItemResultDTO> items;
     }
 
     @Getter

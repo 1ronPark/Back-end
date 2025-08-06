@@ -18,9 +18,12 @@ public class ItemConverter {
 
     public static ItemResponseDTO.ItemResultDTO toItemResultDTO(Item item, String itemImageUrl, boolean itemLike) {
         return ItemResponseDTO.ItemResultDTO.builder()
+                .itemId(item.getId())
                 .itemName(item.getName())
                 .memberName(item.getMember().getName())
                 .itemImageUrl(itemImageUrl)
+                .updatedAt(item.getUpdatedAt().toLocalDate())
+                .recruitStatus(item.isProjectStatus())
                 .likedByCurrentUser(itemLike)
                 .build();
     }
