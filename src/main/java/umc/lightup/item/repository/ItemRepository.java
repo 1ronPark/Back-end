@@ -16,8 +16,8 @@ import java.util.Optional;
 @Repository
 public interface ItemRepository extends JpaRepository<Item, Long> {
     List<Item> findByMember(Member member);
-    @Query("select i from Item i left join fetch i.itemComments where i.id = :itemId")
-    Optional<Item> findByIdWithComments(@Param("itemId") Long itemId);
+    @Query("select distinct i from Item i left join fetch i.itemComments ic left join fetch ic.commentMember where i.id = :itemId")
+    Optional<Item> findByIdWithCommentsAndCommentMembers(@Param("itemId") Long itemId);
 
     Page<Item> findAll(Pageable pageable);
 }
