@@ -241,4 +241,12 @@ public class ItemCommandServiceImpl implements ItemCommandService {
 
         return itemCommentRepository.save(createdItemComment);
     }
+
+    @Override
+    @Transactional
+    public void removeItemComment(Member member, Long commentId) {
+        if (itemCommentRepository.deleteByCommentMemberAndId(member, commentId) == 0) {
+            throw new GeneralHandler(ErrorStatus.ITEM_COMMENT_NOT_FOUND);
+        }
+    }
 }

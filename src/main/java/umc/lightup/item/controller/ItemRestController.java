@@ -125,4 +125,14 @@ public class ItemRestController {
         ItemComment itemComment = itemCommandService.createItemComment(member, itemId, request);
         return ApiResponse.onSuccess(ItemConverter.toItemCommentResultDTO(itemComment));
     }
+
+    @DeleteMapping("/comments/{commentId}")
+    @Operation(summary = "프로젝트 댓글 삭제 API", description = "특정 프로젝트 상세 조회 페이지에서 댓글을 삭제하는 API입니다.")
+    public ApiResponse<Void> removeItemComment(Authentication authentication, @PathVariable("commentId") Long commentId) {
+        String email = authentication.getName();
+        Member member = memberCommandService.getMember(email);
+
+        itemCommandService.removeItemComment(member, commentId);
+        return ApiResponse.of(SuccessStatus._NO_CONTENT, null);
+    }
 }

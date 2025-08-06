@@ -22,6 +22,7 @@ public interface ItemCommandService {
     void removeItemLike(String email, long itemId);
     void updateItemHistory(Member member, Item item);
     ItemComment createItemComment(Member member, Long itemId, ItemRequestDTO.ItemCommentRequestDTO request);
+    void removeItemComment(Member member, Long commentId);
     Set<Long> findItemLikes(long memberId);
 
     List<ItemResponseDTO.ItemResultDTO> getAllItems(Pageable pageable, @Nullable Set<Long> likedItemIds);
