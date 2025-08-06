@@ -312,6 +312,19 @@ public class MemberRestController {
         return ApiResponse.onSuccess(MemberConverter.toSelectSkillResultDTO(skillName, member));
     }
 
+    @DeleteMapping("/skills/{skillId}")
+    @Operation(
+            summary = "스킬 선택 취소 API",
+            description = "유저가 스킬 선택을 취소하는 API입니다. 스킬은 하나씩 취소할 수 있습니다."
+    )
+    public ApiResponse<Void> deleteSkill(Authentication authentication, @PathVariable("skillId") Long skillId) {
+        String email = authentication.getName();
+        Member member = memberCommandService.getMember(email);
+
+        memberCommandService.removeMemberSkill(skillId, member.getId());
+        return ApiResponse.of(SuccessStatus._NO_CONTENT, null);
+    }
+
     @PostMapping("/strengths")
     @Operation(
             summary = "강점 선택 API",
@@ -327,6 +340,20 @@ public class MemberRestController {
     }
 
 
+    @DeleteMapping("/strengths/{strengthId}")
+    @Operation(
+            summary = "강점 선택 취소 API",
+            description = "유저가 강점 선택을 취소하는 API입니다. 강점은 하나씩 취소할 수 있습니다."
+    )
+    public ApiResponse<Void> deleteStrength(Authentication authentication, @PathVariable("strengthId") Long strengthId) {
+        String email = authentication.getName();
+        Member member = memberCommandService.getMember(email);
+
+        memberCommandService.removeMemberStrength(strengthId, member.getId());
+        return ApiResponse.of(SuccessStatus._NO_CONTENT, null);
+    }
+
+
     @PostMapping("/regions")
     @Operation(summary = "유저 선호 지역 선택 API", description = "유저가 선호 지역을 선택하는 API입니다.")
     public ApiResponse<MemberResponseDTO.selectRegionResultsDTO> selectRegions(Authentication authentication, @RequestBody @Valid MemberRequestDTO.MemberRegionListRequestDTO request) {
@@ -335,5 +362,16 @@ public class MemberRestController {
 
         List<MemberResponseDTO.singleRegionResultDTO> resultDTOList = memberCommandService.selectRegions(member, request);
         return ApiResponse.onSuccess(MemberConverter.toSelectRegionResultsDTO(resultDTOList));
+    }
+
+    @DeleteMapping("/regions/{memberRegionId}")
+    @Operation(summary = "유저 선호 지역 취소 API", description = "유저가 선호 지역을 취소하는 API입니다. 선호 지역 취소는 하나씩 가능합니다.")
+    public ApiResponse<Void> deleteRegion(Authentication authentication, @PathVariable("memberRegionId") Long memberRegionId) {
+
+        String email = authentication.getName();
+        Member member = memberCommandService.getMember(email);
+
+        memberCommandService.removeMemberRegion(memberRegionId, member.getId());
+        return ApiResponse.of(SuccessStatus._NO_CONTENT, null);
     }
 }

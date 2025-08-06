@@ -21,8 +21,11 @@ public interface MemberCommandService {
     Portfolio savePortfolio(Member member, String name, String portfolioLink);
     void removePortfolio(String memberEmail, long portFolioId);
     String selectSkill(Long skillId,Member member);
+    void removeMemberSkill(Long skillId, Long memberId);
     String selectStrength(Long strengthId,Member member);
+    void removeMemberStrength(Long strengthId, Long memberId);
     List<MemberResponseDTO.singleRegionResultDTO> selectRegions(Member member, MemberRequestDTO.MemberRegionListRequestDTO request);
+    void removeMemberRegion(Long memberRegionId, Long memberId);
     void addMemberLike(Member fromMember, long toMemberId);
     void removeMemberLike(String fromMemberEmail, long toMemberId);
     boolean isNicknameExist(String nickname);

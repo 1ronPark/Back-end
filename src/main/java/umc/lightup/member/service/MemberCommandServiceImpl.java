@@ -282,6 +282,13 @@ public class MemberCommandServiceImpl implements MemberCommandService {
 
     @Override
     @Transactional
+    public void removeMemberSkill(Long skillId, Long memberId) {
+        if (memberSkillRepository.deleteByMemberIdAndSkillId(memberId, skillId) == 0)
+            throw new GeneralHandler(ErrorStatus.MEMBER_SKILL_NOT_FOUND);
+    }
+
+    @Override
+    @Transactional
     public String selectStrength(Long strengthId, Member member) {
         Strength foundStrength = strengthRepository.findById(strengthId)
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.STRENGTH_NOT_FOUND));
@@ -293,6 +300,13 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         memberStrengthRepository.save(memberStrength);
 
         return foundStrength.getName();
+    }
+
+    @Override
+    @Transactional
+    public void removeMemberStrength(Long strengthId, Long memberId) {
+        if (memberStrengthRepository.deleteByMemberIdAndStrengthId(memberId, strengthId) == 0)
+            throw new GeneralHandler(ErrorStatus.MEMBER_STRENGTH_NOT_FOUND);
     }
 
     @Override
@@ -310,6 +324,13 @@ public class MemberCommandServiceImpl implements MemberCommandService {
             resultDTOList.add(MemberConverter.toSingleRegionResultDTO(memberRegion));
         }
         return resultDTOList;
+    }
+
+    @Override
+    @Transactional
+    public void removeMemberRegion(Long memberRegionId, Long memberId) {
+        if (memberRegionRepository.deleteByIdAndMemberId(memberRegionId, memberId) == 0)
+            throw new GeneralHandler(ErrorStatus.MEMBER_REGION_NOT_FOUND);
     }
 
     @Override

@@ -18,5 +18,6 @@ public interface MemberSkillRepository extends JpaRepository<MemberSkill, Long> 
     @Query("select s from MemberSkill ms join ms.skill s where ms.member = :member")
     List<Skill> findSkillByMember(@Param("member") Member member);
     boolean existsByMemberAndSkill(Member member, Skill skill);
+    int deleteByMemberIdAndSkillId(Long memberId, Long skillId);
 }
 
