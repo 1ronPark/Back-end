@@ -14,6 +14,9 @@ import java.util.List;
 public interface MemberStrengthRepository extends JpaRepository<MemberStrength, Long> {
     @Query("select s.name from MemberStrength ms join ms.strength s where ms.member = :member")
     List<String> findStrengthNameByMember(@Param("member") Member member);
+    @Query("select s from MemberStrength ms join ms.strength s where ms.member = :member")
+    List<Strength> findStrengthByMember(@Param("member") Member member);
     boolean existsByMemberAndStrength(Member member, Strength skill);
+    int deleteByMemberIdAndStrengthId(Long memberId, Long strengthId);
 }
 

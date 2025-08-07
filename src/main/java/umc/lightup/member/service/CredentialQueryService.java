@@ -9,6 +9,7 @@ import umc.lightup.member.dto.OAuth2ResponseDTO;
 public interface CredentialQueryService {
     Credential findByEmail(String email);
     Credential updatePasswordByEmail(String email, MemberRequestDTO.PasswordChangeRequestDTO request);
+    void checkPasswordByEmail(String email, String password);
     void initializePasswordByEmail(String email);
     MemberResponseDTO.CredentialInfoResultDTO getMemberCredentials(String email);
     OAuth2ResponseDTO.GoogleUserinfoResponseDTO getGoogleUserinfo(String authCode);

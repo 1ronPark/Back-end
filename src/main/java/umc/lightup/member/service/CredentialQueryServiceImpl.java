@@ -81,6 +81,14 @@ public class CredentialQueryServiceImpl implements CredentialQueryService {
         return target;
     }
 
+    @Override
+    public void checkPasswordByEmail(String email, String password) {
+        Credential target = credentialRepository.findByCredentialTypeAndEmail(CredentialType.PASSWORD, email)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        if (!passwordEncoder.matches(password, target.getCredential())) {
+            throw new GeneralHandler(ErrorStatus.INVALID_PASSWORD);
+        }
+    }
 
     private static final String PASSWORD_CHARACTERS =
             "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*-_=+;,.<>?";

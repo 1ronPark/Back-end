@@ -13,6 +13,7 @@ import umc.lightup.member.enums.Role;
 import umc.lightup.member.service.CredentialQueryService;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -55,10 +56,25 @@ public class Member extends BaseEntity implements UserDetails {
     @Column(unique = true, length = 20)
     private String phoneNumber;
 
+    @Setter
     @Column(length = 80)
-    private String career;
+    private String profileTitle;
 
+    @Setter
+    @Column(columnDefinition = "TEXT")
+    private String selfIntroduce;
+
+    @Setter
     private String profileImageUrl; // 추가, S3 필요
+
+    @Builder.Default
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<MemberRegion> memberRegions = new ArrayList<>();
+
+    public void addMemberRegion(MemberRegion memberRegion) {
+        this.memberRegions.add(memberRegion);
+        memberRegion.assignMember(this);
+    }
 
 //    @OneToMany(mappedBy = "member", orphanRemoval = true)
 //    private List<Credential> credentials;

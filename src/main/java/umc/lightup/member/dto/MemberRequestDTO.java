@@ -1,5 +1,6 @@
 package umc.lightup.member.dto;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -11,9 +12,12 @@ import umc.lightup.member.enums.Role;
 import umc.lightup.member.validation.annotation.UniqueEmail;
 import umc.lightup.member.validation.annotation.UniqueNickname;
 import umc.lightup.member.validation.annotation.ValidRole;
+import umc.lightup.region.validation.annotation.ExistSiDo;
+import umc.lightup.region.validation.annotation.ExistSiGunGu;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 public class MemberRequestDTO {
 
@@ -102,6 +106,32 @@ public class MemberRequestDTO {
     @Builder
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class ProfileChangeDto {
+//        @NotNull
+//        @Size(max = 4) //length는 0일 수 있으나 null일 수는 없음
+//        private List<Long> skillIds;
+//        @NotNull
+//        @Size(max = 4)
+//        private List<Long> strengthIds;
+//        @NotNull
+//        @Size(max = 4)
+//        private List<Long> regionIds;
+//        @NotNull
+//        @Size(max = 4)
+//        private List<PortfolioInfoDTO> portfolios;
+        @NotEmpty
+        @Size(max = 80)
+        private String profileTitle;
+        @Size(max = 3000) //Nullable
+        private String selfIntroduction;
+        private List<ActivityInfoDTO> activities;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor(access = AccessLevel.PROTECTED)
     public static class PasswordLoginRequestDTO{
         @NotBlank(message = "이메일은 필수입니다.")
         @Email(message = "올바른 이메일 형식이어야 합니다.")
@@ -126,6 +156,31 @@ public class MemberRequestDTO {
 
     @Getter
     @Setter
+    @Builder
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class PasswordCheckRequestDTO {
+        @NotBlank(message = "패스워드는 필수입니다.")
+        private String password;
+    }
+
+    @Getter
+    @Setter
+    public static class PortFolioNameRequestDTO {
+        @NotEmpty
+        @Size(max = 30)
+        private String name;
+    }
+
+    @Getter
+    @Setter
+    public static class PortFolioRequestDTO {
+        @NotNull
+        private Long portfolioId;
+    }
+
+    @Getter
+    @Setter
     public static class MemberPositionRequestDTO {
         @NotEmpty
         private String position;
@@ -144,5 +199,23 @@ public class MemberRequestDTO {
         @NotNull
         private Long strengthId;
      
+    }
+
+    @Getter
+    @Setter
+    public static class MemberRegionListRequestDTO {
+        @Size(max = 3, message = "지역은 최대 3개까지 선택할 수 있습니다.")
+        @Valid
+        private List<MemberRegionRequestDTO> memberRegions;
+    }
+
+    @Getter
+    @Setter
+    public static class MemberRegionRequestDTO {
+        @NotBlank
+        @ExistSiDo
+        private String siDo;
+        @ExistSiGunGu
+        private String siGunGu;
     }
 }

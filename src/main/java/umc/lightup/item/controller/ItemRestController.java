@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +24,9 @@ import umc.lightup.item.service.ItemCommandService;
 import umc.lightup.member.domain.Member;
 import umc.lightup.member.service.MemberCommandService;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -39,10 +40,18 @@ public class ItemRestController {
 
     @GetMapping("/search")
     @Operation(summary = "전체 프로젝트 조회 API", description = "전체 프로젝트를 조회하는 API이며 페이징을 포함합니다. 요청 파라미터로 page 번호를 입력할 수 있습니다.")
-    public ApiResponse<ItemResponseDTO.ItemResultListDTO> viewAllItems(@RequestParam(defaultValue = "0") @Min(1) Integer page) {
+    public ApiResponse<ItemResponseDTO.ItemResultListDTO> viewAllItems(Authentication authentication, @RequestParam(defaultValue = "0") @Min(1) Integer page) {
         Pageable pageable = PageRequest.of(page - 1, DEFAULT_ITEM_PAGE_SIZE, Sort.by("createdAt").descending());
 
-        List<ItemResponseDTO.ItemResultDTO> allItems = itemCommandService.getAllItems(pageable);
+        Set<Long> likedItemIds = Collections.emptySet();
+
+        if (authentication != null) {
+            String email = authentication.getName();
+            Member member = memberCommandService.getMember(email);
+            likedItemIds = itemCommandService.findItemLikes(member.getId());
+        }
+
+        List<ItemResponseDTO.ItemResultDTO> allItems = itemCommandService.getAllItems(pageable, likedItemIds);
         return ApiResponse.onSuccess(ItemConverter.toItemResultListDTO(allItems));
     }
 
@@ -75,12 +84,12 @@ public class ItemRestController {
         Item findItem = itemCommandService.getSingleItem(itemId);
         List<ItemResponseDTO.ItemRegionResultDTO> itemRegions = itemCommandService.getItemRegions(findItem);
         List<ItemResponseDTO.RecruitPositionResultDTO> itemRecruitPositions = itemCommandService.getItemRecruitPositions(findItem);
+        boolean itemLike = itemCommandService.getItemLike(member.getId(), findItem.getId());
         itemCommandService.updateItemHistory(member, findItem);
-        return ApiResponse.onSuccess(ItemConverter.toItemInfoDTO(findItem, itemRegions, itemRecruitPositions));
+        return ApiResponse.onSuccess(ItemConverter.toItemInfoDTO(findItem, itemRegions, itemRecruitPositions, itemLike));
     }
 
     @PostMapping("/{itemId}/like")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "프로젝트 좋아요 등록 API", description = "유저가 특정 프로젝트에 좋아요를 등록하는 API 입니다.")
     public ApiResponse<Void> addItemLike(Authentication authentication, @PathVariable("itemId") long itemId) {
         String email = authentication.getName();
@@ -90,7 +99,6 @@ public class ItemRestController {
     }
 
     @DeleteMapping("/{itemId}/like")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "프로젝트 좋아요 취소 API", description = "유저가 특정 프로젝트의 좋아요를 취소하는 API 입니다.")
     public ApiResponse<Void> removeItemLike(Authentication authentication, @PathVariable("itemId") long itemId) {
         String email = authentication.getName();

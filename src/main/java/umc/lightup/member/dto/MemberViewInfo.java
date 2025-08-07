@@ -1,9 +1,13 @@
 package umc.lightup.member.dto;
 
 import lombok.*;
+import umc.lightup.member.converter.MemberConverter;
+import umc.lightup.member.domain.Activity;
 import umc.lightup.member.domain.Member;
+import umc.lightup.member.domain.MemberRegion;
 import umc.lightup.member.domain.Portfolio;
-import umc.lightup.region.domain.Region;
+import umc.lightup.skill.domain.Skill;
+import umc.lightup.strength.domain.Strength;
 
 import java.util.List;
 
@@ -20,16 +24,33 @@ import java.util.List;
 @AllArgsConstructor
 public class MemberViewInfo {
     private Member member;
-    private List<String> skills;
-    private List<String> strengths;
-    private List<Region> regions;
-    private List<Portfolio> portfolios;
+    @Builder.Default
+    private List<String> positionNames = List.of();
+    @Builder.Default
+    private List<String> skillNames = List.of();
+    @Builder.Default
+    private List<String> strengthNames = List.of();
+    @Builder.Default
+    private List<Skill> skills = List.of();
+    @Builder.Default
+    private List<Strength> strengths = List.of();
+    @Builder.Default
+    private List<MemberRegion> regions = List.of();
+    @Builder.Default
+    private List<Portfolio> portfolios = List.of();
+    @Builder.Default
+    private List<Activity> activities = List.of();
+    @Builder.Default
     private boolean emailOpen = false;
+    @Builder.Default
     private boolean phoneOpen = false;
+    @Builder.Default
     private boolean pictureOpen = false;
 
     public MemberResponseDTO.MemberInfoDTO toMemberInfoDTO() {
         return MemberResponseDTO.MemberInfoDTO.builder()
+                .id(member.getId())
+                .profileTitle(member.getProfileTitle())
                 .name(member.getName())
                 .nickname(member.getNickname())
                 .age(member.getAge())
@@ -38,23 +59,87 @@ public class MemberViewInfo {
                 .birth(member.getBirth())
                 .gender(member.getGender())
                 .school(member.getSchool())
-                .career(member.getCareer())
+                .selfIntroduce(member.getSelfIntroduce())
 
-                .skills(skills)
-                .strengths(strengths)
+                .skills(skillNames)
+                .strengths(strengthNames)
+                .positions(positionNames)
                 .regions(regions.stream()
-                        .map(r->r.getSiDo()+" "+r.getSiGunGu())
+                        .map(MemberConverter::toSingleRegionResultDTO)
                         .toList())
-                .portfolios(portfolios.stream()
-                        .map(portfolio -> MemberResponseDTO.PortfolioInfoDTO.builder()
-                                .name(portfolio.getName())
-                                .fileUrl(portfolio.getFileUrl())
-                                .build())
-                        .toList())
+                .portfolios(getPortfolioInfoDTOs())
+                .activities(getActivityInfoDTOs())
 
                 .email(emailOpen?member.getEmail():null)
                 .phoneNumber(phoneOpen?member.getPhoneNumber():null)
                 .profileImageUrl(pictureOpen?member.getProfileImageUrl():null)
+                .build();
+    }
+
+    private List<ActivityInfoDTO> getActivityInfoDTOs() {
+        return activities.stream()
+                .map(activity -> ActivityInfoDTO.builder()
+                        .name(activity.getName())
+                        .startDate(activity.getStartDate())
+                        .hasEndDate(activity.getEndDate() != null)
+                        .endDate(activity.getEndDate())
+                        .build())
+                .toList();
+    }
+
+    private List<PortfolioInfoDTO> getPortfolioInfoDTOs() {
+        return portfolios.stream()
+                .map(portfolio -> PortfolioInfoDTO.builder()
+                        .name(portfolio.getName())
+                        .fileUrl(portfolio.getFileUrl())
+                        .build())
+                .toList();
+    }
+
+    private List<String> getRegionAsList() {
+        return regions.stream()
+                .map(r -> r.getSiDo() + " " + r.getSiGunGu())
+                .toList();
+    }
+
+    public MemberResponseDTO.MyProfileDTO toMyProfileDTO() {
+        return MemberResponseDTO.MyProfileDTO.builder()
+                .profileTitle(member.getProfileTitle())
+                .name(member.getName())
+                .nickname(member.getNickname())
+                .email(member.getEmail())
+                .age(member.getAge())
+                .gender(member.getGender())
+                .school(member.getSchool())
+                .mbti(member.getMbti())
+                .profileImageUrl(member.getProfileImageUrl())
+                .selfIntroduce(member.getSelfIntroduce())
+                .skills(skills.stream()
+                        .map(s->MemberResponseDTO.SkillResultWithIdDTO.builder()
+                                .id(s.getId())
+                                .name(s.getName())
+                                .skillType(s.getSkillType())
+                                .build())
+                        .toList())
+                .strengths(strengths.stream()
+                        .map(s->MemberResponseDTO.StrengthResultWithIdDTO.builder()
+                                .id(s.getId())
+                                .name(s.getName())
+                                .strengthType(s.getStrengthType())
+                                .build())
+                        .toList())
+                .regions(regions.stream()
+                        .map(r-> MemberResponseDTO.RegionResultWithIdDTO.builder()
+                                .id(r.getId())
+                                .siDo(r.getSiDo())
+                                .siGunGu(r.getSiGunGu())
+                                .build())
+                        .toList())
+                .positions(positionNames)
+                .portfolios(portfolios.stream()
+                        .map(MemberConverter::toPortfolioInfoWithIdDTO)
+                        .toList())
+                .activities(getActivityInfoDTOs())
                 .build();
     }
 }

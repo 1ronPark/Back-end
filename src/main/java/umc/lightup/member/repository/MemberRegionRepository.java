@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface MemberRegionRepository extends JpaRepository<MemberRegion, Long> {
     List<MemberRegion> findByMember(Member member);
+    int deleteByIdAndMemberId(Long memberRegionId, Long memberId);
 }
