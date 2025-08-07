@@ -17,13 +17,14 @@ public class StrengthResponseDTO {
         List<String> strengths;
     }
 
-    @Builder
+    //커스텀 강점 생성 기능 삭제
+/*    @Builder
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class createdStrengthResultDTO {
         String createdStrength;
         Long memberId;
-    }
+    }*/
 
 }

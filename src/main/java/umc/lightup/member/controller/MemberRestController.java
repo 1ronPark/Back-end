@@ -11,7 +11,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import umc.lightup.api.ApiResponse;
 import umc.lightup.api.code.status.SuccessStatus;
-import umc.lightup.member.domain.Credential;
 import umc.lightup.member.converter.MemberConverter;
 import umc.lightup.member.domain.Member;
 import umc.lightup.member.dto.MemberRequestDTO;
@@ -75,6 +74,7 @@ public class MemberRestController {
     }
 
     @PostMapping("/position")
+    @Operation(summary = "포지션 선택 API", description = "유저가 포지션을 선택하는 API 입니다.")
     public ApiResponse<MemberResponseDTO.MemberPositionResultDTO> selectMemberPosition(Authentication authentication, @RequestParam String positionName) {
         String userName = authentication.getName();
         Member member = memberCommandService.getMember(userName);
@@ -88,6 +88,7 @@ public class MemberRestController {
     }
 
     @DeleteMapping("/position")
+    @Operation(summary = "포지션 취소 API", description = "유저가 포지션 선택을 취소할 때 호출되는 API 입니다.")
     public ApiResponse<MemberResponseDTO.MemberPositionDeleteResultDTO> deleteMemberPosition(Authentication authentication, @RequestParam String positionName) {
         String userName = authentication.getName();
         Member member = memberCommandService.getMember(userName);
@@ -131,6 +132,17 @@ public class MemberRestController {
         //null 반환이 과연 옳은가? 물론 이 null 안 쓰려면 응답 통일 형식부터 갈아엎어야 하는 대공사가 필요하긴 함
     }
 
+    @PostMapping("/password/initialize")
+    @ResponseStatus(HttpStatus.NO_CONTENT) //명시적으로 쓰기 싫었는데 안 쓰니 200 OK가 나가버리네...
+    @Operation(
+            summary = "비밀번호 초기화 API",
+            description = "비밀번호를 변경하는 API입니다. 사용자가 비밀번호를 잊었을 때 사용합니다."
+    )
+    public ApiResponse<Void> passwordInitialize(@RequestParam @NotBlank @Email String email) {
+        credentialQueryService.initializePasswordByEmail(email);
+        return ApiResponse.of(SuccessStatus._NO_CONTENT, null);
+    }
+
     @PostMapping("/email/exist")
     @Operation(
             summary = "이메일 존재 여부 확인 API",
@@ -141,6 +153,39 @@ public class MemberRestController {
         //아 그냥 ApiResponse<Boolean> 반환해버리고 싶다
         boolean emailExist = memberCommandService.isEmailExist(email);
         return ApiResponse.onSuccess(new MemberResponseDTO.EmailExistResultDTO(emailExist));
+    }
+
+    @PostMapping("/{memberId}/like")
+    @ResponseStatus(HttpStatus.NO_CONTENT) //명시적으로 쓰기 싫었는데 안 쓰니 200 OK가 나가버리네...
+    @Operation(
+            summary = "회원 좋아요 등록 API",
+            description = "회원이 다른 회원에게 좋아요를 등록하는 API입니다.",
+            security = {@SecurityRequirement(name = "JWT TOKEN")}
+    )
+    public ApiResponse<Void> addMemberLike(Authentication authentication,
+                                           @PathVariable("memberId") long memberId) {
+        //귀찮았을 뿐 사실 여기에서 존재하는 memberId인지 확인까지 하는 게 맞음, 다만 현재 코드도 Service단에서 확인을 진행해서 동작은 정상적
+        //근데 왜 이메일 확인은 자연스럽게 아무데서도 안 하고 있는 거지?
+        String email = authentication.getName();
+        Member member = memberCommandService.getMember(email);
+        memberCommandService.addMemberLike(member, memberId);
+        return ApiResponse.of(SuccessStatus._NO_CONTENT, null);
+    }
+
+    @DeleteMapping("/{memberId}/like")
+    @ResponseStatus(HttpStatus.NO_CONTENT) //명시적으로 쓰기 싫었는데 안 쓰니 200 OK가 나가버리네...
+    @Operation(
+            summary = "회원 좋아요 등록 취소 API",
+            description = "회원이 다른 회원에게 진행한 좋아요 등록을 취소하는 API입니다.",
+            security = {@SecurityRequirement(name = "JWT TOKEN")}
+    )
+    public ApiResponse<Void> removeMemberLike(Authentication authentication,
+                                              @PathVariable("memberId") long memberId) {
+        //귀찮았을 뿐 사실 여기에서 존재하는 memberId인지 확인까지 하는 게 맞음
+        String email = authentication.getName();
+        // Member member = memberCommandService.getMember(email);
+        memberCommandService.removeMemberLike(email, memberId);
+        return ApiResponse.of(SuccessStatus._NO_CONTENT, null);
     }
   
     @PostMapping("/skills")

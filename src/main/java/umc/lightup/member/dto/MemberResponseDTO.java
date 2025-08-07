@@ -36,8 +36,8 @@ public class MemberResponseDTO {
         private long id;
         private String name;
         private String nickname;
-        private int age;
-        private boolean gender;
+        private Integer age;
+        private Boolean gender;
         private LocalDate birth;
         private Role role;
         private Mbti mbti;
@@ -55,8 +55,8 @@ public class MemberResponseDTO {
     public static class MemberInfoDTO {
         private String name;
         private String nickname;
-        private int age;
-        private boolean gender;
+        private Integer age;
+        private Boolean gender;
         private LocalDate birth;
         private Role role;
         private Mbti mbti;

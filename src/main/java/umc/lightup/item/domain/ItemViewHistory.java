@@ -1,12 +1,17 @@
 package umc.lightup.item.domain;
 
 import jakarta.persistence.*;
+import lombok.*;
 import org.springframework.data.annotation.LastModifiedDate;
 import umc.lightup.member.domain.Member;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class ItemViewHistory { //extends 없음
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,4 +28,8 @@ public class ItemViewHistory { //extends 없음
     @LastModifiedDate
     @Column(nullable = false)
     private LocalDateTime viewedAt;
+
+    public void updateViewedAt() {
+        this.viewedAt = LocalDateTime.now();
+    }
 }

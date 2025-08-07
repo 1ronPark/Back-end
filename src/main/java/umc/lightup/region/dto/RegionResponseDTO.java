@@ -7,14 +7,14 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-public class RegionReponseDTO {
+public class RegionResponseDTO {
 
     @Builder
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class SiDoListDTO {
-        List<String> sido;
+        List<String> siDo;
     }
 
     @Builder
@@ -22,6 +22,6 @@ public class RegionReponseDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class SiGunGuListDTO {
-        List<String> sigungu;
+        List<String> siGunGu;
     }
 }

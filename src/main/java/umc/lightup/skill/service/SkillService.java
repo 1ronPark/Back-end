@@ -3,14 +3,9 @@ package umc.lightup.skill.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import umc.lightup.api.code.status.ErrorStatus;
-import umc.lightup.exception.handler.GeneralHandler;
-import umc.lightup.member.domain.Member;
-import umc.lightup.member.domain.MemberSkill;
 import umc.lightup.member.repository.MemberSkillRepository;
-import umc.lightup.skill.converter.SkillConverter;
 import umc.lightup.skill.domain.Skill;
-import umc.lightup.skill.dto.SkillRequestDTO;
+import umc.lightup.skill.enums.SkillType;
 import umc.lightup.skill.repository.SkillRepository;
 
 import java.util.List;
@@ -23,14 +18,28 @@ public class SkillService {
     private final SkillRepository skillRepository;
     private final MemberSkillRepository memberSkillRepository;
 
-    public List<String> getSkillsList() {
-        List<Skill> skills = skillRepository.findBasicSkills();
+    public List<String> getSkillsList(String positionName) {
+        SkillType skillType = mapPositionToSkillType(positionName);
+        List<Skill> skills = skillRepository.findAllOrderedBySkillType(skillType);
+
         return skills.stream()
                 .map(Skill::getName)
                 .toList();
     }
 
-    @Transactional
+    private SkillType mapPositionToSkillType(String positionName) {
+        return switch (positionName) {
+            case "프론트엔드" -> SkillType.FRONTEND;
+            case "백엔드" -> SkillType.BACKEND;
+            case "디자인" -> SkillType.DESIGN;
+            case "기획" -> SkillType.PLAN;
+            case "마케팅" -> SkillType.MARKETING;
+            default -> SkillType.COMMON;
+        };
+    }
+
+    //커스텀 스킬 기능 삭제
+/*    @Transactional
     public String createSkill(SkillRequestDTO.CreateSkillDTO request, Member member) {
         Skill newSkill = SkillConverter.toSkill(request, member);
 
@@ -44,5 +53,5 @@ public class SkillService {
         MemberSkill memberSkill = MemberSkill.createMemberSkill(member, newSkill);
         memberSkillRepository.save(memberSkill);
         return newSkill.getName();
-    }
+    }*/
 }
