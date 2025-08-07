@@ -16,7 +16,7 @@ public class ItemConverter {
                 .build();
     }
 
-    public static ItemResponseDTO.ItemResultDTO toItemResultDTO(Item item, String itemImageUrl, boolean itemLike) {
+    public static ItemResponseDTO.ItemResultDTO toItemResultDTO(Item item, String itemImageUrl, int viewCount, int commentCount, boolean itemLike) {
         return ItemResponseDTO.ItemResultDTO.builder()
                 .itemId(item.getId())
                 .itemName(item.getName())
@@ -24,6 +24,8 @@ public class ItemConverter {
                 .itemImageUrl(itemImageUrl)
                 .updatedAt(item.getUpdatedAt().toLocalDate())
                 .recruitStatus(item.isProjectStatus())
+                .viewCount(viewCount)
+                .commentCount(commentCount)
                 .likedByCurrentUser(itemLike)
                 .build();
     }
@@ -48,7 +50,7 @@ public class ItemConverter {
                 .build();
     }
 
-    public static ItemResponseDTO.ItemInfoDTO toItemInfoDTO(Item item, List<ItemResponseDTO.ItemRegionResultDTO> itemRegionResultDTOList, List<ItemResponseDTO.RecruitPositionResultDTO> recruitPositionResultDTOList, boolean itemLike) {
+    public static ItemResponseDTO.ItemInfoDTO toItemInfoDTO(Item item, List<ItemResponseDTO.ItemRegionResultDTO> itemRegionResultDTOList, List<ItemResponseDTO.RecruitPositionResultDTO> recruitPositionResultDTOList, List<ItemResponseDTO.ItemCommentResultDTO> itemCommentResultDTOList, int commentCount, boolean itemLike) {
         return ItemResponseDTO.ItemInfoDTO.builder()
                 .introduce(item.getIntroduce())
                 .itemName(item.getName())
@@ -62,6 +64,9 @@ public class ItemConverter {
                 .regions(itemRegionResultDTOList)
                 .description(item.getDescription())
                 .recruitPositions(recruitPositionResultDTOList)
+                .itemComments(itemCommentResultDTOList)
+                .commentCount(commentCount)
+                .updatedAt(item.getUpdatedAt().toLocalDate())
                 .likedByCurrentUser(itemLike)
                 .build();
     }
@@ -99,6 +104,16 @@ public class ItemConverter {
         return ItemResponseDTO.ItemApplyResultDTO.builder()
                 .appliedAt(itemApply.getAppliedAt())
                 .message(itemApply.getItem().getName() + "에 지원했어요")
+                .build();
+    }
+
+    public static ItemResponseDTO.ItemCommentResultDTO toItemCommentResultDTO (ItemComment itemComment) {
+        return ItemResponseDTO.ItemCommentResultDTO.builder()
+                .itemCommentId(itemComment.getId())
+                .authorName(itemComment.getCommentMember().getName())
+                .authorProfileImageURL(itemComment.getCommentMember().getProfileImageUrl())
+                .content(itemComment.getContent())
+                .updatedAt(itemComment.getUpdatedAt())
                 .build();
     }
 

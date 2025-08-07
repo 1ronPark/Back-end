@@ -33,6 +33,8 @@ public class ItemResponseDTO {
         private String itemImageUrl;
         private LocalDate updatedAt;
         private boolean recruitStatus;
+        private int viewCount;
+        private int commentCount;
         private boolean likedByCurrentUser;
     }
 
@@ -79,6 +81,9 @@ public class ItemResponseDTO {
         private List<ItemRegionResultDTO> regions;
         private String description;
         private List<RecruitPositionResultDTO> recruitPositions;
+        private List<ItemCommentResultDTO> itemComments;
+        private int commentCount;
+        private LocalDate updatedAt;
         private boolean likedByCurrentUser;
     }
 
@@ -110,5 +115,17 @@ public class ItemResponseDTO {
     public static class ItemApplyResultDTO {
         private LocalDateTime appliedAt;
         private String message;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ItemCommentResultDTO {
+        private Long itemCommentId;
+        private String authorName;
+        private String authorProfileImageURL;
+        private String content;
+        private LocalDateTime updatedAt;
     }
 }
