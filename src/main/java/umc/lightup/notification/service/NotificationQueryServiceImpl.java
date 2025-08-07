@@ -82,6 +82,12 @@ public class NotificationQueryServiceImpl implements NotificationQueryService {
     return NotificationConverter.sseTestDTO(message);
   }
 
+  @Override
+  public NotificationResponseDTO.NotificationTotal getTotal(Member member) {
+    Long totalSize = notificationRepostiory.countByReceiver(member);
+    return NotificationConverter.notificationTotal(totalSize);
+  }
+
   // 알림목록 조회 api 전용
   @Override
   public Page<Notification> getNotificationList(Member member, Integer page, Integer size) {

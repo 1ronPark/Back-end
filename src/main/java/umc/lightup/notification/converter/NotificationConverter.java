@@ -34,6 +34,12 @@ public class NotificationConverter {
             .build();
   }
 
+  public static NotificationResponseDTO.NotificationTotal notificationTotal(Long totalSize){
+    return NotificationResponseDTO.NotificationTotal.builder()
+            .total(totalSize)
+            .build();
+  }
+
   public static NotificationResponseDTO.NotificationDeleteDTO notificationDeleteDTO(Notification notification){
     return NotificationResponseDTO.NotificationDeleteDTO.builder()
             .notificationId(notification.getId())

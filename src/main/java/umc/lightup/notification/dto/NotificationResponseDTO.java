@@ -36,6 +36,14 @@ public class NotificationResponseDTO {
   @Getter
   @NoArgsConstructor
   @AllArgsConstructor
+  public static class NotificationTotal{
+    Long total;
+  }
+
+  @Builder
+  @Getter
+  @NoArgsConstructor
+  @AllArgsConstructor
   public static class NotificationDeleteDTO{
     Long notificationId;
     String message;
