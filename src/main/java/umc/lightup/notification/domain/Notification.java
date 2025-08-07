@@ -1,14 +1,18 @@
 package umc.lightup.notification.domain;
 
 import jakarta.persistence.*;
-import lombok.Getter;
+import lombok.*;
 import umc.lightup.common.BaseEntity;
 import umc.lightup.notification.enums.NotificationType;
 import umc.lightup.notification.enums.ReferenceType;
 import umc.lightup.member.domain.Member;
 
 @Getter
+@Setter
 @Entity
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class Notification extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,4 +42,5 @@ public class Notification extends BaseEntity {
 
     @Column(name = "is_read", nullable = false)
     private Boolean isRead;
+
 }

@@ -34,6 +34,9 @@ public enum ErrorStatus implements BaseErrorCode {
     INVALID_AUTH_CODE(HttpStatus.BAD_REQUEST, "CREDENTIAL4005", "auth code가 올바르지 않습니다."),
     AUTH_NOT_GRANTED(HttpStatus.BAD_REQUEST, "CREDENTIAL4006", "소셜로그인의 권한이 부족합니다. 필요한 모든 권한 제공에 동의했는지 확인해 주세요."),
 
+    //Notification 관련 에러
+    NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "NOTIFICATION4001", "해당 알림이 존재하지 않습니다. "),
+  
     //MemberLike 관련 에러
     ALREADY_LIKED(HttpStatus.BAD_REQUEST, "MEMBER4100", "이미 좋아요 한 회원입니다. 좋아요를 취소하려면 Delete Method로 요청을 보내 주세요."),
     LIKE_NOT_FOUND(HttpStatus.BAD_REQUEST, "MEMBER4101", "좋아요하지 않은 회원입니다. 좋아요를 하려면 Post Method로 요청을 보내 주세요."),
@@ -91,6 +94,7 @@ public enum ErrorStatus implements BaseErrorCode {
     //Email 관련 에러
     EMAIL_SEND_FAIL(HttpStatus.SERVICE_UNAVAILABLE, "EMAIL5003", "이메일 전송에 실패했습니다.")
     ;
+
 
 
     private final HttpStatus httpStatus;
