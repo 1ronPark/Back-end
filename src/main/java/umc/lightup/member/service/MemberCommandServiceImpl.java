@@ -269,7 +269,9 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     public MemberResponseDTO.MemberInfoListDTO searchMember(
             Member member,
             MemberRequestDTO.MemberSearchRequestDTO options) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if (options.getRegions() == null) options.setRegions(List.of());
+        if (options.getPositions() == null) options.setPositions(List.of());
+        return memberRepository.getMemberInfos(member, options);
     }
 
     @Override

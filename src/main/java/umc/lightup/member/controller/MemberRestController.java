@@ -227,7 +227,7 @@ public class MemberRestController {
     )
     public ApiResponse<MemberResponseDTO.MemberInfoListDTO> searchMember(
             Authentication authentication,
-            @RequestBody MemberRequestDTO.MemberSearchRequestDTO request) {
+            @RequestBody @Valid MemberRequestDTO.MemberSearchRequestDTO request) {
         Member member = null;
         if (authentication != null) {
             String email = authentication.getName();

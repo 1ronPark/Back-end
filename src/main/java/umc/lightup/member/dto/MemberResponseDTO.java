@@ -106,9 +106,10 @@ public class MemberResponseDTO {
     @AllArgsConstructor
     public static class MemberInfoListDTO {
         List<MemberInfoSimpleDTO> members;
-        int totalPages;
+        long numOfTotalResults;
     }
 
+    @Setter
     @Getter
     @Builder
     @NoArgsConstructor
@@ -119,12 +120,12 @@ public class MemberResponseDTO {
         private String nickname;
         private Boolean gender;
         private Mbti mbti;
-        private String selfIntroduce;
         private List<String> skills;
         private List<String> strengths;
         private List<singleRegionResultDTO> regions;
         private List<String> positions;
         private String profileImageUrl;
+        private boolean liked;
     }
     
     @Getter
