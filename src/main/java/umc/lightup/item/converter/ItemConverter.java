@@ -66,6 +66,7 @@ public class ItemConverter {
                 .recruitPositions(recruitPositionResultDTOList)
                 .itemComments(itemCommentResultDTOList)
                 .commentCount(commentCount)
+                .updatedAt(item.getUpdatedAt().toLocalDate())
                 .likedByCurrentUser(itemLike)
                 .build();
     }

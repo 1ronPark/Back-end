@@ -83,6 +83,7 @@ public class ItemResponseDTO {
         private List<RecruitPositionResultDTO> recruitPositions;
         private List<ItemCommentResultDTO> itemComments;
         private int commentCount;
+        private LocalDate updatedAt;
         private boolean likedByCurrentUser;
     }
 
