@@ -123,8 +123,9 @@ public class ItemCommandServiceImpl implements ItemCommandService {
                     String itemImageUrl = item.getItemProfileImageUrl();
                     boolean liked = likedItemIds != null && likedItemIds.contains(item.getId());
                     int commentCount = itemCommentRepository.countByItemId(item.getId());
+                    int viewCount = itemViewHistoryRepository.countByItemId(item.getId());
 
-                    return ItemConverter.toItemResultDTO(item, itemImageUrl, commentCount, liked);
+                    return ItemConverter.toItemResultDTO(item, itemImageUrl, viewCount, commentCount, liked);
                 }).toList();
     }
 

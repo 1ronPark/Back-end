@@ -16,7 +16,7 @@ public class ItemConverter {
                 .build();
     }
 
-    public static ItemResponseDTO.ItemResultDTO toItemResultDTO(Item item, String itemImageUrl, int commentCount, boolean itemLike) {
+    public static ItemResponseDTO.ItemResultDTO toItemResultDTO(Item item, String itemImageUrl, int viewCount, int commentCount, boolean itemLike) {
         return ItemResponseDTO.ItemResultDTO.builder()
                 .itemId(item.getId())
                 .itemName(item.getName())
@@ -24,6 +24,7 @@ public class ItemConverter {
                 .itemImageUrl(itemImageUrl)
                 .updatedAt(item.getUpdatedAt().toLocalDate())
                 .recruitStatus(item.isProjectStatus())
+                .viewCount(viewCount)
                 .commentCount(commentCount)
                 .likedByCurrentUser(itemLike)
                 .build();
