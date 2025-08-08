@@ -36,11 +36,14 @@ public class ItemConverter {
                 .build();
     }
 
-    public static ItemResponseDTO.MyItemResultDTO toMyItemResultDTO(Item item, String itemImageUrl) {
+    public static ItemResponseDTO.MyItemResultDTO toMyItemResultDTO(Item item, String itemImageUrl, List<ItemResponseDTO.ItemCategoriesResultDTO> itemCategoriesResultDTOList) {
         return ItemResponseDTO.MyItemResultDTO.builder()
                 .itemName(item.getName())
                 .introduce(item.getIntroduce())
                 .itemImageUrl(itemImageUrl)
+                .itemCategories(itemCategoriesResultDTOList)
+                .recruitStatus(item.isProjectStatus())
+//                .applicantStatus()
                 .build();
     }
 

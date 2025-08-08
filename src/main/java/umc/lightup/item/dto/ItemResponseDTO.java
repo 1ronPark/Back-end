@@ -54,6 +54,9 @@ public class ItemResponseDTO {
         private String itemName;
         private String introduce;
         private String itemImageUrl;
+        private List<ItemCategoriesResultDTO> itemCategories;
+        private boolean recruitStatus;
+//        private boolean applicantStatus;
     }
 
     @Getter

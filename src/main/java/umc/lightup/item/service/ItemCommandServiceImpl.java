@@ -24,10 +24,8 @@ import umc.lightup.position.domain.Position;
 import umc.lightup.position.repository.PositionRepository;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -132,12 +130,18 @@ public class ItemCommandServiceImpl implements ItemCommandService {
     @Override
     public List<ItemResponseDTO.MyItemResultDTO> getMyItems(Member member) {
         List<Item> myItemList = itemRepository.findByMember(member);
+        List<ItemCategory> itemCategories = itemCategoryRepository.findByItems(myItemList);
+        Map<Long, List<ItemCategory>> categoryMap = itemCategories.stream()
+                .collect(Collectors.groupingBy(ic -> ic.getItem().getId()));
 
         return myItemList.stream()
             .map(item -> {
                 String itemImageUrl = item.getItemProfileImageUrl();
 
-                return ItemConverter.toMyItemResultDTO(item, itemImageUrl);
+                List<ItemResponseDTO.ItemCategoriesResultDTO> itemCategoriesResultDTOList = categoryMap.getOrDefault(item.getId(), List.of()).stream()
+                        .map(ItemConverter::toItemCategoriesResultDTO)
+                        .toList();
+                return ItemConverter.toMyItemResultDTO(item, itemImageUrl, itemCategoriesResultDTOList);
             })
             .toList();
     }
