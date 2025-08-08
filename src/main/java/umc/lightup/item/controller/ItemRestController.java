@@ -41,8 +41,12 @@ public class ItemRestController {
 
     @GetMapping("/search")
     @Operation(summary = "전체 프로젝트 조회 API", description = "전체 프로젝트를 조회하는 API이며 페이징을 포함합니다. 요청 파라미터로 page 번호를 입력할 수 있습니다.")
-    public ApiResponse<ItemResponseDTO.ItemResultListDTO> viewAllItems(Authentication authentication, @RequestParam(defaultValue = "0") @Min(1) Integer page) {
-        Pageable pageable = PageRequest.of(page - 1, DEFAULT_ITEM_PAGE_SIZE, Sort.by("createdAt").descending());
+    public ApiResponse<ItemResponseDTO.ItemResultListDTO> viewAllItems(
+            Authentication authentication,
+            @RequestParam(defaultValue = "0") @Min(1) Integer page,
+            @RequestParam(defaultValue = "latest") String sort) {
+        Sort sortOption = getSortOption(sort);
+        Pageable pageable = PageRequest.of(page - 1, DEFAULT_ITEM_PAGE_SIZE, sortOption);
 
         Set<Long> likedItemIds = Collections.emptySet();
 
@@ -85,11 +89,12 @@ public class ItemRestController {
         Item findItem = itemCommandService.getSingleItemWithComments(itemId);
         List<ItemResponseDTO.ItemRegionResultDTO> itemRegions = itemCommandService.getItemRegions(findItem);
         List<ItemResponseDTO.RecruitPositionResultDTO> itemRecruitPositions = itemCommandService.getItemRecruitPositions(findItem);
+        List<ItemResponseDTO.ItemCategoriesResultDTO> itemCategories = itemCommandService.getItemCategories(findItem);
         List<ItemResponseDTO.ItemCommentResultDTO> itemComments = itemCommandService.getItemComments(findItem);
         boolean itemLike = itemCommandService.getItemLike(member.getId(), findItem.getId());
         int commentCount = itemCommandService.countComments(findItem.getId());
         itemCommandService.updateItemHistory(member, findItem);
-        return ApiResponse.onSuccess(ItemConverter.toItemInfoDTO(findItem, itemRegions, itemRecruitPositions, itemComments, commentCount, itemLike));
+        return ApiResponse.onSuccess(ItemConverter.toItemInfoDTO(findItem, itemRegions, itemCategories, itemRecruitPositions, itemComments, commentCount, itemLike));
     }
 
     @PostMapping("/{itemId}/like")
@@ -137,4 +142,14 @@ public class ItemRestController {
         itemCommandService.removeItemComment(member, commentId);
         return ApiResponse.of(SuccessStatus._NO_CONTENT, null);
     }
+
+
+    //프로젝트 정렬 조건 처리 메서드
+    private Sort getSortOption(String sort) {
+        if (sort.equalsIgnoreCase("popular")) {
+            return Sort.by("viewCount").descending();
+        }
+        return Sort.by("createdAt").descending();
+    }
+
 }

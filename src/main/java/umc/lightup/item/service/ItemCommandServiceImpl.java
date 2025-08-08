@@ -24,10 +24,8 @@ import umc.lightup.position.domain.Position;
 import umc.lightup.position.repository.PositionRepository;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +43,7 @@ public class ItemCommandServiceImpl implements ItemCommandService {
 
     private final AmazonS3Manager s3Manager;
     private final UuidRepository uuidRepository;
+    private final ItemCategoryRepository itemCategoryRepository;
 
     @Override
     @Transactional
@@ -123,21 +122,26 @@ public class ItemCommandServiceImpl implements ItemCommandService {
                     String itemImageUrl = item.getItemProfileImageUrl();
                     boolean liked = likedItemIds != null && likedItemIds.contains(item.getId());
                     int commentCount = itemCommentRepository.countByItemId(item.getId());
-                    int viewCount = itemViewHistoryRepository.countByItemId(item.getId());
 
-                    return ItemConverter.toItemResultDTO(item, itemImageUrl, viewCount, commentCount, liked);
+                    return ItemConverter.toItemResultDTO(item, itemImageUrl, commentCount, liked);
                 }).toList();
     }
 
     @Override
     public List<ItemResponseDTO.MyItemResultDTO> getMyItems(Member member) {
         List<Item> myItemList = itemRepository.findByMember(member);
+        List<ItemCategory> itemCategories = itemCategoryRepository.findByItems(myItemList);
+        Map<Long, List<ItemCategory>> categoryMap = itemCategories.stream()
+                .collect(Collectors.groupingBy(ic -> ic.getItem().getId()));
 
         return myItemList.stream()
             .map(item -> {
                 String itemImageUrl = item.getItemProfileImageUrl();
 
-                return ItemConverter.toMyItemResultDTO(item, itemImageUrl);
+                List<ItemResponseDTO.ItemCategoriesResultDTO> itemCategoriesResultDTOList = categoryMap.getOrDefault(item.getId(), List.of()).stream()
+                        .map(ItemConverter::toItemCategoriesResultDTO)
+                        .toList();
+                return ItemConverter.toMyItemResultDTO(item, itemImageUrl, itemCategoriesResultDTOList);
             })
             .toList();
     }
@@ -218,6 +222,10 @@ public class ItemCommandServiceImpl implements ItemCommandService {
                     .viewedAt(LocalDateTime.now())
                     .build());
         }
+
+        if (itemRepository.increaseViewCount(item.getId()) == 0) {
+            throw new GeneralHandler(ErrorStatus.ITEM_NOT_FOUND);
+        }
     }
 
     @Override
@@ -268,5 +276,12 @@ public class ItemCommandServiceImpl implements ItemCommandService {
     @Override
     public int countComments(Long itemId) {
         return itemCommentRepository.countByItemId(itemId);
+    }
+
+    @Override
+    public List<ItemResponseDTO.ItemCategoriesResultDTO> getItemCategories(Item item) {
+        return itemCategoryRepository.findByItem(item).stream()
+                .map(ItemConverter::toItemCategoriesResultDTO)
+                .toList();
     }
 }

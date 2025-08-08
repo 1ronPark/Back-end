@@ -16,7 +16,7 @@ public class ItemConverter {
                 .build();
     }
 
-    public static ItemResponseDTO.ItemResultDTO toItemResultDTO(Item item, String itemImageUrl, int viewCount, int commentCount, boolean itemLike) {
+    public static ItemResponseDTO.ItemResultDTO toItemResultDTO(Item item, String itemImageUrl, int commentCount, boolean itemLike) {
         return ItemResponseDTO.ItemResultDTO.builder()
                 .itemId(item.getId())
                 .itemName(item.getName())
@@ -24,7 +24,7 @@ public class ItemConverter {
                 .itemImageUrl(itemImageUrl)
                 .updatedAt(item.getUpdatedAt().toLocalDate())
                 .recruitStatus(item.isProjectStatus())
-                .viewCount(viewCount)
+                .viewCount(item.getViewCount())
                 .commentCount(commentCount)
                 .likedByCurrentUser(itemLike)
                 .build();
@@ -36,11 +36,14 @@ public class ItemConverter {
                 .build();
     }
 
-    public static ItemResponseDTO.MyItemResultDTO toMyItemResultDTO(Item item, String itemImageUrl) {
+    public static ItemResponseDTO.MyItemResultDTO toMyItemResultDTO(Item item, String itemImageUrl, List<ItemResponseDTO.ItemCategoriesResultDTO> itemCategoriesResultDTOList) {
         return ItemResponseDTO.MyItemResultDTO.builder()
                 .itemName(item.getName())
                 .introduce(item.getIntroduce())
                 .itemImageUrl(itemImageUrl)
+                .itemCategories(itemCategoriesResultDTOList)
+                .recruitStatus(item.isProjectStatus())
+//                .applicantStatus()
                 .build();
     }
 
@@ -50,7 +53,7 @@ public class ItemConverter {
                 .build();
     }
 
-    public static ItemResponseDTO.ItemInfoDTO toItemInfoDTO(Item item, List<ItemResponseDTO.ItemRegionResultDTO> itemRegionResultDTOList, List<ItemResponseDTO.RecruitPositionResultDTO> recruitPositionResultDTOList, List<ItemResponseDTO.ItemCommentResultDTO> itemCommentResultDTOList, int commentCount, boolean itemLike) {
+    public static ItemResponseDTO.ItemInfoDTO toItemInfoDTO(Item item, List<ItemResponseDTO.ItemRegionResultDTO> itemRegionResultDTOList, List<ItemResponseDTO.ItemCategoriesResultDTO> itemCategoriesResultDTOList, List<ItemResponseDTO.RecruitPositionResultDTO> recruitPositionResultDTOList, List<ItemResponseDTO.ItemCommentResultDTO> itemCommentResultDTOList, int commentCount, boolean itemLike) {
         return ItemResponseDTO.ItemInfoDTO.builder()
                 .introduce(item.getIntroduce())
                 .itemName(item.getName())
@@ -64,6 +67,7 @@ public class ItemConverter {
                 .regions(itemRegionResultDTOList)
                 .description(item.getDescription())
                 .recruitPositions(recruitPositionResultDTOList)
+                .itemCategories(itemCategoriesResultDTOList)
                 .itemComments(itemCommentResultDTOList)
                 .commentCount(commentCount)
                 .updatedAt(item.getUpdatedAt().toLocalDate())
@@ -114,6 +118,12 @@ public class ItemConverter {
                 .authorProfileImageURL(itemComment.getCommentMember().getProfileImageUrl())
                 .content(itemComment.getContent())
                 .updatedAt(itemComment.getUpdatedAt())
+                .build();
+    }
+
+    public static ItemResponseDTO.ItemCategoriesResultDTO toItemCategoriesResultDTO (ItemCategory itemCategory) {
+        return ItemResponseDTO.ItemCategoriesResultDTO.builder()
+                .categoryName(itemCategory.getCategoryType().getDisplayName())
                 .build();
     }
 
