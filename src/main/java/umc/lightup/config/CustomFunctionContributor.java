@@ -10,5 +10,9 @@ public class CustomFunctionContributor implements FunctionContributor {
     public void contributeFunctions(FunctionContributions functionContributions) {
         functionContributions.getFunctionRegistry()
                 .register("bitand", new StandardSQLFunction("bitand", StandardBasicTypes.INTEGER));
+        functionContributions.getFunctionRegistry()
+                .register("json_objectagg", new StandardSQLFunction("json_objectagg", StandardBasicTypes.STRING));
+        functionContributions.getFunctionRegistry()
+                .register("json_arrayagg", new StandardSQLFunction("json_arrayagg", StandardBasicTypes.STRING));
     }
 }

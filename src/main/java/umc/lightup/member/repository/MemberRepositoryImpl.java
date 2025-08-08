@@ -1,5 +1,8 @@
 package umc.lightup.member.repository;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -11,6 +14,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import umc.lightup.api.code.status.ErrorStatus;
+import umc.lightup.config.QueryDSLTemplate;
+import umc.lightup.exception.handler.GeneralHandler;
 import umc.lightup.member.domain.*;
 import umc.lightup.member.dto.MemberRequestDTO;
 import umc.lightup.member.dto.MemberResponseDTO;
@@ -21,9 +27,7 @@ import umc.lightup.skill.domain.QSkill;
 import umc.lightup.strength.domain.QStrength;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
@@ -40,11 +44,13 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom{
     private final QStrength strength = QStrength.strength;
     private final QMemberStrength memberStrength = QMemberStrength.memberStrength;
 
+    private final QueryDSLTemplate queryDSLTemplate;
+    private final ObjectMapper objectMapper;
+
     @Override
     public MemberResponseDTO.MemberInfoListDTO getMemberInfos
             (Member requestedMember, MemberRequestDTO.MemberSearchRequestDTO options) {
-        // 아니 JSON_OBJECTAGG 함수로 일대다들을 한 번에 묶어 가져올 생각 하고 있었는데 QueryDSL이 지원을 안 한다네요???
-        // 그 함수가 MySQL에만 있고 다른 DB에는 없다니 이해는 하는데, 그렇다고 Native Query를 쓰기는 많이 복잡할 것 같은데...
+        // JSON_OBJECTAGG 구현 버전
         BooleanBuilder predicate = new BooleanBuilder();
 
         // 1) Position.name 리스트 필터
@@ -125,6 +131,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom{
         }
 
         if (options.getPage() == null) options.setPage(1L);
+        if (options.getLimit() == null) options.setLimit(16L);
 
         BooleanExpression likedCondition;
         if (requestedMember == null) likedCondition = Expressions.FALSE;
@@ -137,8 +144,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom{
                     )
                     .exists();
 
-
-        List<MemberWithLikeDTO> memberList = jpaQueryFactory
+        List<MemberResponseDTO.MemberInfoSimpleDTO> resultList = jpaQueryFactory
                 .select(Projections.constructor(MemberWithLikeDTO.class,
                         member.id,
                         member.name,
@@ -146,98 +152,47 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom{
                         member.gender,
                         member.mbti,
                         member.profileImageUrl,
+
+                        // Positions 집계
+                        JPAExpressions
+                                .select(queryDSLTemplate.jsonArrayAgg(position.name))
+                                .from(memberPosition)
+                                .join(memberPosition.position, position)
+                                .where(memberPosition.member.id.eq(member.id)),
+
+                        // Regions 집계
+                        JPAExpressions
+                                .select(queryDSLTemplate.jsonArrayAgg(
+                                        queryDSLTemplate.jsonObject(
+                                                Expressions.constant("siDo"), memberRegion.siDo,
+                                                Expressions.constant("siGunGu"), memberRegion.siGunGu
+                                        )
+                                ))
+                                .from(memberRegion)
+                                .where(memberRegion.member.id.eq(member.id)),
+
+                        // Skills 집계
+                        JPAExpressions
+                                .select(queryDSLTemplate.jsonArrayAgg(skill.name))
+                                .from(memberSkill)
+                                .join(memberSkill.skill, skill)
+                                .where(memberSkill.member.id.eq(member.id)),
+
+                        // Strengths 집계
+                        JPAExpressions
+                                .select(queryDSLTemplate.jsonArrayAgg(strength.name))
+                                .from(memberStrength)
+                                .join(memberStrength.strength, strength)
+                                .where(memberStrength.member.id.eq(member.id)),
                         likedCondition.as("liked")))
                 .from(member)
                 .where(predicate)
-                .offset((options.getPage() - 1) * 16)
-                .limit(16)
-                .fetch();
-
-        List<MemberResponseDTO.MemberInfoSimpleDTO> resultList = memberList.stream()
-                .map(m -> MemberResponseDTO.MemberInfoSimpleDTO.builder()
-                        .id(m.getId())
-                        .name(m.getName())
-                        .nickname(m.getNickname())
-                        .gender(m.getGender())
-                        .mbti(Mbti.fromByte(m.getMbti()))
-                        .profileImageUrl(m.getProfileImageUrl())
-                        .liked(m.isLiked())
-                        .positions(List.of())
-                        .regions(List.of())
-                        .skills(List.of())
-                        .strengths(List.of())
-                        .build())
+                .offset((options.getPage() - 1) * options.getLimit())
+                .limit(options.getLimit())
+                .fetch().stream()
+                .map(m -> m.toMemberInfoSimpleDTO(objectMapper))
                 .toList();
 
-        //이후 id값을 기준으로 데이터 넣을 때 활용, list로 선형탐색하면 시간복잡도가 증가하기 때문에 쓴 방식
-        Map<Long, MemberResponseDTO.MemberInfoSimpleDTO> mapById =
-                resultList.stream().collect(Collectors.toMap(
-                MemberResponseDTO.MemberInfoSimpleDTO::getId,
-                m -> m));
-
-        List<Long> memberIds = memberList.stream()
-                .map(MemberWithLikeDTO::getId)
-                .toList();
-
-        //positions
-        jpaQueryFactory
-                .select(Projections.constructor(MemberIdAndNameDTO.class,
-                        memberPosition.member.id,
-                        position.name))
-                .from(memberPosition)
-                .join(memberPosition.position, position)
-                .where(memberPosition.member.id.in(memberIds))
-                .fetch().stream()
-                .collect(Collectors.groupingBy(
-                        MemberIdAndNameDTO::getId,
-                        Collectors.mapping(MemberIdAndNameDTO::getName, Collectors.toList())))
-                .forEach((key, value) -> mapById.get(key).setPositions(value));
-
-        //regions
-        jpaQueryFactory
-                .select(Projections.constructor(MemberIdAndRegionDTO.class,
-                        memberRegion.member.id,
-                        memberRegion.siDo,
-                        memberRegion.siGunGu))
-                .from(memberRegion)
-                .where(memberRegion.member.id.in(memberIds))
-                .fetch().stream()
-                .collect(Collectors.groupingBy(
-                        MemberIdAndRegionDTO::getId,
-                        Collectors.mapping(r->
-                                MemberResponseDTO.singleRegionResultDTO.builder()
-                                        .siDo(r.siDo)
-                                        .siGunGu(r.siGunGu)
-                                        .build(), Collectors.toList())))
-                .forEach((key, value) -> mapById.get(key).setRegions(value));
-
-        //skills
-        jpaQueryFactory
-                .select(Projections.constructor(MemberIdAndNameDTO.class,
-                        memberSkill.member.id,
-                        skill.name))
-                .from(memberSkill)
-                .join(memberSkill.skill, skill)
-                .where(memberSkill.member.id.in(memberIds))
-                .fetch().stream()
-                .collect(Collectors.groupingBy(
-                        MemberIdAndNameDTO::getId,
-                        Collectors.mapping(MemberIdAndNameDTO::getName, Collectors.toList())))
-                .forEach((key, value) -> mapById.get(key).setSkills(value));
-
-        //strengths
-        jpaQueryFactory
-                .select(Projections.constructor(MemberIdAndNameDTO.class,
-                        memberStrength.member.id,
-                        strength.name))
-                .from(memberStrength)
-                .join(memberStrength.strength, strength)
-                .where(memberStrength.member.id.in(memberIds))
-                .fetch().stream()
-                .collect(Collectors.groupingBy(
-                        MemberIdAndNameDTO::getId,
-                        Collectors.mapping(MemberIdAndNameDTO::getName, Collectors.toList())))
-                .forEach((key, value) -> mapById.get(key).setStrengths(value));
 
         long totalResultCount = Optional.ofNullable(jpaQueryFactory
                 .select(member.count())
@@ -261,24 +216,49 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom{
         private Boolean gender;
         private Byte mbti;
         private String profileImageUrl;
+        private String positionsJson;
+        private String regionsJson;
+        private String skillsJson;
+        private String strengthsJson;
         private boolean liked;
-    }
 
-    @Getter
-    @AllArgsConstructor
-    //private 사용 불가
-    public static class MemberIdAndNameDTO {
-        private long id;
-        private String name;
-    }
+        public MemberResponseDTO.MemberInfoSimpleDTO toMemberInfoSimpleDTO(ObjectMapper objectMapper) {
+            try {
+                //null이 가능하다 했으니 null check 진행
+                List<String> positions;
+                if (positionsJson == null || positionsJson.isBlank()) positions = List.of();
+                else positions = objectMapper.readValue(positionsJson, new TypeReference<>(){});
 
-    @Getter
-    @AllArgsConstructor
-    //private 사용 불가
-    public static class MemberIdAndRegionDTO {
-        private long id;
-        private String siDo;
-        private String siGunGu;
+                List<MemberResponseDTO.singleRegionResultDTO> regions;
+                if (regionsJson == null || regionsJson.isBlank()) regions = List.of();
+                else regions = objectMapper.readValue(regionsJson, new TypeReference<>(){});
+
+                List<String> skills;
+                if (skillsJson == null || skillsJson.isBlank()) skills = List.of();
+                else skills = objectMapper.readValue(skillsJson, new TypeReference<>(){});
+
+                List<String> strengths;
+                if (strengthsJson == null || strengthsJson.isBlank()) strengths = List.of();
+                else strengths = objectMapper.readValue(strengthsJson, new TypeReference<>(){});
+
+                return MemberResponseDTO.MemberInfoSimpleDTO.builder()
+                        .id(id)
+                        .name(name)
+                        .nickname(nickname)
+                        .gender(gender)
+                        .mbti(mbti == null ? null : Mbti.fromByte(mbti))
+                        .profileImageUrl(profileImageUrl)
+                        .positions(positions) // <> 내부 생략 가능
+                        .regions(regions)
+                        .skills(skills)
+                        .strengths(strengths)
+                        .liked(liked)
+                        .build();
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+                throw new GeneralHandler(ErrorStatus._INTERNAL_SERVER_ERROR);
+            }
+        }
     }
 
     private NumberTemplate<Integer> memberMbtiBitAnd(int mask) {

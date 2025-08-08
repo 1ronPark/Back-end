@@ -192,6 +192,8 @@ public class MemberRequestDTO {
         private Boolean onlyLiked;
         @Positive
         private Long page;
+        @Positive
+        private Long limit;
     }
 
     @Getter
