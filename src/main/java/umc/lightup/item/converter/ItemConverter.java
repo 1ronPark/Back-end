@@ -50,7 +50,7 @@ public class ItemConverter {
                 .build();
     }
 
-    public static ItemResponseDTO.ItemInfoDTO toItemInfoDTO(Item item, List<ItemResponseDTO.ItemRegionResultDTO> itemRegionResultDTOList, List<ItemResponseDTO.RecruitPositionResultDTO> recruitPositionResultDTOList, List<ItemResponseDTO.ItemCommentResultDTO> itemCommentResultDTOList, int commentCount, boolean itemLike) {
+    public static ItemResponseDTO.ItemInfoDTO toItemInfoDTO(Item item, List<ItemResponseDTO.ItemRegionResultDTO> itemRegionResultDTOList, List<ItemResponseDTO.ItemCategoriesResultDTO> itemCategoriesResultDTOList, List<ItemResponseDTO.RecruitPositionResultDTO> recruitPositionResultDTOList, List<ItemResponseDTO.ItemCommentResultDTO> itemCommentResultDTOList, int commentCount, boolean itemLike) {
         return ItemResponseDTO.ItemInfoDTO.builder()
                 .introduce(item.getIntroduce())
                 .itemName(item.getName())
@@ -64,6 +64,7 @@ public class ItemConverter {
                 .regions(itemRegionResultDTOList)
                 .description(item.getDescription())
                 .recruitPositions(recruitPositionResultDTOList)
+                .itemCategories(itemCategoriesResultDTOList)
                 .itemComments(itemCommentResultDTOList)
                 .commentCount(commentCount)
                 .updatedAt(item.getUpdatedAt().toLocalDate())
@@ -114,6 +115,12 @@ public class ItemConverter {
                 .authorProfileImageURL(itemComment.getCommentMember().getProfileImageUrl())
                 .content(itemComment.getContent())
                 .updatedAt(itemComment.getUpdatedAt())
+                .build();
+    }
+
+    public static ItemResponseDTO.ItemCategoriesResultDTO toItemCategoriesResultDTO (ItemCategory itemCategory) {
+        return ItemResponseDTO.ItemCategoriesResultDTO.builder()
+                .categoryName(itemCategory.getCategoryType().getDisplayName())
                 .build();
     }
 

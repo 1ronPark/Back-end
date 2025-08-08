@@ -45,6 +45,7 @@ public class ItemCommandServiceImpl implements ItemCommandService {
 
     private final AmazonS3Manager s3Manager;
     private final UuidRepository uuidRepository;
+    private final ItemCategoryRepository itemCategoryRepository;
 
     @Override
     @Transactional
@@ -271,5 +272,12 @@ public class ItemCommandServiceImpl implements ItemCommandService {
     @Override
     public int countComments(Long itemId) {
         return itemCommentRepository.countByItemId(itemId);
+    }
+
+    @Override
+    public List<ItemResponseDTO.ItemCategoriesResultDTO> getItemCategories(Item item) {
+        return itemCategoryRepository.findByItem(item).stream()
+                .map(ItemConverter::toItemCategoriesResultDTO)
+                .toList();
     }
 }

@@ -38,5 +38,7 @@ public interface ItemCommandService {
 
     List<ItemResponseDTO.RecruitPositionResultDTO> getItemRecruitPositions(Item item);
 
+    List<ItemResponseDTO.ItemCategoriesResultDTO> getItemCategories(Item item);
+
     List<ItemResponseDTO.ItemCommentResultDTO> getItemComments(Item item);
 }

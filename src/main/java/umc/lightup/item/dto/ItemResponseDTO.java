@@ -73,6 +73,7 @@ public class ItemResponseDTO {
         private String itemName;
         private String itemProfileImageUrl;
         private String memberName;
+        private String nickName;
         private boolean gender;
         private int age;
         private Mbti mbti;
@@ -81,6 +82,7 @@ public class ItemResponseDTO {
         private List<ItemRegionResultDTO> regions;
         private String description;
         private List<RecruitPositionResultDTO> recruitPositions;
+        private List<ItemCategoriesResultDTO> itemCategories;
         private List<ItemCommentResultDTO> itemComments;
         private int commentCount;
         private LocalDate updatedAt;
@@ -106,6 +108,14 @@ public class ItemResponseDTO {
         private String mainTasks;
         private String preferentialTreatment;
         private String preferMbti;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ItemCategoriesResultDTO {
+        private String categoryName;
     }
 
     @Getter
