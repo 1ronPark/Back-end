@@ -25,6 +25,15 @@ public enum ErrorStatus implements BaseErrorCode {
     NOT_IMAGE(HttpStatus.BAD_REQUEST, "MEMBER4008", "이미지 파일이 아닙니다."), //MEMBER4007 에러를 만들었던 기억이 있는데 왜 없지?
     NO_CREDENTIAL(HttpStatus.INTERNAL_SERVER_ERROR, "MEMBER5000", "저장된 패스워드가 없습니다."),
 
+    // Credential 관련 에러
+    CREDENTIAL_NOT_FOUND(HttpStatus.BAD_REQUEST, "CREDENTIAL4000", "해당 형태의 로그인 정보를 찾을 수 없습니다."),
+    ALREADY_SIGNED_IN_EMAIL(HttpStatus.BAD_REQUEST, "CREDENTIAL4001", "이미 동일한 이메일로 가입된 회원이 있습니다."),
+    CREDENTIAL_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "CREDENTIAL4002", "이미 해당 방법으로 소셜로그인이 연결되어 있습니다."),
+    CREDENTIAL_ALREADY_USED(HttpStatus.BAD_REQUEST, "CREDENTIAL4003", "이미 다른 계정에 소셜로그인이 연결되어 있습니다."),
+    ONLY_CREDENTIAL_REMAIN(HttpStatus.BAD_REQUEST, "CREDENTIAL4004", "현재 유일한 로그인 방법이 하나밖에 없습니다. 로그인 방법을 지우면 로그인이 불가합니다."),
+    INVALID_AUTH_CODE(HttpStatus.BAD_REQUEST, "CREDENTIAL4005", "auth code가 올바르지 않습니다."),
+    AUTH_NOT_GRANTED(HttpStatus.BAD_REQUEST, "CREDENTIAL4006", "소셜로그인의 권한이 부족합니다. 필요한 모든 권한 제공에 동의했는지 확인해 주세요."),
+
     //Notification 관련 에러
     NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "NOTIFICATION4001", "해당 알림이 존재하지 않습니다. "),
   

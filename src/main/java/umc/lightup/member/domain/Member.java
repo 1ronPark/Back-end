@@ -27,7 +27,7 @@ public class Member extends BaseEntity implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 20)
+    @Column(length = 20) //소셜로그인 회원가입 시 안 들어올 수 있음
     private String name;
 
     @Column(unique = true, length = 20)

@@ -12,12 +12,15 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import umc.lightup.api.ApiResponse;
+import umc.lightup.api.code.status.ErrorStatus;
 import umc.lightup.api.code.status.SuccessStatus;
+import umc.lightup.exception.handler.GeneralHandler;
 import umc.lightup.member.converter.MemberConverter;
 import umc.lightup.member.domain.Member;
 import umc.lightup.member.domain.Portfolio;
 import umc.lightup.member.dto.MemberRequestDTO;
 import umc.lightup.member.dto.MemberResponseDTO;
+import umc.lightup.member.enums.CredentialType;
 import umc.lightup.member.dto.PortfolioInfoDTO;
 import umc.lightup.member.service.CredentialQueryService;
 import umc.lightup.member.service.MemberCommandService;
@@ -52,6 +55,79 @@ public class MemberRestController {
     public ApiResponse<MemberResponseDTO.LoginResultDTO> login
             (@RequestBody @Valid MemberRequestDTO.PasswordLoginRequestDTO request) {
         return ApiResponse.onSuccess(memberCommandService.loginMember(request));
+    }
+
+    @PostMapping("/join/{oauth}")
+    @Operation(summary = "유저 소셜로그인을 통한 회원가입 API",description = "유저가 소셜로그인으로 회원가입하는 API입니다.")
+    public ApiResponse<MemberResponseDTO.JoinResultDTO> joinByOAuth(
+            @PathVariable("oauth") CredentialType oauth,
+            @RequestParam @NotBlank String authCode) {
+        Member member = switch (oauth) {
+            case GOOGLE -> memberCommandService.joinMemberByGoogle(authCode);
+            case KAKAO -> memberCommandService.joinMemberByKakao(authCode);
+            case PASSWORD -> throw new GeneralHandler(ErrorStatus._BAD_REQUEST);
+        };
+        return ApiResponse.onSuccess(MemberResponseDTO.joinResultDTOBuilder()
+                .memberId(member.getId())
+                .createdAt(member.getCreatedAt())
+                .build());
+    }
+
+    @PostMapping("/login/{oauth}")
+    @Operation(summary = "유저 소셜로그인 API",description = "유저가 소셜로그인하는 API입니다.")
+    public ApiResponse<MemberResponseDTO.LoginResultDTO> loginByOAuth
+            (@PathVariable("oauth") CredentialType oauth,
+             @RequestParam @NotBlank String authCode) {
+        MemberResponseDTO.LoginResultDTO loginResult = switch (oauth) {
+            case GOOGLE -> memberCommandService.loginMemberByGoogle(authCode);
+            case KAKAO -> memberCommandService.loginMemberByKakao(authCode);
+            case PASSWORD -> throw new GeneralHandler(ErrorStatus._BAD_REQUEST);
+        };
+        return ApiResponse.onSuccess(loginResult);
+    }
+
+    @PostMapping("login/path/{oauth}")
+    @Operation(summary = "유저 소셜로그인 방법 추가 API",
+            description = "유저가 로그인 방법을 추가하는 API입니다.",
+            security = { @SecurityRequirement(name = "JWT TOKEN")}
+    )
+    public ApiResponse<Void> addLogin
+            (Authentication authentication,
+             @PathVariable("oauth") CredentialType oauth,
+             @RequestParam @NotBlank String authCode) {
+        String email = authentication.getName();
+        Member member = memberCommandService.getMember(email);
+        switch (oauth) {
+            case GOOGLE -> memberCommandService.addGoogleLogin(member, authCode);
+            case KAKAO -> memberCommandService.addKakaoLogin(member, authCode);
+            case PASSWORD -> memberCommandService.addPasswordLogin(member, authCode);
+        };
+        return ApiResponse.of(SuccessStatus._NO_CONTENT, null);
+    }
+
+    @GetMapping("login/path")
+    @Operation(summary = "유저 소셜로그인 방법 확인 API",
+            description = "유저가 로그인 방법을 확인하는 API입니다.",
+            security = { @SecurityRequirement(name = "JWT TOKEN")}
+    )
+    public ApiResponse<MemberResponseDTO.CredentialInfoResultDTO> checkLogin
+            (Authentication authentication) {
+        String email = authentication.getName();
+        return ApiResponse.onSuccess(credentialQueryService.getMemberCredentials(email));
+    }
+
+    @DeleteMapping("login/path/{oauth}")
+    @Operation(summary = "유저 소셜로그인 방법 삭제 API",
+            description = "유저가 로그인 방법을 삭제하는 API입니다.",
+            security = { @SecurityRequirement(name = "JWT TOKEN")}
+    )
+    public ApiResponse<Void> removeLogin
+            (Authentication authentication,
+             @PathVariable("oauth") CredentialType oauth) {
+        String email = authentication.getName();
+        Member member = memberCommandService.getMember(email);
+        memberCommandService.removeCredential(member, oauth);
+        return ApiResponse.of(SuccessStatus._NO_CONTENT, null);
     }
 
     @GetMapping("/me")

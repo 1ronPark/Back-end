@@ -37,6 +37,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/members/me",
                                 "/api/v1/members/me/**",
                                 "/api/v1/members/password/change",
+                                "/api/v1/members/login/path",
+                                "/api/v1/members/login/path/**",
                                 "/api/v1/notification/{notificationId}",
                                 "/api/v1/members/*/like")
                         .authenticated()
