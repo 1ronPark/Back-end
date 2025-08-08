@@ -33,7 +33,7 @@ public class ItemResponseDTO {
         private String itemImageUrl;
         private LocalDate updatedAt;
         private boolean recruitStatus;
-        private int viewCount;
+        private Long viewCount;
         private int commentCount;
         private boolean likedByCurrentUser;
     }
