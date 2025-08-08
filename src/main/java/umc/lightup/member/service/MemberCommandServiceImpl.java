@@ -376,6 +376,15 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     }
 
     @Override
+    public MemberResponseDTO.MemberInfoListDTO searchMember(
+            Member member,
+            MemberRequestDTO.MemberSearchRequestDTO options) {
+        if (options.getRegions() == null) options.setRegions(List.of());
+        if (options.getPositions() == null) options.setPositions(List.of());
+        return memberRepository.getMemberInfos(member, options);
+    }
+
+    @Override
     @Transactional
     public String selectSkill(Long skillId, Member member) {
         Skill foundSkill = skillRepository.findById(skillId)

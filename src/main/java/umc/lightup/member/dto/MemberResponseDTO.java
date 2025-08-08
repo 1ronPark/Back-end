@@ -105,10 +105,40 @@ public class MemberResponseDTO {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class MemberInfoListDTO {
+        List<MemberInfoSimpleDTO> members;
+        long numOfTotalResults;
+    }
+
+    @Setter
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class CredentialInfoResultDTO {
         private List<CredentialInfoDTO> credentials;
     }
 
+    @Setter
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class MemberInfoSimpleDTO {
+        private long id;
+        private String name;
+        private String nickname;
+        private Boolean gender;
+        private Mbti mbti;
+        private List<String> skills;
+        private List<String> strengths;
+        private List<singleRegionResultDTO> regions;
+        private List<String> positions;
+        private String profileImageUrl;
+        private boolean liked;
+    }
+    
+    @Setter
     @Getter
     @Builder
     @NoArgsConstructor
@@ -255,7 +285,7 @@ public class MemberResponseDTO {
                 .nickname(member.getNickname())
                 .age(member.getAge())
                 .role(member.getRole())
-                .mbti(member.getMbti())
+                .mbti(Mbti.fromByte(member.getMbti()))
                 .birth(member.getBirth())
                 .gender(member.getGender())
                 .school(member.getSchool())

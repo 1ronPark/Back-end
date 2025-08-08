@@ -29,6 +29,7 @@ public interface MemberCommandService {
     Portfolio savePortfolio(Member member, String name, MultipartFile portfolioFile);
     Portfolio savePortfolio(Member member, String name, String portfolioLink);
     void removePortfolio(String memberEmail, long portFolioId);
+    MemberResponseDTO.MemberInfoListDTO searchMember(Member member, MemberRequestDTO.MemberSearchRequestDTO options);
     String selectSkill(Long skillId,Member member);
     void removeMemberSkill(Long skillId, Long memberId);
     String selectStrength(Long strengthId,Member member);
