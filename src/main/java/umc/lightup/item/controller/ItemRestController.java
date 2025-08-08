@@ -43,8 +43,8 @@ public class ItemRestController {
     @Operation(summary = "전체 프로젝트 조회 API", description = "전체 프로젝트를 조회하는 API이며 페이징을 포함합니다. 요청 파라미터로 page 번호를 입력할 수 있습니다.")
     public ApiResponse<ItemResponseDTO.ItemResultListDTO> viewAllItems(
             Authentication authentication,
-            @RequestParam(defaultValue = "0") @Min(1) Integer page,
-            @RequestParam(defaultValue = "latest") String sort) {
+            @RequestParam(value = "page", defaultValue = "0") @Min(1) Integer page,
+            @RequestParam(value = "sort", defaultValue = "latest") String sort) {
         Sort sortOption = getSortOption(sort);
         Pageable pageable = PageRequest.of(page - 1, DEFAULT_ITEM_PAGE_SIZE, sortOption);
 

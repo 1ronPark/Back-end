@@ -61,7 +61,7 @@ public class MemberRestController {
     @Operation(summary = "유저 소셜로그인을 통한 회원가입 API",description = "유저가 소셜로그인으로 회원가입하는 API입니다.")
     public ApiResponse<MemberResponseDTO.JoinResultDTO> joinByOAuth(
             @PathVariable("oauth") CredentialType oauth,
-            @RequestParam @NotBlank String authCode) {
+            @RequestParam("authCode") @NotBlank String authCode) {
         Member member = switch (oauth) {
             case GOOGLE -> memberCommandService.joinMemberByGoogle(authCode);
             case KAKAO -> memberCommandService.joinMemberByKakao(authCode);
@@ -77,7 +77,7 @@ public class MemberRestController {
     @Operation(summary = "유저 소셜로그인 API",description = "유저가 소셜로그인하는 API입니다.")
     public ApiResponse<MemberResponseDTO.LoginResultDTO> loginByOAuth
             (@PathVariable("oauth") CredentialType oauth,
-             @RequestParam @NotBlank String authCode) {
+             @RequestParam("authCode") @NotBlank String authCode) {
         MemberResponseDTO.LoginResultDTO loginResult = switch (oauth) {
             case GOOGLE -> memberCommandService.loginMemberByGoogle(authCode);
             case KAKAO -> memberCommandService.loginMemberByKakao(authCode);
@@ -94,7 +94,7 @@ public class MemberRestController {
     public ApiResponse<Void> addLogin
             (Authentication authentication,
              @PathVariable("oauth") CredentialType oauth,
-             @RequestParam @NotBlank String authCode) {
+             @RequestParam("authCode") @NotBlank String authCode) {
         String email = authentication.getName();
         Member member = memberCommandService.getMember(email);
         switch (oauth) {
@@ -159,7 +159,7 @@ public class MemberRestController {
 
     @PostMapping("/position")
     @Operation(summary = "포지션 선택 API", description = "유저가 포지션을 선택하는 API 입니다.")
-    public ApiResponse<MemberResponseDTO.MemberPositionResultDTO> selectMemberPosition(Authentication authentication, @RequestParam String positionName) {
+    public ApiResponse<MemberResponseDTO.MemberPositionResultDTO> selectMemberPosition(Authentication authentication, @RequestParam("positionName") String positionName) {
         String userName = authentication.getName();
         Member member = memberCommandService.getMember(userName);
 
@@ -173,7 +173,7 @@ public class MemberRestController {
 
     @DeleteMapping("/position")
     @Operation(summary = "포지션 취소 API", description = "유저가 포지션 선택을 취소할 때 호출되는 API 입니다.")
-    public ApiResponse<MemberResponseDTO.MemberPositionDeleteResultDTO> deleteMemberPosition(Authentication authentication, @RequestParam String positionName) {
+    public ApiResponse<MemberResponseDTO.MemberPositionDeleteResultDTO> deleteMemberPosition(Authentication authentication, @RequestParam("positionName") String positionName) {
         String userName = authentication.getName();
         Member member = memberCommandService.getMember(userName);
 
@@ -345,7 +345,7 @@ public class MemberRestController {
             summary = "비밀번호 초기화 API",
             description = "비밀번호를 변경하는 API입니다. 사용자가 비밀번호를 잊었을 때 사용합니다."
     )
-    public ApiResponse<Void> passwordInitialize(@RequestParam @NotBlank @Email String email) {
+    public ApiResponse<Void> passwordInitialize(@RequestParam("email") @NotBlank @Email String email) {
         credentialQueryService.initializePasswordByEmail(email);
         return ApiResponse.of(SuccessStatus._NO_CONTENT, null);
     }
@@ -355,7 +355,7 @@ public class MemberRestController {
             summary = "이메일 존재 여부 확인 API",
             description = "이메일 존재 여부를 확인하는 API입니다. 회원가입 시 중복 여부나 로그인 시 메일 존재 여부 확인 등의 용도로 사용할 수 있습니다."
     )
-    public ApiResponse<MemberResponseDTO.EmailExistResultDTO> emailExist(@RequestParam @NotBlank @Email String email) {
+    public ApiResponse<MemberResponseDTO.EmailExistResultDTO> emailExist(@RequestParam("email") @NotBlank @Email String email) {
         //항상 DTO 쓰다 여기에만 RequestParam 쓰니 이상하긴 하네...
         //아 그냥 ApiResponse<Boolean> 반환해버리고 싶다
         boolean emailExist = memberCommandService.isEmailExist(email);
