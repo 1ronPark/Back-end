@@ -10,6 +10,7 @@ import umc.lightup.notification.dto.NotificationResponseDTO;
 public interface NotificationQueryService {
   SseEmitter subscribe(Member member, String lastEventId);
   NotificationResponseDTO.SSETestDTO testSend(long id, String message);
+  NotificationResponseDTO.NotificationTotal getTotal(Member member);
   Page<Notification> getNotificationList(Member member, Integer page, Integer size);
 
   void sendToClient(SseEmitter emitter, String id, Object data);

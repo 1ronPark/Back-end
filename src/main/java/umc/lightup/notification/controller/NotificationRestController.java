@@ -43,6 +43,21 @@ public class NotificationRestController {
     return ApiResponse.onSuccess(NotificationConverter.notificationListDTO(notificationList));
   }
 
+  @GetMapping("/size")
+  @Operation(
+          summary = "수신 알림 총 갯수 API",
+          description = "수신 받은 알림 총 갯수 조회를 위한 API 입니다.",
+          security = { @SecurityRequirement(name = "JWT TOKEN")}
+  )
+  @ApiResponses({
+          @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
+  })
+  public ApiResponse<NotificationResponseDTO.NotificationTotal> getNotificationTotal(Authentication authentication){
+    Member member = memberCommandService.getMember(authentication.getName());
+    Long totalSize = notificationQueryService.getTotal(member).getTotal();
+    return ApiResponse.onSuccess(NotificationConverter.notificationTotal(totalSize));
+  }
+
   @DeleteMapping("/{notificationId}")
   @Operation(
           summary = "알림 지우기 API",
