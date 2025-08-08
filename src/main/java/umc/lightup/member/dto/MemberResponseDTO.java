@@ -2,6 +2,7 @@ package umc.lightup.member.dto;
 
 import lombok.*;
 import umc.lightup.member.domain.Member;
+import umc.lightup.member.enums.CredentialType;
 import umc.lightup.member.enums.Mbti;
 import umc.lightup.member.enums.Role;
 import umc.lightup.skill.enums.SkillType;
@@ -114,6 +115,15 @@ public class MemberResponseDTO {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class CredentialInfoResultDTO {
+        private List<CredentialInfoDTO> credentials;
+    }
+
+    @Setter
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class MemberInfoSimpleDTO {
         private long id;
         private String name;
@@ -128,6 +138,17 @@ public class MemberResponseDTO {
         private boolean liked;
     }
     
+    @Setter
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CredentialInfoDTO {
+        private CredentialType credentialType;
+        private LocalDateTime createdAt;
+        private LocalDateTime updatedAt;
+    }
+
     @Getter
     @Builder
     @NoArgsConstructor

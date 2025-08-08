@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import umc.lightup.member.enums.Gender;
 import umc.lightup.member.enums.Mbti;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -17,8 +18,8 @@ public class ItemResponseDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ItemJoinResultDTO {
-        Long memberId;
-        String itemName;
+        private Long memberId;
+        private String itemName;
     }
 
     @Getter
@@ -26,9 +27,14 @@ public class ItemResponseDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ItemResultDTO {
-        String itemName;
-        String memberName;
-        String itemImageUrl;
+        private Long itemId;
+        private String itemName;
+        private String memberName;
+        private String itemImageUrl;
+        private LocalDate updatedAt;
+        private boolean recruitStatus;
+        private Long viewCount;
+        private int commentCount;
         private boolean likedByCurrentUser;
     }
 
@@ -37,7 +43,7 @@ public class ItemResponseDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ItemResultListDTO {
-        List<ItemResultDTO> items;
+        private List<ItemResultDTO> items;
     }
 
     @Getter
@@ -45,9 +51,12 @@ public class ItemResponseDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class MyItemResultDTO {
-        String itemName;
-        String introduce;
-        String itemImageUrl;
+        private String itemName;
+        private String introduce;
+        private String itemImageUrl;
+        private List<ItemCategoriesResultDTO> itemCategories;
+        private boolean recruitStatus;
+//        private boolean applicantStatus;
     }
 
     @Getter
@@ -55,7 +64,7 @@ public class ItemResponseDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class MyItemResultListDTO {
-        List<MyItemResultDTO> items;
+        private List<MyItemResultDTO> items;
     }
 
     @Getter
@@ -67,6 +76,7 @@ public class ItemResponseDTO {
         private String itemName;
         private String itemProfileImageUrl;
         private String memberName;
+        private String nickName;
         private boolean gender;
         private int age;
         private Mbti mbti;
@@ -75,6 +85,10 @@ public class ItemResponseDTO {
         private List<ItemRegionResultDTO> regions;
         private String description;
         private List<RecruitPositionResultDTO> recruitPositions;
+        private List<ItemCategoriesResultDTO> itemCategories;
+        private List<ItemCommentResultDTO> itemComments;
+        private int commentCount;
+        private LocalDate updatedAt;
         private boolean likedByCurrentUser;
     }
 
@@ -103,8 +117,28 @@ public class ItemResponseDTO {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class ItemCategoriesResultDTO {
+        private String categoryName;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class ItemApplyResultDTO {
         private LocalDateTime appliedAt;
         private String message;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ItemCommentResultDTO {
+        private Long itemCommentId;
+        private String authorName;
+        private String authorProfileImageURL;
+        private String content;
+        private LocalDateTime updatedAt;
     }
 }

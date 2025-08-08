@@ -9,4 +9,5 @@ import java.util.Optional;
 
 public interface ItemViewHistoryRepository extends JpaRepository<ItemViewHistory, Long> {
     Optional<ItemViewHistory> findByMemberAndItem(Member memberId, Item itemId);
+    int countByItemId(Long itemId);
 }

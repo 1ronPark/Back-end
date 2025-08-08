@@ -25,6 +25,18 @@ public enum ErrorStatus implements BaseErrorCode {
     NOT_IMAGE(HttpStatus.BAD_REQUEST, "MEMBER4008", "이미지 파일이 아닙니다."), //MEMBER4007 에러를 만들었던 기억이 있는데 왜 없지?
     NO_CREDENTIAL(HttpStatus.INTERNAL_SERVER_ERROR, "MEMBER5000", "저장된 패스워드가 없습니다."),
 
+    // Credential 관련 에러
+    CREDENTIAL_NOT_FOUND(HttpStatus.BAD_REQUEST, "CREDENTIAL4000", "해당 형태의 로그인 정보를 찾을 수 없습니다."),
+    ALREADY_SIGNED_IN_EMAIL(HttpStatus.BAD_REQUEST, "CREDENTIAL4001", "이미 동일한 이메일로 가입된 회원이 있습니다."),
+    CREDENTIAL_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "CREDENTIAL4002", "이미 해당 방법으로 소셜로그인이 연결되어 있습니다."),
+    CREDENTIAL_ALREADY_USED(HttpStatus.BAD_REQUEST, "CREDENTIAL4003", "이미 다른 계정에 소셜로그인이 연결되어 있습니다."),
+    ONLY_CREDENTIAL_REMAIN(HttpStatus.BAD_REQUEST, "CREDENTIAL4004", "현재 유일한 로그인 방법이 하나밖에 없습니다. 로그인 방법을 지우면 로그인이 불가합니다."),
+    INVALID_AUTH_CODE(HttpStatus.BAD_REQUEST, "CREDENTIAL4005", "auth code가 올바르지 않습니다."),
+    AUTH_NOT_GRANTED(HttpStatus.BAD_REQUEST, "CREDENTIAL4006", "소셜로그인의 권한이 부족합니다. 필요한 모든 권한 제공에 동의했는지 확인해 주세요."),
+
+    //Notification 관련 에러
+    NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "NOTIFICATION4001", "해당 알림이 존재하지 않습니다. "),
+  
     //MemberLike 관련 에러
     ALREADY_LIKED(HttpStatus.BAD_REQUEST, "MEMBER4100", "이미 좋아요 한 회원입니다. 좋아요를 취소하려면 Delete Method로 요청을 보내 주세요."),
     LIKE_NOT_FOUND(HttpStatus.BAD_REQUEST, "MEMBER4101", "좋아요하지 않은 회원입니다. 좋아요를 하려면 Post Method로 요청을 보내 주세요."),
@@ -61,6 +73,9 @@ public enum ErrorStatus implements BaseErrorCode {
     //ItemApply 관련 에러
     DUPLICATE_ITEM_APPLY(HttpStatus.BAD_REQUEST, "ITEMAPPLY4000", "이미 지원한 프로젝트입니다."),
 
+    //ItemComment 관련 에러
+    ITEM_COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEMCOMMENT4000", "해당 댓글이 존재하지 않습니다."),
+
     //ItemViewHistory 관련 에러
     ITEM_VIEW_HISTORY_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEMVIEWHISTORY4000", "프로젝트 조회 내역이 존재하지 않습니다."),
 
@@ -82,6 +97,7 @@ public enum ErrorStatus implements BaseErrorCode {
     //Email 관련 에러
     EMAIL_SEND_FAIL(HttpStatus.SERVICE_UNAVAILABLE, "EMAIL5003", "이메일 전송에 실패했습니다.")
     ;
+
 
 
     private final HttpStatus httpStatus;
