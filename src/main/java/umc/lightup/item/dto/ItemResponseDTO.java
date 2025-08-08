@@ -33,6 +33,8 @@ public class ItemResponseDTO {
         private String itemImageUrl;
         private LocalDate updatedAt;
         private boolean recruitStatus;
+        private Long viewCount;
+        private int commentCount;
         private boolean likedByCurrentUser;
     }
 
@@ -52,6 +54,9 @@ public class ItemResponseDTO {
         private String itemName;
         private String introduce;
         private String itemImageUrl;
+        private List<ItemCategoriesResultDTO> itemCategories;
+        private boolean recruitStatus;
+//        private boolean applicantStatus;
     }
 
     @Getter
@@ -71,6 +76,7 @@ public class ItemResponseDTO {
         private String itemName;
         private String itemProfileImageUrl;
         private String memberName;
+        private String nickName;
         private boolean gender;
         private int age;
         private Mbti mbti;
@@ -79,6 +85,10 @@ public class ItemResponseDTO {
         private List<ItemRegionResultDTO> regions;
         private String description;
         private List<RecruitPositionResultDTO> recruitPositions;
+        private List<ItemCategoriesResultDTO> itemCategories;
+        private List<ItemCommentResultDTO> itemComments;
+        private int commentCount;
+        private LocalDate updatedAt;
         private boolean likedByCurrentUser;
     }
 
@@ -107,8 +117,28 @@ public class ItemResponseDTO {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class ItemCategoriesResultDTO {
+        private String categoryName;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class ItemApplyResultDTO {
         private LocalDateTime appliedAt;
         private String message;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ItemCommentResultDTO {
+        private Long itemCommentId;
+        private String authorName;
+        private String authorProfileImageURL;
+        private String content;
+        private LocalDateTime updatedAt;
     }
 }

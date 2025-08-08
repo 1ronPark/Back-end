@@ -18,6 +18,7 @@ import umc.lightup.api.code.status.SuccessStatus;
 import umc.lightup.item.converter.ItemConverter;
 import umc.lightup.item.domain.Item;
 import umc.lightup.item.domain.ItemApply;
+import umc.lightup.item.domain.ItemComment;
 import umc.lightup.item.dto.ItemRequestDTO;
 import umc.lightup.item.dto.ItemResponseDTO;
 import umc.lightup.item.service.ItemCommandService;
@@ -40,8 +41,12 @@ public class ItemRestController {
 
     @GetMapping("/search")
     @Operation(summary = "전체 프로젝트 조회 API", description = "전체 프로젝트를 조회하는 API이며 페이징을 포함합니다. 요청 파라미터로 page 번호를 입력할 수 있습니다.")
-    public ApiResponse<ItemResponseDTO.ItemResultListDTO> viewAllItems(Authentication authentication, @RequestParam(defaultValue = "0") @Min(1) Integer page) {
-        Pageable pageable = PageRequest.of(page - 1, DEFAULT_ITEM_PAGE_SIZE, Sort.by("createdAt").descending());
+    public ApiResponse<ItemResponseDTO.ItemResultListDTO> viewAllItems(
+            Authentication authentication,
+            @RequestParam(defaultValue = "0") @Min(1) Integer page,
+            @RequestParam(defaultValue = "latest") String sort) {
+        Sort sortOption = getSortOption(sort);
+        Pageable pageable = PageRequest.of(page - 1, DEFAULT_ITEM_PAGE_SIZE, sortOption);
 
         Set<Long> likedItemIds = Collections.emptySet();
 
@@ -81,12 +86,15 @@ public class ItemRestController {
     @Operation(summary = "특정 프로젝트 상세 조회 API", description = "특정 프로젝트를 상세 조회하는 API 입니다.")
     public ApiResponse<ItemResponseDTO.ItemInfoDTO> getItemInfo(Authentication authentication, @PathVariable("itemId") @Min(1) Long itemId) {
         Member member = memberCommandService.getMember(authentication.getName());
-        Item findItem = itemCommandService.getSingleItem(itemId);
+        Item findItem = itemCommandService.getSingleItemWithComments(itemId);
         List<ItemResponseDTO.ItemRegionResultDTO> itemRegions = itemCommandService.getItemRegions(findItem);
         List<ItemResponseDTO.RecruitPositionResultDTO> itemRecruitPositions = itemCommandService.getItemRecruitPositions(findItem);
+        List<ItemResponseDTO.ItemCategoriesResultDTO> itemCategories = itemCommandService.getItemCategories(findItem);
+        List<ItemResponseDTO.ItemCommentResultDTO> itemComments = itemCommandService.getItemComments(findItem);
         boolean itemLike = itemCommandService.getItemLike(member.getId(), findItem.getId());
+        int commentCount = itemCommandService.countComments(findItem.getId());
         itemCommandService.updateItemHistory(member, findItem);
-        return ApiResponse.onSuccess(ItemConverter.toItemInfoDTO(findItem, itemRegions, itemRecruitPositions, itemLike));
+        return ApiResponse.onSuccess(ItemConverter.toItemInfoDTO(findItem, itemRegions, itemCategories, itemRecruitPositions, itemComments, commentCount, itemLike));
     }
 
     @PostMapping("/{itemId}/like")
@@ -114,4 +122,34 @@ public class ItemRestController {
         ItemApply itemApply = itemCommandService.applyItem(member, item);
         return ApiResponse.onSuccess(ItemConverter.toItemApplyResultDTO(itemApply));
     }
+
+    @PostMapping("/{itemId}/comments")
+    @Operation(summary = "프로젝트 댓글 작성 API", description = "특정 프로젝트 상세 조회 페이지에서 댓글을 작성할 수 있는 API입니다.")
+    public ApiResponse<ItemResponseDTO.ItemCommentResultDTO> writeItemComment(Authentication authentication, @PathVariable("itemId") Long itemId, @RequestBody ItemRequestDTO.ItemCommentRequestDTO request) {
+        String email = authentication.getName();
+        Member member = memberCommandService.getMember(email);
+
+        ItemComment itemComment = itemCommandService.createItemComment(member, itemId, request);
+        return ApiResponse.onSuccess(ItemConverter.toItemCommentResultDTO(itemComment));
+    }
+
+    @DeleteMapping("/comments/{commentId}")
+    @Operation(summary = "프로젝트 댓글 삭제 API", description = "특정 프로젝트 상세 조회 페이지에서 댓글을 삭제하는 API입니다.")
+    public ApiResponse<Void> removeItemComment(Authentication authentication, @PathVariable("commentId") Long commentId) {
+        String email = authentication.getName();
+        Member member = memberCommandService.getMember(email);
+
+        itemCommandService.removeItemComment(member, commentId);
+        return ApiResponse.of(SuccessStatus._NO_CONTENT, null);
+    }
+
+
+    //프로젝트 정렬 조건 처리 메서드
+    private Sort getSortOption(String sort) {
+        if (sort.equalsIgnoreCase("popular")) {
+            return Sort.by("viewCount").descending();
+        }
+        return Sort.by("createdAt").descending();
+    }
+
 }

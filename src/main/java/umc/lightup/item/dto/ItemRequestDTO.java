@@ -68,4 +68,11 @@ public class ItemRequestDTO {
         @NotNull
         private Integer recruitNumber;
     }
+
+    @Getter
+    @Setter
+    public static class ItemCommentRequestDTO {
+        @NotBlank
+        private String content;
+    }
 }

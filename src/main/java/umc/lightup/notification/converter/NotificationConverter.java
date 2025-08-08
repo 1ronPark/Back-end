@@ -18,6 +18,7 @@ public class NotificationConverter {
             .message(notification.getMessage())
             .notificationType(String.valueOf(notification.getType()))
             .isRead(notification.getIsRead())
+            .referenceId(notification.getReferenceId())
             .build();
   }
 
@@ -31,6 +32,12 @@ public class NotificationConverter {
             .totalElements(notificationList.getTotalElements())
             .listSize(notificationListDTO.size())
             .notificationList(notificationListDTO)
+            .build();
+  }
+
+  public static NotificationResponseDTO.NotificationTotal notificationTotal(Long totalSize){
+    return NotificationResponseDTO.NotificationTotal.builder()
+            .total(totalSize)
             .build();
   }
 

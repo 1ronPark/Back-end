@@ -24,10 +24,8 @@ import umc.lightup.position.domain.Position;
 import umc.lightup.position.repository.PositionRepository;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -41,9 +39,11 @@ public class ItemCommandServiceImpl implements ItemCommandService {
     private final ItemLikeRepository itemLikeRepository;
     private final ItemViewHistoryRepository itemViewHistoryRepository;
     private final ItemApplyRepository itemApplyRepository;
+    private final ItemCommentRepository itemCommentRepository;
 
     private final AmazonS3Manager s3Manager;
     private final UuidRepository uuidRepository;
+    private final ItemCategoryRepository itemCategoryRepository;
 
     @Override
     @Transactional
@@ -121,20 +121,27 @@ public class ItemCommandServiceImpl implements ItemCommandService {
                 .map(item -> {
                     String itemImageUrl = item.getItemProfileImageUrl();
                     boolean liked = likedItemIds != null && likedItemIds.contains(item.getId());
+                    int commentCount = itemCommentRepository.countByItemId(item.getId());
 
-                    return ItemConverter.toItemResultDTO(item, itemImageUrl, liked);
+                    return ItemConverter.toItemResultDTO(item, itemImageUrl, commentCount, liked);
                 }).toList();
     }
 
     @Override
     public List<ItemResponseDTO.MyItemResultDTO> getMyItems(Member member) {
         List<Item> myItemList = itemRepository.findByMember(member);
+        List<ItemCategory> itemCategories = itemCategoryRepository.findByItems(myItemList);
+        Map<Long, List<ItemCategory>> categoryMap = itemCategories.stream()
+                .collect(Collectors.groupingBy(ic -> ic.getItem().getId()));
 
         return myItemList.stream()
             .map(item -> {
                 String itemImageUrl = item.getItemProfileImageUrl();
 
-                return ItemConverter.toMyItemResultDTO(item, itemImageUrl);
+                List<ItemResponseDTO.ItemCategoriesResultDTO> itemCategoriesResultDTOList = categoryMap.getOrDefault(item.getId(), List.of()).stream()
+                        .map(ItemConverter::toItemCategoriesResultDTO)
+                        .toList();
+                return ItemConverter.toMyItemResultDTO(item, itemImageUrl, itemCategoriesResultDTOList);
             })
             .toList();
     }
@@ -142,6 +149,12 @@ public class ItemCommandServiceImpl implements ItemCommandService {
     @Override
     public Item getSingleItem(Long itemId) {
         return itemRepository.findById(itemId)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.ITEM_NOT_FOUND));
+    }
+
+    @Override
+    public Item getSingleItemWithComments(Long itemId) {
+        return itemRepository.findByIdWithCommentsAndCommentMembers(itemId)
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.ITEM_NOT_FOUND));
     }
 
@@ -209,6 +222,10 @@ public class ItemCommandServiceImpl implements ItemCommandService {
                     .viewedAt(LocalDateTime.now())
                     .build());
         }
+
+        if (itemRepository.increaseViewCount(item.getId()) == 0) {
+            throw new GeneralHandler(ErrorStatus.ITEM_NOT_FOUND);
+        }
     }
 
     @Override
@@ -224,5 +241,47 @@ public class ItemCommandServiceImpl implements ItemCommandService {
                 .status(ItemApplyStatus.PENDING)
                 .appliedAt(LocalDateTime.now())
                 .build());
+    }
+
+    @Override
+    @Transactional
+    public ItemComment createItemComment(Member member, Long itemId, ItemRequestDTO.ItemCommentRequestDTO request) {
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.ITEM_NOT_FOUND));
+
+        ItemComment createdItemComment = ItemComment.builder()
+                .content(request.getContent())
+                .commentMember(member)
+                .item(item)
+                .build();
+
+        return itemCommentRepository.save(createdItemComment);
+    }
+
+    @Override
+    @Transactional
+    public void removeItemComment(Member member, Long commentId) {
+        if (itemCommentRepository.deleteByCommentMemberAndId(member, commentId) == 0) {
+            throw new GeneralHandler(ErrorStatus.ITEM_COMMENT_NOT_FOUND);
+        }
+    }
+
+    @Override
+    public List<ItemResponseDTO.ItemCommentResultDTO> getItemComments(Item item) {
+        return item.getItemComments().stream()
+                .map(ItemConverter::toItemCommentResultDTO)
+                .toList();
+    }
+
+    @Override
+    public int countComments(Long itemId) {
+        return itemCommentRepository.countByItemId(itemId);
+    }
+
+    @Override
+    public List<ItemResponseDTO.ItemCategoriesResultDTO> getItemCategories(Item item) {
+        return itemCategoryRepository.findByItem(item).stream()
+                .map(ItemConverter::toItemCategoriesResultDTO)
+                .toList();
     }
 }
