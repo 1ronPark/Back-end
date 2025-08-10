@@ -85,6 +85,11 @@ public enum ErrorStatus implements BaseErrorCode {
     //ItemCategory 관련 에러
     ITEM_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEMCATEGORY4000", "해당 아이템 카테고리가 존재하지 않습니다."),
 
+    //MemberPosition 관련 에러
+    MEMBER_POSITION_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER_POSITION4000", "해당 포지션을 선택하지 않았습니다."),
+    DUPLICATED_POSITION_SELECT(HttpStatus.NOT_FOUND, "MEMBER_POSITION4001", "이미 선택한 포지션입니다."),
+
+
     //MemberSkill 관련 에러
     MEMBER_SKILL_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER_SKILL4000", "유저의 스킬이 존재하지 않습니다."),
 

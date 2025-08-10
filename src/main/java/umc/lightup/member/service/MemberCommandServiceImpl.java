@@ -222,7 +222,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.POSITION_NOT_FOUND));
 
         if (memberPositionRepository.existsByMemberIdAndPositionId(memberId, position.getId())){
-            throw new GeneralHandler(ErrorStatus._BAD_REQUEST);
+            throw new GeneralHandler(ErrorStatus.DUPLICATED_POSITION_SELECT);
         }
 
         memberPositionRepository.save(new MemberPosition(member, position));
@@ -237,7 +237,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.POSITION_NOT_FOUND));
 
         MemberPosition memberPosition = memberPositionRepository.findByMemberIdAndPositionId(memberId, position.getId())
-                .orElseThrow(() -> new GeneralHandler(ErrorStatus._BAD_REQUEST));
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_POSITION_NOT_FOUND));
 
         memberPositionRepository.delete(memberPosition);
     }
