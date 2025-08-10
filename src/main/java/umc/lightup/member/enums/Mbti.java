@@ -35,7 +35,9 @@ public enum Mbti {
         return result;
     }
 
-    public static Mbti fromByte(byte b) {
+    public static Mbti fromByte(Byte b) {
+        if (b == null) return null; // 아 맞다 null...
+
         StringBuilder textValue = new StringBuilder();
         if ((b & 0x08) != 0) textValue.append("E");
         else textValue.append("I");

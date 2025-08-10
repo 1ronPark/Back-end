@@ -246,7 +246,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom{
                         .name(name)
                         .nickname(nickname)
                         .gender(gender)
-                        .mbti(mbti == null ? null : Mbti.fromByte(mbti))
+                        .mbti(Mbti.fromByte(mbti))
                         .profileImageUrl(profileImageUrl)
                         .positions(positions) // <> 내부 생략 가능
                         .regions(regions)
