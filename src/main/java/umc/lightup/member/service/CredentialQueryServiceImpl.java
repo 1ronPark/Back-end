@@ -18,11 +18,13 @@ import umc.lightup.member.domain.Credential;
 import umc.lightup.member.domain.Member;
 import umc.lightup.member.dto.*;
 import umc.lightup.member.enums.CredentialType;
+import umc.lightup.member.enums.Role;
 import umc.lightup.member.openfeign.GoogleApiClient;
 import umc.lightup.member.openfeign.GoogleOAuth2Client;
 import umc.lightup.member.openfeign.KakaoApiClient;
 import umc.lightup.member.openfeign.KakaoOAuth2Client;
 import umc.lightup.member.repository.CredentialRepository;
+import umc.lightup.member.repository.MemberRepository;
 
 import java.security.SecureRandom;
 import java.util.Collections;
@@ -33,11 +35,13 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CredentialQueryServiceImpl implements CredentialQueryService {
+    private final MemberRepository memberRepository;
     private final CredentialRepository credentialRepository;
     private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
     private final SecureRandom secureRandom;
     private final JwtTokenProvider jwtTokenProvider;
+    private final MemberCommandService memberCommandService;
 
     private final GoogleOAuth2Client googleOAuth2Client;
     private final GoogleApiClient googleApiClient;
@@ -57,6 +61,159 @@ public class CredentialQueryServiceImpl implements CredentialQueryService {
     private String kakaoClientSecret;
     @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
     private String kakaoRedirectUri;
+
+    @Override
+    @Transactional
+    public Member joinMember(MemberRequestDTO.JoinDto request) {
+        Credential credential = request.toCredential(passwordEncoder);
+        Member member = credential.getMember();
+        Member saved = memberRepository.save(member);
+        credentialRepository.save(credential);
+        return saved;
+    }
+
+    @Override
+    public MemberResponseDTO.LoginResultDTO loginMember(MemberRequestDTO.PasswordLoginRequestDTO request) {
+        Credential credential = credentialRepository
+                .findByCredentialTypeAndEmail(CredentialType.PASSWORD, request.getEmail())
+                .orElseThrow(()-> new GeneralHandler(ErrorStatus.CREDENTIAL_NOT_FOUND));
+
+        if(!passwordEncoder.matches(request.getPassword(), credential.getCredential())) {
+            throw new GeneralHandler(ErrorStatus.INVALID_PASSWORD);
+        }
+
+        //주객전도가 되긴 했으나 한 번의 쿼리로 데이터를 가져오기 위한 가장 편한 방법임
+        return getLoginResultDTO(credential.getMember());
+    }
+
+    @Override
+    public MemberResponseDTO.LoginResultDTO loginMemberByGoogle(String authCode) {
+        OAuth2ResponseDTO.GoogleUserinfoResponseDTO userinfo = getGoogleUserinfo(authCode);
+
+        Credential credential = credentialRepository
+                .findByCredentialTypeAndCredential(CredentialType.GOOGLE, userinfo.getSub())
+                .orElseThrow(()-> new GeneralHandler(ErrorStatus.CREDENTIAL_NOT_FOUND));
+
+        return getLoginResultDTO(credential.getMember());
+    }
+
+    @Override
+    public MemberResponseDTO.LoginResultDTO loginMemberByKakao(String authCode) {
+        OAuth2ResponseDTO.KakaoUserinfoResponseDTO userinfo = getKakaoUserinfo(authCode);
+
+        Credential credential = credentialRepository
+                .findByCredentialTypeAndCredential(CredentialType.KAKAO, Long.toString(userinfo.getId()))
+                .orElseThrow(()-> new GeneralHandler(ErrorStatus.CREDENTIAL_NOT_FOUND));
+
+        return getLoginResultDTO(credential.getMember());
+    }
+
+    @Override
+    @Transactional
+    public Member joinMemberByGoogle(String authCode) {
+        OAuth2ResponseDTO.GoogleUserinfoResponseDTO userinfo = getGoogleUserinfo(authCode);
+
+        if (memberCommandService.isEmailExist(userinfo.getEmail()))
+            throw new GeneralHandler(ErrorStatus.ALREADY_SIGNED_IN_EMAIL);
+
+        Member member = Member.builder()
+                .email(userinfo.getEmail())
+                .name(userinfo.getName())
+                .role(Role.PROVISION)
+                .build();
+        Credential credential = Credential.builder()
+                .credentialType(CredentialType.GOOGLE)
+                .member(member)
+                .credential(userinfo.getSub())
+                .build();
+        Member saved = memberRepository.save(member);
+        credentialRepository.save(credential);
+        return saved;
+    }
+
+    @Override
+    @Transactional
+    public Member joinMemberByKakao(String authCode) {
+        OAuth2ResponseDTO.KakaoUserinfoResponseDTO userinfo = getKakaoUserinfo(authCode);
+
+        if (userinfo.getEmail() == null || memberCommandService.isEmailExist(userinfo.getEmail()))
+            throw new GeneralHandler(ErrorStatus.ALREADY_SIGNED_IN_EMAIL);
+
+        Member member = Member.builder()
+                .email(userinfo.getEmail())
+                .name(userinfo.getKakao_account().getProfile().getNickname())
+                .profileImageUrl(userinfo.getKakao_account().getProfile().getProfile_image_url())
+                .role(Role.PROVISION)
+                .build();
+        Credential credential = Credential.builder()
+                .credentialType(CredentialType.KAKAO)
+                .member(member)
+                .credential(Long.toString(userinfo.getId()))
+                .build();
+        Member saved = memberRepository.save(member);
+        credentialRepository.save(credential);
+        return saved;
+    }
+
+    @Override
+    @Transactional
+    public Member addGoogleLogin(Member member, String authCode) {
+        if (credentialRepository.existsByCredentialTypeAndMember(CredentialType.GOOGLE, member))
+            throw new GeneralHandler(ErrorStatus.CREDENTIAL_ALREADY_EXIST);
+        OAuth2ResponseDTO.GoogleUserinfoResponseDTO userinfo = getGoogleUserinfo(authCode);
+        if (credentialRepository.existsByCredentialTypeAndCredential(CredentialType.GOOGLE, userinfo.getSub()))
+            throw new GeneralHandler(ErrorStatus.CREDENTIAL_ALREADY_USED);
+
+        Credential credential = Credential.builder()
+                .credentialType(CredentialType.GOOGLE)
+                .member(member)
+                .credential(userinfo.getSub())
+                .build();
+        credentialRepository.save(credential);
+        return member;
+    }
+
+    @Override
+    @Transactional
+    public Member addKakaoLogin(Member member, String authCode) {
+        if (credentialRepository.existsByCredentialTypeAndMember(CredentialType.KAKAO, member))
+            throw new GeneralHandler(ErrorStatus.CREDENTIAL_ALREADY_EXIST);
+        OAuth2ResponseDTO.KakaoUserinfoResponseDTO userinfo = getKakaoUserinfo(authCode);
+        if (credentialRepository.existsByCredentialTypeAndCredential(CredentialType.KAKAO, Long.toString(userinfo.getId())))
+            throw new GeneralHandler(ErrorStatus.CREDENTIAL_ALREADY_USED);
+
+        Credential credential = Credential.builder()
+                .credentialType(CredentialType.KAKAO)
+                .member(member)
+                .credential(Long.toString(userinfo.getId()))
+                .build();
+        credentialRepository.save(credential);
+        return member;
+    }
+
+    @Override
+    @Transactional
+    public Member addPasswordLogin(Member member, String password) {
+        if (credentialRepository.existsByCredentialTypeAndMember(CredentialType.PASSWORD, member))
+            throw new GeneralHandler(ErrorStatus.CREDENTIAL_ALREADY_EXIST);
+        Credential credential = Credential.builder()
+                .credentialType(CredentialType.PASSWORD)
+                .member(member)
+                .credential(passwordEncoder.encode(password))
+                .build();
+        credentialRepository.save(credential);
+        return member;
+    }
+
+    @Override
+    @Transactional
+    public void removeCredential(Member member, CredentialType credentialType) {
+        if (credentialRepository.countByMember(member) <= 1)
+            throw new GeneralHandler(ErrorStatus.ONLY_CREDENTIAL_REMAIN);
+
+        if (credentialRepository.removeByCredentialTypeAndMember(credentialType, member) == 0)
+            throw new GeneralHandler(ErrorStatus.CREDENTIAL_NOT_FOUND);
+    }
 
     @Override
     public Credential findByEmail(String email) {
@@ -131,8 +288,7 @@ public class CredentialQueryServiceImpl implements CredentialQueryService {
         return MemberConverter.toSelectCredentialInfoResultDTO(credentials);
     }
 
-    @Override
-    public OAuth2ResponseDTO.GoogleUserinfoResponseDTO getGoogleUserinfo(String authCode) {
+    private OAuth2ResponseDTO.GoogleUserinfoResponseDTO getGoogleUserinfo(String authCode) {
         OAuth2RequestDTO.GoogleOAuth2RequestDTO oauth2Request =
                 OAuth2RequestDTO.GoogleOAuth2RequestDTO.builder()
                         .code(authCode)
@@ -156,8 +312,7 @@ public class CredentialQueryServiceImpl implements CredentialQueryService {
         return userinfo.getBody();
     }
 
-    @Override
-    public OAuth2ResponseDTO.KakaoUserinfoResponseDTO getKakaoUserinfo(String authCode) {
+    private OAuth2ResponseDTO.KakaoUserinfoResponseDTO getKakaoUserinfo(String authCode) {
         OAuth2RequestDTO.KakaoOAuth2RequestDTO oauth2Request =
                 OAuth2RequestDTO.KakaoOAuth2RequestDTO.builder()
                         .code(authCode)
@@ -181,8 +336,7 @@ public class CredentialQueryServiceImpl implements CredentialQueryService {
         return userinfo.getBody();
     }
 
-    @Override
-    public MemberResponseDTO.LoginResultDTO getLoginResultDTO(Member member) {
+    private MemberResponseDTO.LoginResultDTO getLoginResultDTO(Member member) {
         Authentication authentication = new UsernamePasswordAuthenticationToken(
                 member.getEmail(), null,
                 Collections.singleton(() -> member.getRole().name())

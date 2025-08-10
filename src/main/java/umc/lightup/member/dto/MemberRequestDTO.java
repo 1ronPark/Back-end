@@ -181,6 +181,9 @@ public class MemberRequestDTO {
 
     @Getter
     @Setter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class MemberSearchRequestDTO {
         private List<String> positions;
         // 글자 하나하나 받는것과 각각에 대한 boolean으로 받는 것 모두 가능한데 프론트 입장에서 뭐가 편할지 모르겠음
@@ -228,6 +231,9 @@ public class MemberRequestDTO {
 
     @Getter
     @Setter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class MemberRegionRequestDTO {
         @NotBlank
         @ExistSiDo
