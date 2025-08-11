@@ -98,9 +98,9 @@ public class CredentialQueryServiceImpl implements CredentialQueryService {
     }
 
     @Override
+    @Transactional
     public MemberResponseDTO.LoginResultDTO callbackMemberByGoogle(String authCode) {
         OAuth2ResponseDTO.GoogleUserinfoResponseDTO userinfo = getGoogleUserinfo(authCode);
-
 
         Optional<Credential> optionalCredential = credentialRepository
                 .findByCredentialTypeAndCredential(CredentialType.GOOGLE, userinfo.getSub());
@@ -123,6 +123,7 @@ public class CredentialQueryServiceImpl implements CredentialQueryService {
     }
 
     @Override
+    @Transactional
     public MemberResponseDTO.LoginResultDTO callbackMemberByKakao(String authCode) {
         OAuth2ResponseDTO.KakaoUserinfoResponseDTO userinfo = getKakaoUserinfo(authCode);
 
