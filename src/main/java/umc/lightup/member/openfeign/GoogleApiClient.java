@@ -9,7 +9,7 @@ import umc.lightup.member.dto.OAuth2ResponseDTO;
 
 @FeignClient(name = "googleApiClient", url = "https://www.googleapis.com")
 public interface GoogleApiClient {
-    @GetMapping(value = "/userinfo/v2/me",
+    @GetMapping(value = "/oauth2/v3/userinfo",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<OAuth2ResponseDTO.GoogleUserinfoResponseDTO> getUserinfo

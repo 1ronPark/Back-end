@@ -3,6 +3,8 @@ package umc.lightup.member.dto;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 public class OAuth2ResponseDTO {
     @Getter
     @Setter
@@ -46,34 +48,53 @@ public class OAuth2ResponseDTO {
     @Getter
     @Setter
     public static class KakaoUserinfoResponseDTO {
-        private String iss;
-        private String aud;
-        private String sub;
-        private String iat;
-        private String exp;
-        private String auth_time;
-        private String nickname;
-        private String picture;
-        private String email;
-//        long id;
-//        KakaoAccount kakao_account;
-//
-//        @Getter
-//        @Setter
-//        public static class KakaoAccount {
-//            String email;
-//            Profile profile;
-//        }
-//
-//        @Getter
-//        @Setter
-//        public static class Profile {
-//            String nickname;
-//            String profile_image_url;
-//        }
-//
-//        public String getEmail() {
-//            return kakao_account.getEmail();
-//        }
+//        private String iss;
+//        private String aud;
+//        private String sub;
+//        private String iat;
+//        private String exp;
+//        private String auth_time;
+//        private String nickname;
+//        private String picture;
+//        private String email;
+        long id;
+        LocalDateTime connected_at;
+        Properties properties;
+        KakaoAccount kakao_account;
+
+        @Getter
+        @Setter
+        public static class Properties {
+            private String nickname;
+            private String profile_image;
+            private String thumbnail_image;
+        }
+
+        @Getter
+        @Setter
+        public static class KakaoAccount {
+            Boolean profile_nickname_needs_agreement;
+            Boolean profile_image_needs_agreement;
+            Profile profile;
+            Boolean has_email;
+            Boolean email_needs_agreement;
+            Boolean is_email_valid;
+            Boolean is_email_verified;
+            String email;
+        }
+
+        @Getter
+        @Setter
+        public static class Profile {
+            String nickname;
+            String thumbnail_image_url;
+            String profile_image_url;
+            Boolean is_default_image;
+            Boolean is_default_nickname;
+        }
+
+        public String getEmail() {
+            return kakao_account.getEmail();
+        }
     }
 }
