@@ -35,33 +35,45 @@ public class OAuth2ResponseDTO {
 
     @Getter
     @Setter
-    public static class KakaoUserinfoResponseDTO {
-        long id;
-        KakaoAccount kakao_account;
-
-        @Getter
-        @Setter
-        public static class KakaoAccount {
-            String email;
-            Profile profile;
-        }
-
-        @Getter
-        @Setter
-        public static class Profile {
-            String nickname;
-            String profile_image_url;
-        }
-
-        public String getEmail() {
-            return kakao_account.getEmail();
-        }
+    public static class KakaoOAuth2ResponseDTO {
+        private String token_type;
+        private String access_token;
+        private String expires_in;
+        private String refresh_token;
+        private String refresh_token_expires_in;
     }
 
     @Getter
     @Setter
-    public static class KakaoOAuth2ResponseDTO {
-        private String access_token;
-        // ...
+    public static class KakaoUserinfoResponseDTO {
+        private String iss;
+        private String aud;
+        private String sub;
+        private String iat;
+        private String exp;
+        private String auth_time;
+        private String nickname;
+        private String picture;
+        private String email;
+//        long id;
+//        KakaoAccount kakao_account;
+//
+//        @Getter
+//        @Setter
+//        public static class KakaoAccount {
+//            String email;
+//            Profile profile;
+//        }
+//
+//        @Getter
+//        @Setter
+//        public static class Profile {
+//            String nickname;
+//            String profile_image_url;
+//        }
+//
+//        public String getEmail() {
+//            return kakao_account.getEmail();
+//        }
     }
 }

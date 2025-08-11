@@ -102,7 +102,7 @@ public class CredentialQueryServiceImpl implements CredentialQueryService {
         OAuth2ResponseDTO.KakaoUserinfoResponseDTO userinfo = getKakaoUserinfo(authCode);
 
         Credential credential = credentialRepository
-                .findByCredentialTypeAndCredential(CredentialType.KAKAO, Long.toString(userinfo.getId()))
+                .findByCredentialTypeAndCredential(CredentialType.KAKAO, userinfo.getSub())
                 .orElseThrow(()-> new GeneralHandler(ErrorStatus.CREDENTIAL_NOT_FOUND));
 
         return getLoginResultDTO(credential.getMember());
@@ -139,16 +139,19 @@ public class CredentialQueryServiceImpl implements CredentialQueryService {
         if (userinfo.getEmail() == null || memberCommandService.isEmailExist(userinfo.getEmail()))
             throw new GeneralHandler(ErrorStatus.ALREADY_SIGNED_IN_EMAIL);
 
+        if (memberCommandService.isNicknameExist(userinfo.getNickname()))
+            userinfo.setNickname(null);
+
         Member member = Member.builder()
                 .email(userinfo.getEmail())
-                .name(userinfo.getKakao_account().getProfile().getNickname())
-                .profileImageUrl(userinfo.getKakao_account().getProfile().getProfile_image_url())
+                .nickname(userinfo.getNickname())
+                .profileImageUrl(userinfo.getPicture())
                 .role(Role.PROVISION)
                 .build();
         Credential credential = Credential.builder()
                 .credentialType(CredentialType.KAKAO)
                 .member(member)
-                .credential(Long.toString(userinfo.getId()))
+                .credential(userinfo.getSub())
                 .build();
         Member saved = memberRepository.save(member);
         credentialRepository.save(credential);
@@ -179,13 +182,13 @@ public class CredentialQueryServiceImpl implements CredentialQueryService {
         if (credentialRepository.existsByCredentialTypeAndMember(CredentialType.KAKAO, member))
             throw new GeneralHandler(ErrorStatus.CREDENTIAL_ALREADY_EXIST);
         OAuth2ResponseDTO.KakaoUserinfoResponseDTO userinfo = getKakaoUserinfo(authCode);
-        if (credentialRepository.existsByCredentialTypeAndCredential(CredentialType.KAKAO, Long.toString(userinfo.getId())))
+        if (credentialRepository.existsByCredentialTypeAndCredential(CredentialType.KAKAO, userinfo.getSub()))
             throw new GeneralHandler(ErrorStatus.CREDENTIAL_ALREADY_USED);
 
         Credential credential = Credential.builder()
                 .credentialType(CredentialType.KAKAO)
                 .member(member)
-                .credential(Long.toString(userinfo.getId()))
+                .credential(userinfo.getSub())
                 .build();
         credentialRepository.save(credential);
         return member;
