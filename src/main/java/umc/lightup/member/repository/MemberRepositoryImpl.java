@@ -43,6 +43,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom{
     private final QMemberSkill memberSkill = QMemberSkill.memberSkill;
     private final QStrength strength = QStrength.strength;
     private final QMemberStrength memberStrength = QMemberStrength.memberStrength;
+    private final QMemberViewHistory memberViewHistory = QMemberViewHistory.memberViewHistory;
 
     private final QueryDSLTemplate queryDSLTemplate;
     private final ObjectMapper objectMapper;
@@ -119,15 +120,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom{
 
         // 4) 좋아요
         if (requestedMember != null && options.getOnlyLiked() != null && options.getOnlyLiked()) {
-            BooleanExpression likedExists = JPAExpressions
-                    .selectOne()
-                    .from(memberLike)
-                    .where(
-                            memberLike.toMember.eq(member),         // 이 member가 좋아요 받은 대상
-                            memberLike.fromMember.eq(requestedMember) // 내가 누른 '좋아요' 인가
-                    )
-                    .exists();
-            predicate.and(likedExists);
+            predicate.and(getLikedCondition(requestedMember));
         }
 
         if (options.getPage() == null) options.setPage(1L);
@@ -135,14 +128,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom{
 
         BooleanExpression likedCondition;
         if (requestedMember == null) likedCondition = Expressions.FALSE;
-        else likedCondition = JPAExpressions
-                    .selectOne()
-                    .from(memberLike)
-                    .where(
-                            memberLike.toMember.eq(member),          // 조회 중인 멤버가 좋아요 받은 대상
-                            memberLike.fromMember.eq(requestedMember) // 조회자 기준
-                    )
-                    .exists();
+        else likedCondition = getLikedCondition(requestedMember);
 
         List<MemberResponseDTO.MemberInfoSimpleDTO> resultList = jpaQueryFactory
                 .select(Projections.constructor(MemberWithLikeDTO.class,
@@ -252,6 +238,80 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom{
                         .regions(regions)
                         .skills(skills)
                         .strengths(strengths)
+                        .liked(liked)
+                        .build();
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+                throw new GeneralHandler(ErrorStatus._INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
+
+    @Override
+    public List<MemberResponseDTO.HistoryInfoDTO> getMemberViewHistoryInfos
+            (Member requestedMember, long size) {
+        // JSON_OBJECTAGG 구현 버전
+        // if (size == null) size = 5L; // controller 단에서 default 설정 진행
+
+        return jpaQueryFactory
+                .select(Projections.constructor(MemberHistoryFormLikeDTO.class,
+                        member.id,
+                        member.name,
+                        member.nickname,
+                        member.profileImageUrl,
+
+                        // Positions 집계
+                        JPAExpressions
+                                .select(queryDSLTemplate.jsonArrayAgg(position.name))
+                                .from(memberPosition)
+                                .join(memberPosition.position, position)
+                                .where(memberPosition.member.id.eq(member.id)),
+                        getLikedCondition(requestedMember).as("liked")))
+                .from(memberViewHistory)                    // memberViewHistory에서 시작
+                .join(memberViewHistory.toMember, member)   // member와 조인
+                .orderBy(memberViewHistory.updatedAt.desc())
+                .offset(0)
+                .limit(size)
+                .fetch().stream()
+                .map(m -> m.toHistoryInfoDTO(objectMapper))
+                .toList();
+    }
+
+    private BooleanExpression getLikedCondition(Member requestedMember) {
+        return JPAExpressions
+                .selectOne()
+                .from(memberLike)
+                .where(
+                        memberLike.toMember.eq(member),          // 조회 중인 멤버가 좋아요 받은 대상
+                        memberLike.fromMember.eq(requestedMember) // 조회자 기준
+                )
+                .exists();
+    }
+
+    @Getter
+    @AllArgsConstructor
+    //private 사용 불가
+    public static class MemberHistoryFormLikeDTO {
+        private long id;
+        private String name;
+        private String nickname;
+        private String profileImageUrl;
+        private String positionsJson;
+        private boolean liked;
+
+        public MemberResponseDTO.HistoryInfoDTO toHistoryInfoDTO(ObjectMapper objectMapper) {
+            try {
+                //null이 가능하다 했으니 null check 진행
+                List<String> positions;
+                if (positionsJson == null || positionsJson.isBlank()) positions = List.of();
+                else positions = objectMapper.readValue(positionsJson, new TypeReference<>(){});
+
+                return MemberResponseDTO.HistoryInfoDTO.builder()
+                        .id(id)
+                        .name(name)
+                        .nickname(nickname)
+                        .profileImageUrl(profileImageUrl)
+                        .positions(positions) // <> 내부 생략 가능
                         .liked(liked)
                         .build();
             } catch (JsonProcessingException e) {
