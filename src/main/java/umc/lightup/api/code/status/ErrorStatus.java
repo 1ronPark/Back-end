@@ -89,7 +89,6 @@ public enum ErrorStatus implements BaseErrorCode {
     MEMBER_POSITION_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER_POSITION4000", "해당 포지션을 선택하지 않았습니다."),
     DUPLICATED_POSITION_SELECT(HttpStatus.NOT_FOUND, "MEMBER_POSITION4001", "이미 선택한 포지션입니다."),
 
-
     //MemberSkill 관련 에러
     MEMBER_SKILL_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER_SKILL4000", "유저의 스킬이 존재하지 않습니다."),
 
@@ -100,7 +99,26 @@ public enum ErrorStatus implements BaseErrorCode {
     MEMBER_REGION_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER_REGION4000", "선택 지역이 존재하지 않습니다."),
 
     //Email 관련 에러
-    EMAIL_SEND_FAIL(HttpStatus.SERVICE_UNAVAILABLE, "EMAIL5003", "이메일 전송에 실패했습니다.")
+    EMAIL_SEND_FAIL(HttpStatus.SERVICE_UNAVAILABLE, "EMAIL5003", "이메일 전송에 실패했습니다."),
+
+    //Post 관련 에러
+    POST_NOT_FOUND(HttpStatus.NOT_FOUND, "POST4000", "포스트가 존재하지 않습니다."),
+
+    //PostImage 관련 에러
+    TOO_MANY_POST_IMAGE(HttpStatus.BAD_REQUEST, "POST_IMAGE4000", "이미지는 3개까지만 업로드 가능합니다."),
+
+    //PostComment 관련 에러
+    POST_COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "POST_COMMENT4000", "해당 포스트의 댓글이 존재하지 않습니다."),
+
+    //PostLike 관련 에러
+    MY_POST_LIKE(HttpStatus.BAD_REQUEST, "POSTLIKE4000", "자신의 포스트에는 좋아요를 누를 수 없습니다."),
+    POST_ALREADY_LIKED(HttpStatus.BAD_REQUEST, "POSTLIKE4001", "이미 좋아요를 누른 포스트입니다."),
+    POST_LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "POSTLIKE4002", "포스트 좋아요가 존재하지 않습니다."),
+
+    //CommentLike 관련 에러
+    MY_COMMENT_LIKE(HttpStatus.BAD_REQUEST, "COMMENTLIKE4000", "자신의 댓글에는 좋아요를 누를 수 없습니다."),
+    COMMENT_ALREADY_LIKED(HttpStatus.BAD_REQUEST, "COMMENTLIKE4001", "이미 좋아요를 누른 댓글입니다."),
+    COMMENT_LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "COMMENTLIKE4002", "해당 댓글 좋아요가 존재하지 않습니다.")
     ;
 
 
