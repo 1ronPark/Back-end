@@ -59,8 +59,8 @@ public class MemberResponseDTO {
         private String profileTitle;
         private String name;
         private String nickname;
-        private int age;
-        private boolean gender;
+        private Integer age;
+        private Boolean gender;
         private Mbti mbti;
         private String school;
         private String profileImageUrl;
