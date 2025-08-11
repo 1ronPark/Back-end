@@ -116,7 +116,7 @@ public class CredentialQueryServiceImpl implements CredentialQueryService {
         OAuth2ResponseDTO.KakaoUserinfoResponseDTO userinfo = getKakaoUserinfo(authCode);
 
         Credential credential = credentialRepository
-                .findByCredentialTypeAndCredential(CredentialType.KAKAO, userinfo.getSub())
+                .findByCredentialTypeAndCredential(CredentialType.KAKAO, Long.toString(userinfo.getId()))
                 .orElseThrow(()-> new GeneralHandler(ErrorStatus.CREDENTIAL_NOT_FOUND));
 
         return getLoginResultDTO(credential.getMember());
@@ -128,10 +128,10 @@ public class CredentialQueryServiceImpl implements CredentialQueryService {
         OAuth2ResponseDTO.KakaoUserinfoResponseDTO userinfo = getKakaoUserinfo(authCode);
 
         Optional<Credential> optionalCredential = credentialRepository
-                .findByCredentialTypeAndCredential(CredentialType.KAKAO, userinfo.getSub());
+                .findByCredentialTypeAndCredential(CredentialType.KAKAO, Long.toString(userinfo.getId()));
         if (optionalCredential.isPresent())
             return getLoginResultDTO(optionalCredential.get().getMember());
-        else return getLoginResultDTO(joinMemberByKakao(authCode));
+        else return getLoginResultDTO(joinMemberByKakao(userinfo));
     }
 
     @Override
@@ -169,19 +169,19 @@ public class CredentialQueryServiceImpl implements CredentialQueryService {
         if (userinfo.getEmail() == null || memberCommandService.isEmailExist(userinfo.getEmail()))
             throw new GeneralHandler(ErrorStatus.ALREADY_SIGNED_IN_EMAIL);
 
-        if (memberCommandService.isNicknameExist(userinfo.getNickname()))
-            userinfo.setNickname(null);
+        String nickname = userinfo.getKakao_account().getProfile().getNickname();
+        if (memberCommandService.isNicknameExist(nickname)) nickname = null;
 
         Member member = Member.builder()
                 .email(userinfo.getEmail())
-                .nickname(userinfo.getNickname())
-                .profileImageUrl(userinfo.getPicture())
+                .nickname(nickname)
+                .profileImageUrl(userinfo.getKakao_account().getProfile().getProfile_image_url())
                 .role(Role.PROVISION)
                 .build();
         Credential credential = Credential.builder()
                 .credentialType(CredentialType.KAKAO)
                 .member(member)
-                .credential(userinfo.getSub())
+                .credential(Long.toString(userinfo.getId()))
                 .build();
         Member saved = memberRepository.save(member);
         credentialRepository.save(credential);
@@ -212,13 +212,13 @@ public class CredentialQueryServiceImpl implements CredentialQueryService {
         if (credentialRepository.existsByCredentialTypeAndMember(CredentialType.KAKAO, member))
             throw new GeneralHandler(ErrorStatus.CREDENTIAL_ALREADY_EXIST);
         OAuth2ResponseDTO.KakaoUserinfoResponseDTO userinfo = getKakaoUserinfo(authCode);
-        if (credentialRepository.existsByCredentialTypeAndCredential(CredentialType.KAKAO, userinfo.getSub()))
+        if (credentialRepository.existsByCredentialTypeAndCredential(CredentialType.KAKAO, Long.toString(userinfo.getId())))
             throw new GeneralHandler(ErrorStatus.CREDENTIAL_ALREADY_USED);
 
         Credential credential = Credential.builder()
                 .credentialType(CredentialType.KAKAO)
                 .member(member)
-                .credential(userinfo.getSub())
+                .credential(Long.toString(userinfo.getId()))
                 .build();
         credentialRepository.save(credential);
         return member;
