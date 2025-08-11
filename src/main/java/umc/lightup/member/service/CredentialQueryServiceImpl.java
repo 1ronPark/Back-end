@@ -98,6 +98,20 @@ public class CredentialQueryServiceImpl implements CredentialQueryService {
     }
 
     @Override
+    public MemberResponseDTO.LoginResultDTO callbackMemberByGoogle(String authCode) {
+        OAuth2ResponseDTO.GoogleUserinfoResponseDTO userinfo = getGoogleUserinfo(authCode);
+
+
+        Optional<Credential> optionalCredential = credentialRepository
+                .findByCredentialTypeAndCredential(CredentialType.GOOGLE, userinfo.getSub());
+
+        if (optionalCredential.isPresent())
+            return getLoginResultDTO(optionalCredential.get().getMember());
+        else return getLoginResultDTO(joinMemberByGoogle(userinfo));
+
+    }
+
+    @Override
     public MemberResponseDTO.LoginResultDTO loginMemberByKakao(String authCode) {
         OAuth2ResponseDTO.KakaoUserinfoResponseDTO userinfo = getKakaoUserinfo(authCode);
 
@@ -109,10 +123,23 @@ public class CredentialQueryServiceImpl implements CredentialQueryService {
     }
 
     @Override
+    public MemberResponseDTO.LoginResultDTO callbackMemberByKakao(String authCode) {
+        OAuth2ResponseDTO.KakaoUserinfoResponseDTO userinfo = getKakaoUserinfo(authCode);
+
+        Optional<Credential> optionalCredential = credentialRepository
+                .findByCredentialTypeAndCredential(CredentialType.KAKAO, userinfo.getSub());
+        if (optionalCredential.isPresent())
+            return getLoginResultDTO(optionalCredential.get().getMember());
+        else return getLoginResultDTO(joinMemberByKakao(authCode));
+    }
+
+    @Override
     @Transactional
     public Member joinMemberByGoogle(String authCode) {
-        OAuth2ResponseDTO.GoogleUserinfoResponseDTO userinfo = getGoogleUserinfo(authCode);
+        return joinMemberByGoogle(getGoogleUserinfo(authCode));
+    }
 
+    private Member joinMemberByGoogle(OAuth2ResponseDTO.GoogleUserinfoResponseDTO userinfo) {
         if (memberCommandService.isEmailExist(userinfo.getEmail()))
             throw new GeneralHandler(ErrorStatus.ALREADY_SIGNED_IN_EMAIL);
 
@@ -134,8 +161,10 @@ public class CredentialQueryServiceImpl implements CredentialQueryService {
     @Override
     @Transactional
     public Member joinMemberByKakao(String authCode) {
-        OAuth2ResponseDTO.KakaoUserinfoResponseDTO userinfo = getKakaoUserinfo(authCode);
+        return joinMemberByKakao(getKakaoUserinfo(authCode));
+    }
 
+    private Member joinMemberByKakao(OAuth2ResponseDTO.KakaoUserinfoResponseDTO userinfo) {
         if (userinfo.getEmail() == null || memberCommandService.isEmailExist(userinfo.getEmail()))
             throw new GeneralHandler(ErrorStatus.ALREADY_SIGNED_IN_EMAIL);
 

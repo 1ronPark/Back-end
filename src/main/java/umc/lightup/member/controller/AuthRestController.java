@@ -60,6 +60,20 @@ public class AuthRestController {
                 .build());
     }
 
+    @PostMapping("/callback/{oauth}")
+    @Operation(summary = "유저 소셜로그인을 통한 로그인/회원가입 API",
+            description = "유저가 소셜로그인으로 로그인/회원가입하는 API입니다. 계정 정보가 있으면 로그인, 없으면 회원가입으로 처리됩니다.")
+    public ApiResponse<MemberResponseDTO.LoginResultDTO> callbackByOAuth(
+            @PathVariable("oauth") CredentialType oauth,
+            @RequestParam("authCode") @NotBlank String authCode) {
+        MemberResponseDTO.LoginResultDTO loginResult = switch (oauth) {
+            case GOOGLE -> credentialQueryService.callbackMemberByGoogle(authCode);
+            case KAKAO -> credentialQueryService.callbackMemberByKakao(authCode);
+            case PASSWORD -> throw new GeneralHandler(ErrorStatus._BAD_REQUEST);
+        };
+        return ApiResponse.onSuccess(loginResult);
+    }
+
     @PostMapping("/login/{oauth}")
     @Operation(summary = "유저 소셜로그인 API",description = "유저가 소셜로그인하는 API입니다.")
     public ApiResponse<MemberResponseDTO.LoginResultDTO> loginByOAuth
