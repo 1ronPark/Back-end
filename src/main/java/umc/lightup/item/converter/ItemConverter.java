@@ -58,7 +58,6 @@ public class ItemConverter {
                 .age(item.getMember().getAge())
                 .mbti(item.getMember().getMbti())
                 .email(item.getMember().getEmail())
-                .school(item.getMember().getSchool())
                 .regions(itemRegionResultDTOList)
                 .description(item.getDescription())
                 .recruitPositions(recruitPositionResultDTOList)

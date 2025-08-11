@@ -11,6 +11,8 @@ import umc.lightup.common.BaseEntity;
 import umc.lightup.member.enums.Mbti;
 import umc.lightup.member.enums.Role;
 import umc.lightup.member.service.CredentialQueryService;
+import umc.lightup.school.domain.School;
+import umc.lightup.school.domain.SchoolEmailVerification;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -50,8 +52,12 @@ public class Member extends BaseEntity implements UserDetails {
     @Column(unique = true, nullable = false, length = 30)
     private String email;
 
-    @Column(length = 30)
-    private String school;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "school_id")
+    private School school;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<SchoolEmailVerification> emailVerifications = new ArrayList<>();
 
     @Column(unique = true, length = 20)
     private String phoneNumber;

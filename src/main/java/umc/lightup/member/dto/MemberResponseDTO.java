@@ -88,7 +88,6 @@ public class MemberResponseDTO {
         private Role role;
         private Mbti mbti;
         private String selfIntroduce;
-        private String school;
         private List<String> skills;
         private List<String> strengths;
         private List<singleRegionResultDTO> regions;
@@ -239,7 +238,6 @@ public class MemberResponseDTO {
                 .mbti(member.getMbti())
                 .birth(member.getBirth())
                 .gender(member.getGender())
-                .school(member.getSchool())
                 .phoneNumber(member.getPhoneNumber())
                 .selfIntroduce(member.getSelfIntroduce())
                 .profileImageUrl(member.getProfileImageUrl())

@@ -58,7 +58,6 @@ public class MemberViewInfo {
                 .mbti(member.getMbti())
                 .birth(member.getBirth())
                 .gender(member.getGender())
-                .school(member.getSchool())
                 .selfIntroduce(member.getSelfIntroduce())
 
                 .skills(skillNames)
@@ -110,7 +109,6 @@ public class MemberViewInfo {
                 .email(member.getEmail())
                 .age(member.getAge())
                 .gender(member.getGender())
-                .school(member.getSchool())
                 .mbti(member.getMbti())
                 .profileImageUrl(member.getProfileImageUrl())
                 .selfIntroduce(member.getSelfIntroduce())
