@@ -1,4 +1,4 @@
-package umc.lightup.light_talk.controller;
+package umc.lightup.lighttalk.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,11 +17,11 @@ import umc.lightup.api.ApiResponse;
 import umc.lightup.api.code.status.ErrorStatus;
 import umc.lightup.api.code.status.SuccessStatus;
 import umc.lightup.exception.handler.GeneralHandler;
-import umc.lightup.light_talk.converter.PostConverter;
-import umc.lightup.light_talk.domain.Post;
-import umc.lightup.light_talk.dto.PostRequestDTO;
-import umc.lightup.light_talk.dto.PostResponseDTO;
-import umc.lightup.light_talk.service.PostCommandService;
+import umc.lightup.lighttalk.converter.PostConverter;
+import umc.lightup.lighttalk.domain.Post;
+import umc.lightup.lighttalk.dto.PostRequestDTO;
+import umc.lightup.lighttalk.dto.PostResponseDTO;
+import umc.lightup.lighttalk.service.PostCommandService;
 import umc.lightup.member.domain.Member;
 import umc.lightup.member.service.MemberCommandService;
 

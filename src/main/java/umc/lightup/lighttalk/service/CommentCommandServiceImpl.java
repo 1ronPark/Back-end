@@ -1,18 +1,17 @@
-package umc.lightup.light_talk.service;
+package umc.lightup.lighttalk.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import umc.lightup.api.code.status.ErrorStatus;
 import umc.lightup.exception.handler.GeneralHandler;
-import umc.lightup.light_talk.domain.Comment;
-import umc.lightup.light_talk.domain.CommentLike;
-import umc.lightup.light_talk.domain.Post;
-import umc.lightup.light_talk.domain.PostLike;
-import umc.lightup.light_talk.dto.CommentRequestDTO;
-import umc.lightup.light_talk.repository.CommentLikeRepository;
-import umc.lightup.light_talk.repository.CommentRepository;
-import umc.lightup.light_talk.repository.PostRepository;
+import umc.lightup.lighttalk.domain.Comment;
+import umc.lightup.lighttalk.domain.CommentLike;
+import umc.lightup.lighttalk.domain.Post;
+import umc.lightup.lighttalk.dto.CommentRequestDTO;
+import umc.lightup.lighttalk.repository.CommentLikeRepository;
+import umc.lightup.lighttalk.repository.CommentRepository;
+import umc.lightup.lighttalk.repository.PostRepository;
 import umc.lightup.member.domain.Member;
 
 @Service
@@ -60,9 +59,7 @@ public class CommentCommandServiceImpl implements CommentCommandService{
             throw new GeneralHandler(ErrorStatus.COMMENT_ALREADY_LIKED);
         }
 
-        if (commentRepository.increaseCommentLike(commentId) == 0) {
-            throw new GeneralHandler(ErrorStatus.COMMENT_LIKE_NOT_FOUND);
-        }
+        commentRepository.increaseCommentLike(commentId);
 
         commentLikeRepository.save(CommentLike.builder()
                 .comment(findComment)
@@ -77,8 +74,6 @@ public class CommentCommandServiceImpl implements CommentCommandService{
             throw new GeneralHandler(ErrorStatus.COMMENT_LIKE_NOT_FOUND);
         }
 
-        if (commentRepository.decreaseCommentLike(commentId) == 0) {
-            throw new GeneralHandler(ErrorStatus.COMMENT_LIKE_NOT_FOUND);
-        }
+        commentRepository.decreaseCommentLike(commentId);
     }
 }

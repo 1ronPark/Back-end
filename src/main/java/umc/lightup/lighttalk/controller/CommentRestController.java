@@ -1,4 +1,4 @@
-package umc.lightup.light_talk.controller;
+package umc.lightup.lighttalk.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -6,11 +6,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import umc.lightup.api.ApiResponse;
 import umc.lightup.api.code.status.SuccessStatus;
-import umc.lightup.light_talk.converter.CommentConverter;
-import umc.lightup.light_talk.domain.Comment;
-import umc.lightup.light_talk.dto.CommentRequestDTO;
-import umc.lightup.light_talk.dto.CommentResponseDTO;
-import umc.lightup.light_talk.service.CommentCommandService;
+import umc.lightup.lighttalk.converter.CommentConverter;
+import umc.lightup.lighttalk.domain.Comment;
+import umc.lightup.lighttalk.dto.CommentRequestDTO;
+import umc.lightup.lighttalk.dto.CommentResponseDTO;
+import umc.lightup.lighttalk.service.CommentCommandService;
 import umc.lightup.member.domain.Member;
 import umc.lightup.member.service.MemberCommandService;
 

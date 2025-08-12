@@ -1,9 +1,9 @@
-package umc.lightup.light_talk.repository;
+package umc.lightup.lighttalk.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import umc.lightup.light_talk.domain.Post;
-import umc.lightup.light_talk.domain.PostImage;
+import umc.lightup.lighttalk.domain.Post;
+import umc.lightup.lighttalk.domain.PostImage;
 
 import java.util.List;
 

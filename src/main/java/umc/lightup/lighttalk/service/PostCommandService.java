@@ -1,10 +1,10 @@
-package umc.lightup.light_talk.service;
+package umc.lightup.lighttalk.service;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
-import umc.lightup.light_talk.domain.Post;
-import umc.lightup.light_talk.dto.PostRequestDTO;
-import umc.lightup.light_talk.dto.PostResponseDTO;
+import umc.lightup.lighttalk.domain.Post;
+import umc.lightup.lighttalk.dto.PostRequestDTO;
+import umc.lightup.lighttalk.dto.PostResponseDTO;
 import umc.lightup.member.domain.Member;
 
 import java.util.List;

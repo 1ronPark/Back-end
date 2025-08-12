@@ -1,11 +1,11 @@
-package umc.lightup.light_talk.repository;
+package umc.lightup.lighttalk.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import umc.lightup.light_talk.domain.Comment;
+import umc.lightup.lighttalk.domain.Comment;
 import umc.lightup.member.domain.Member;
 
 @Repository

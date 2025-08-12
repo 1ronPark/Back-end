@@ -1,4 +1,4 @@
-package umc.lightup.light_talk.dto;
+package umc.lightup.lighttalk.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;

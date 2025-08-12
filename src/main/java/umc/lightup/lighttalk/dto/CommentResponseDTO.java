@@ -1,4 +1,4 @@
-package umc.lightup.light_talk.dto;
+package umc.lightup.lighttalk.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

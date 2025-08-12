@@ -1,4 +1,4 @@
-package umc.lightup.light_talk.service;
+package umc.lightup.lighttalk.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -11,16 +11,15 @@ import umc.lightup.aws.s3.AmazonS3Manager;
 import umc.lightup.common.Uuid;
 import umc.lightup.common.repository.UuidRepository;
 import umc.lightup.exception.handler.GeneralHandler;
-import umc.lightup.light_talk.converter.PostConverter;
-import umc.lightup.light_talk.domain.Post;
-import umc.lightup.light_talk.domain.PostImage;
-import umc.lightup.light_talk.domain.PostLike;
-import umc.lightup.light_talk.dto.PostRequestDTO;
-import umc.lightup.light_talk.dto.PostResponseDTO;
-import umc.lightup.light_talk.repository.CommentRepository;
-import umc.lightup.light_talk.repository.PostImageRepository;
-import umc.lightup.light_talk.repository.PostLikeRepository;
-import umc.lightup.light_talk.repository.PostRepository;
+import umc.lightup.lighttalk.converter.PostConverter;
+import umc.lightup.lighttalk.domain.Post;
+import umc.lightup.lighttalk.domain.PostImage;
+import umc.lightup.lighttalk.domain.PostLike;
+import umc.lightup.lighttalk.dto.PostRequestDTO;
+import umc.lightup.lighttalk.dto.PostResponseDTO;
+import umc.lightup.lighttalk.repository.PostImageRepository;
+import umc.lightup.lighttalk.repository.PostLikeRepository;
+import umc.lightup.lighttalk.repository.PostRepository;
 import umc.lightup.member.domain.Member;
 import umc.lightup.member.repository.MemberPositionRepository;
 
@@ -72,7 +71,7 @@ public class PostCommandServiceImpl implements PostCommandService {
 
     @Override
     public Post getSinglePostWithComments(Long postId) {
-        return postRepository.findByIdWithCommentsAndCommentMembers(postId)
+        return postRepository.findPostWithCommentsById(postId)
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.POST_NOT_FOUND));
     }
 
@@ -141,7 +140,7 @@ public class PostCommandServiceImpl implements PostCommandService {
 
     @Override
     public List<PostResponseDTO.PostResultDTO> getAllPosts(Pageable pageable, Set<Long> likedPostIds) {
-        Page<Post> postPage = postRepository.findAllWithDetails(pageable);
+        Page<Post> postPage = postRepository.findAllWithMember(pageable);
 
         return postPage.stream()
                 .map(post -> {

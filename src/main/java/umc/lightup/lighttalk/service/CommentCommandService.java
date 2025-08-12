@@ -1,7 +1,7 @@
-package umc.lightup.light_talk.service;
+package umc.lightup.lighttalk.service;
 
-import umc.lightup.light_talk.domain.Comment;
-import umc.lightup.light_talk.dto.CommentRequestDTO;
+import umc.lightup.lighttalk.domain.Comment;
+import umc.lightup.lighttalk.dto.CommentRequestDTO;
 import umc.lightup.member.domain.Member;
 
 public interface CommentCommandService {

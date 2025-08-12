@@ -3,6 +3,7 @@ package umc.lightup.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -34,13 +35,17 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests((requests) -> requests
+                        .requestMatchers(HttpMethod.GET, "/api/v1/items/search", "/api/v1/light-talk/posts/search").permitAll()
                         .requestMatchers("/api/v1/members/me",
                                 "/api/v1/members/me/**",
                                 "/api/v1/members/password/change",
                                 "/api/v1/members/login/path",
                                 "/api/v1/members/login/path/**",
                                 "/api/v1/notification/{notificationId}",
-                                "/api/v1/members/*/like")
+                                "/api/v1/members/*/like",
+                                "/api/v1/items/**",
+                                "/api/v1/light-talk/posts/**"
+                                )
                         .authenticated()
                         .anyRequest().permitAll()
                 )

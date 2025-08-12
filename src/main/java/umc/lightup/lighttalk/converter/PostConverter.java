@@ -1,9 +1,9 @@
-package umc.lightup.light_talk.converter;
+package umc.lightup.lighttalk.converter;
 
-import umc.lightup.light_talk.domain.Comment;
-import umc.lightup.light_talk.domain.Post;
-import umc.lightup.light_talk.domain.PostImage;
-import umc.lightup.light_talk.dto.PostResponseDTO;
+import umc.lightup.lighttalk.domain.Comment;
+import umc.lightup.lighttalk.domain.Post;
+import umc.lightup.lighttalk.domain.PostImage;
+import umc.lightup.lighttalk.dto.PostResponseDTO;
 import umc.lightup.member.domain.MemberPosition;
 
 import java.util.List;

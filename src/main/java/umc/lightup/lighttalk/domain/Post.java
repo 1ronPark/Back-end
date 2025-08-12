@@ -1,4 +1,4 @@
-package umc.lightup.light_talk.domain;
+package umc.lightup.lighttalk.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -43,5 +43,6 @@ public class Post extends BaseEntity {
 
     @Builder.Default
     @OneToMany(mappedBy = "post")
+    @BatchSize(size = 50)
     private List<PostImage> postImages = new ArrayList<>();
 }
