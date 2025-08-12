@@ -63,6 +63,7 @@ public class Item extends BaseEntity {
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
     private List<ItemImage> itemImages = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
     private List<ItemComment> itemComments = new ArrayList<>();
 
