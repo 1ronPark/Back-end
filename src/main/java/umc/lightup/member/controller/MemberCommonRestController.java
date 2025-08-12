@@ -115,7 +115,7 @@ public class MemberCommonRestController {
     }
 
 
-    @GetMapping("/history")
+    @GetMapping("/recent")
     @Operation(
             summary = "최근 조회한 회원 조회 API",
             description = "최근 조회한 회원 내역을 조회하는 API입니다. 로그인이 필수입니다.",
