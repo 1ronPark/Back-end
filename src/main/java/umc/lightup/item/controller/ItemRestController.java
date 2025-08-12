@@ -123,6 +123,29 @@ public class ItemRestController {
         return ApiResponse.onSuccess(ItemConverter.toItemApplyResultDTO(itemApply));
     }
 
+    @PostMapping("/{itemId}/offer")
+    @Operation(summary = "프로젝트 제안 API", description = "프로젝트 주인이 다른 사용자에게 프로젝트 참여 제안 요청을 보내는 API 입니다.")
+    public ApiResponse<ItemResponseDTO.ItemOfferResultDTO> offerItem(
+            Authentication authentication,
+            @PathVariable("itemId") long itemId,
+            @RequestBody @Valid ItemRequestDTO.OfferPositionRequestDTO offerPositionRequestDTO) {
+        Member member = memberCommandService.getMember(authentication.getName());
+        ItemApply itemApply = itemCommandService.offerItem(member, offerPositionRequestDTO.getMemberId(), itemId);
+        return ApiResponse.onSuccess(ItemConverter.toItemOfferResultDTO(itemApply));
+    }
+
+    @PatchMapping("/{itemId}/offer") //Patch가 적절한가?
+    @Operation(summary = "프로젝트 제안 수락/거절 API", description = "프로젝트 제안을 받은 사용자에게 제안을 수락 또는 거절할 수 있는 API 입니다.")
+    public ApiResponse<Void> acceptItemOffer(
+            Authentication authentication,
+            @PathVariable("itemId") long itemId,
+            @RequestBody @Valid ItemRequestDTO.AcceptItemOfferRequestDTO acceptItemOfferRequestDTO) {
+        Member member = memberCommandService.getMember(authentication.getName());
+        itemCommandService.acceptItemOffer(member, itemId, acceptItemOfferRequestDTO.getAccept());
+        return ApiResponse.of(SuccessStatus._NO_CONTENT, null);
+    }
+
+
     @PostMapping("/{itemId}/comments")
     @Operation(summary = "프로젝트 댓글 작성 API", description = "특정 프로젝트 상세 조회 페이지에서 댓글을 작성할 수 있는 API입니다.")
     public ApiResponse<ItemResponseDTO.ItemCommentResultDTO> writeItemComment(Authentication authentication, @PathVariable("itemId") Long itemId, @RequestBody ItemRequestDTO.ItemCommentRequestDTO request) {

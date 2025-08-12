@@ -112,6 +112,12 @@ public class ItemConverter {
                 .build();
     }
 
+    public static ItemResponseDTO.ItemOfferResultDTO toItemOfferResultDTO (ItemApply itemApply) {
+        return ItemResponseDTO.ItemOfferResultDTO.builder()
+                .appliedAt(itemApply.getAppliedAt())
+                .build();
+    }
+
     public static ItemResponseDTO.ItemCommentResultDTO toItemCommentResultDTO (ItemComment itemComment) {
         return ItemResponseDTO.ItemCommentResultDTO.builder()
                 .itemCommentId(itemComment.getId())

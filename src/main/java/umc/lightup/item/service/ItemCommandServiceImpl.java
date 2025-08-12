@@ -20,6 +20,12 @@ import umc.lightup.item.enums.ItemApplyStatus;
 import umc.lightup.item.repository.*;
 import umc.lightup.member.domain.Member;
 import umc.lightup.member.repository.MemberRegionRepository;
+import umc.lightup.member.repository.MemberRepository;
+import umc.lightup.notification.dto.NotificationEventRequestDTO;
+import umc.lightup.notification.enums.NotificationType;
+import umc.lightup.notification.enums.ReferenceType;
+import umc.lightup.notification.service.NotificationCommandService;
+import umc.lightup.notification.utli.NotificationEventSender;
 import umc.lightup.position.domain.Position;
 import umc.lightup.position.repository.PositionRepository;
 
@@ -40,7 +46,10 @@ public class ItemCommandServiceImpl implements ItemCommandService {
     private final ItemViewHistoryRepository itemViewHistoryRepository;
     private final ItemApplyRepository itemApplyRepository;
     private final ItemCommentRepository itemCommentRepository;
+    private final MemberRepository memberRepository;
 
+    private final NotificationEventSender notificationEventSender;
+    private final NotificationCommandService notificationCommandService;
     private final AmazonS3Manager s3Manager;
     private final UuidRepository uuidRepository;
     private final ItemCategoryRepository itemCategoryRepository;
@@ -241,6 +250,86 @@ public class ItemCommandServiceImpl implements ItemCommandService {
                 .status(ItemApplyStatus.PENDING)
                 .appliedAt(LocalDateTime.now())
                 .build());
+    }
+
+    @Override
+    @Transactional
+    public ItemApply offerItem(Member offeringMember, long offeredMemberId, long itemId) {
+        if (offeringMember.getId().equals(offeredMemberId))
+            throw new GeneralHandler(ErrorStatus.SELF_ITEM_APPLY);
+        if (!itemRepository.existsByIdAndMember(itemId, offeringMember))
+            throw new GeneralHandler(ErrorStatus.ITEM_NOT_FOUND);
+        Member offeredMember = memberRepository.findById(offeredMemberId)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Item item = itemRepository.findById(itemId) //Comment와 fetch join할 이유 없음
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.ITEM_NOT_FOUND));
+        if (itemApplyRepository.existsByMemberAndItem(offeredMember, item))
+            throw new GeneralHandler(ErrorStatus.DUPLICATE_ITEM_APPLY);
+
+        //알림 전송
+        StringBuilder message = new StringBuilder();
+        if (offeringMember.getNickname() != null) message.append(offeringMember.getNickname());
+        else if (offeringMember.getName() != null) message.append(offeringMember.getName());
+        else message.append(offeringMember.getEmail());
+        message.append("님에게서 ");
+        message.append(item.getName());
+        message.append("의 제안이 도착했어요!");
+        NotificationEventRequestDTO.NotificationEventDTO eventDTO =
+                NotificationEventRequestDTO.NotificationEventDTO.builder()
+                        .senderId(offeringMember.getId())
+                        .receiverId(offeredMember.getId())
+                        .notificationType(NotificationType.INVITE)
+                        .message(message.toString())
+                        .referenceType(ReferenceType.ITEM)
+                        .referenceId(item.getId())
+                        .build();
+        notificationCommandService.saveNotification(eventDTO);
+        notificationEventSender.send(eventDTO);
+
+        return itemApplyRepository.save(ItemApply.builder()
+                .member(offeredMember)
+                .item(item)
+                .fromOwner(true)
+                .status(ItemApplyStatus.PENDING)
+                .appliedAt(LocalDateTime.now())
+                .build());
+    }
+
+    @Override
+    @Transactional
+    public void acceptItemOffer(Member offeredMember, long itemId, boolean accept) {
+        Item item = itemRepository.findByIdWithOwner(itemId) //Owner Id가 notification에 사용됨
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.ITEM_NOT_FOUND));
+        ItemApply itemApply = itemApplyRepository.findByMemberAndItem(offeredMember, item)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.ITEM_APPLY_NOT_FOUND));
+        if (!itemApply.isFromOwner())
+            throw new GeneralHandler(ErrorStatus.NOT_OFFERED);
+        if (itemApply.getStatus() != ItemApplyStatus.PENDING)
+            throw new GeneralHandler(ErrorStatus.ALREADY_CHOSE_OFFER_ACCEPTANCE);
+
+        if (accept) itemApply.setStatus(ItemApplyStatus.ACCEPTED);
+        else itemApply.setStatus(ItemApplyStatus.REJECTED);
+
+        //알림 전송
+        StringBuilder message = new StringBuilder();
+        if (offeredMember.getNickname() != null) message.append(offeredMember.getNickname());
+        else if (offeredMember.getName() != null) message.append(offeredMember.getName());
+        else message.append(offeredMember.getEmail());
+        message.append("님이 ");
+        message.append(item.getName());
+        message.append("의 요청 수락 여부를 결정했어요!"); // 이렇게 보내는 게 좋은가? 다른 좋은 Message 없나?
+        // 그렇다고 알림에서부터 수락/거절 사실을 통보하면 마음아플 것 같음... 취업준비할 때 거절은 이를 돌려 말하는 것처럼...
+        NotificationEventRequestDTO.NotificationEventDTO eventDTO =
+                NotificationEventRequestDTO.NotificationEventDTO.builder()
+                        .senderId(offeredMember.getId())
+                        .receiverId(item.getMember().getId())
+                        .notificationType(NotificationType.INVITE)
+                        .message(message.toString())
+                        .referenceType(ReferenceType.ITEM)
+                        .referenceId(item.getId())
+                        .build();
+        notificationCommandService.saveNotification(eventDTO);
+        notificationEventSender.send(eventDTO);
     }
 
     @Override

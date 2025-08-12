@@ -72,6 +72,10 @@ public enum ErrorStatus implements BaseErrorCode {
 
     //ItemApply 관련 에러
     DUPLICATE_ITEM_APPLY(HttpStatus.BAD_REQUEST, "ITEMAPPLY4000", "이미 지원한 프로젝트입니다."),
+    SELF_ITEM_APPLY(HttpStatus.BAD_REQUEST, "ITEMAPPLY4001", "자신의 프로젝트에 대한 요청입니다."),
+    ITEM_APPLY_NOT_FOUND(HttpStatus.BAD_REQUEST, "ITEMAPPLY4002", "프로젝트 지원이나 제안 기록을 찾을 수 없습니다."),
+    NOT_OFFERED(HttpStatus.BAD_REQUEST, "ITEMAPPLY4003", "참여를 제안한 프로젝트가 아닙니다."),
+    ALREADY_CHOSE_OFFER_ACCEPTANCE(HttpStatus.BAD_REQUEST, "ITEMAPPLY4004", "프로젝트 참여 여부를 이미 결정했습니다."),
 
     //ItemComment 관련 에러
     ITEM_COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEMCOMMENT4000", "해당 댓글이 존재하지 않습니다."),

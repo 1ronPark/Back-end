@@ -25,6 +25,8 @@ public interface ItemCommandService {
     void addItemLike(Member member, long itemId);
     void removeItemLike(String email, long itemId);
     void updateItemHistory(Member member, Item item);
+    ItemApply offerItem(Member offeringMember, long offeredMemberId, long itemId);
+    void acceptItemOffer(Member offeredMember, long itemId, boolean accept);
     ItemComment createItemComment(Member member, Long itemId, ItemRequestDTO.ItemCommentRequestDTO request);
     void removeItemComment(Member member, Long commentId);
     Set<Long> findItemLikes(long memberId);

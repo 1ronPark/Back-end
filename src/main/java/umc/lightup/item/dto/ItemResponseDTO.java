@@ -134,6 +134,14 @@ public class ItemResponseDTO {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class ItemOfferResultDTO {
+        private LocalDateTime appliedAt;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class ItemCommentResultDTO {
         private Long itemCommentId;
         private String authorName;

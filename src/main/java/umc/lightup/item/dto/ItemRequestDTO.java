@@ -71,6 +71,21 @@ public class ItemRequestDTO {
 
     @Getter
     @Setter
+    public static class OfferPositionRequestDTO {
+        @NotNull
+        // 왜 내가 ExistMember를 안 만들었지??? 물론 만들면 성능은 떨어짐
+        private Long memberId;
+    }
+
+    @Getter
+    @Setter
+    public static class AcceptItemOfferRequestDTO {
+        @NotNull
+        private Boolean accept;
+    }
+
+    @Getter
+    @Setter
     public static class ItemCommentRequestDTO {
         @NotBlank
         private String content;

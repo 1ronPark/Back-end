@@ -40,7 +40,9 @@ public class SecurityConfig {
                                 "/api/v1/members/login/path",
                                 "/api/v1/members/login/path/**",
                                 "/api/v1/notification/{notificationId}",
-                                "/api/v1/members/*/like")
+                                "/api/v1/members/*/like",
+                                "/api/v1/items/*/offer"
+                        )
                         .authenticated()
                         .anyRequest().permitAll()
                 )
@@ -64,7 +66,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of("http://localhost:5173", "https://starlight-up-hyewonimdang-hyewons-projects-4a1d0b91.vercel.app"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(List.of("GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 
