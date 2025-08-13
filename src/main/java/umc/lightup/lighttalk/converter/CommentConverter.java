@@ -10,4 +10,10 @@ public class CommentConverter {
                 .commentId(comment.getId())
                 .build();
     }
+
+    public static CommentResponseDTO.CommentChangeResultDTO toCommentChangeResultDTO(Comment comment) {
+        return CommentResponseDTO.CommentChangeResultDTO.builder()
+                .commentId(comment.getId())
+                .build();
+    }
 }
