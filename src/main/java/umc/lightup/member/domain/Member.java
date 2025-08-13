@@ -113,6 +113,12 @@ public class Member extends BaseEntity implements UserDetails {
         return getEmail();
     }
 
+    public String getNameNotNull() {
+        if (getNickname() != null) return getNickname();
+        else if (getName() != null) return getName();
+        else return getEmail();
+    }
+
 //    @Column(length = 32)
 //    private String briefExplanation; // 추가
 //

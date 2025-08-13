@@ -267,19 +267,15 @@ public class ItemCommandServiceImpl implements ItemCommandService {
             throw new GeneralHandler(ErrorStatus.DUPLICATE_ITEM_APPLY);
 
         //알림 전송
-        StringBuilder message = new StringBuilder();
-        if (offeringMember.getNickname() != null) message.append(offeringMember.getNickname());
-        else if (offeringMember.getName() != null) message.append(offeringMember.getName());
-        else message.append(offeringMember.getEmail());
-        message.append("님에게서 ");
-        message.append(item.getName());
-        message.append("의 제안이 도착했어요!");
         NotificationEventRequestDTO.NotificationEventDTO eventDTO =
                 NotificationEventRequestDTO.NotificationEventDTO.builder()
                         .senderId(offeringMember.getId())
                         .receiverId(offeredMember.getId())
                         .notificationType(NotificationType.INVITE)
-                        .message(message.toString())
+                        .message(offeringMember.getNameNotNull() +
+                                "님에게서 " +
+                                item.getName() +
+                                "의 제안이 도착했어요!")
                         .referenceType(ReferenceType.ITEM)
                         .referenceId(item.getId())
                         .build();
@@ -311,20 +307,19 @@ public class ItemCommandServiceImpl implements ItemCommandService {
         else itemApply.setStatus(ItemApplyStatus.REJECTED);
 
         //알림 전송
-        StringBuilder message = new StringBuilder();
-        if (offeredMember.getNickname() != null) message.append(offeredMember.getNickname());
-        else if (offeredMember.getName() != null) message.append(offeredMember.getName());
-        else message.append(offeredMember.getEmail());
-        message.append("님이 ");
-        message.append(item.getName());
-        message.append("의 요청 수락 여부를 결정했어요!"); // 이렇게 보내는 게 좋은가? 다른 좋은 Message 없나?
-        // 그렇다고 알림에서부터 수락/거절 사실을 통보하면 마음아플 것 같음... 취업준비할 때 거절은 이를 돌려 말하는 것처럼...
         NotificationEventRequestDTO.NotificationEventDTO eventDTO =
                 NotificationEventRequestDTO.NotificationEventDTO.builder()
                         .senderId(offeredMember.getId())
                         .receiverId(item.getMember().getId())
                         .notificationType(NotificationType.INVITE)
-                        .message(message.toString())
+                        .message(offeredMember.getNameNotNull() +
+                                "님이 " +
+                                item.getName() +
+                                "의 요청에 대해 응답했어요! 응답을 확인해보세요!"
+                                // 이렇게 보내는 게 좋은가? 다른 좋은 Message 없나?
+                                // 그렇다고 알림에서부터 수락/거절 사실을 통보하면 마음아플 것 같음...
+                                // 취업준비할 때 거절은 이를 돌려 말하는 것처럼...
+                        )
                         .referenceType(ReferenceType.ITEM)
                         .referenceId(item.getId())
                         .build();
