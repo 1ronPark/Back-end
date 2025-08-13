@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import umc.lightup.member.repository.MemberSkillRepository;
+import umc.lightup.skill.converter.SkillConverter;
 import umc.lightup.skill.domain.Skill;
+import umc.lightup.skill.dto.SkillResponseDTO;
 import umc.lightup.skill.enums.SkillType;
 import umc.lightup.skill.repository.SkillRepository;
 
@@ -18,12 +20,12 @@ public class SkillService {
     private final SkillRepository skillRepository;
     private final MemberSkillRepository memberSkillRepository;
 
-    public List<String> getSkillsList(String positionName) {
+    public List<SkillResponseDTO.skillResultDTO> getSkillsList(String positionName) {
         SkillType skillType = mapPositionToSkillType(positionName);
         List<Skill> skills = skillRepository.findAllOrderedBySkillType(skillType);
 
         return skills.stream()
-                .map(Skill::getName)
+                .map(SkillConverter::toSkillResultDTO)
                 .toList();
     }
 

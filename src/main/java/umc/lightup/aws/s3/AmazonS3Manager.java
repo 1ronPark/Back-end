@@ -52,4 +52,8 @@ public class AmazonS3Manager {
     public String generatePortFolioKeyName(Uuid uuid) {
         return amazonConfig.getPortfolioPath() + '/' + uuid.getUuid();
     }
+
+    public String generatePostImageKeyName(Uuid uuid) {
+        return amazonConfig.getPostImagePath() + '/' + uuid.getUuid();
+    }
 }

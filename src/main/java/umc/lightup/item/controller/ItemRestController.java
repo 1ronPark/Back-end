@@ -94,8 +94,9 @@ public class ItemRestController {
         List<ItemResponseDTO.ItemCommentResultDTO> itemComments = itemCommandService.getItemComments(findItem);
         boolean itemLike = itemCommandService.getItemLike(member.getId(), findItem.getId());
         int commentCount = itemCommandService.countComments(findItem.getId());
+        boolean itemApplyStatus = itemCommandService.getItemApplyStatus(member, findItem);
         itemCommandService.updateItemHistory(member, findItem);
-        return ApiResponse.onSuccess(ItemConverter.toItemInfoDTO(findItem, itemRegions, itemCategories, itemRecruitPositions, itemComments, commentCount, itemLike));
+        return ApiResponse.onSuccess(ItemConverter.toItemInfoDTO(findItem, itemRegions, itemCategories, itemRecruitPositions, itemComments, commentCount, itemLike, itemApplyStatus));
     }
 
     @PostMapping("/{itemId}/like")

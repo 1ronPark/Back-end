@@ -11,6 +11,7 @@ import java.util.List;
 public interface MemberCommandService {
     Member getMember(String email);
     MemberResponseDTO.MemberInfoDTO getMember(long id, String viewerEmail);
+    List<MemberResponseDTO.HistoryInfoDTO> getHistory(Member member, long size);
     Member putMember(String email, MemberRequestDTO.ChangeDto request);
     MemberResponseDTO.MyProfileDTO getMemberProfile(Member member);
     MemberResponseDTO.MyProfileDTO putMemberProfile(Member member, MemberRequestDTO.ProfileChangeDto request);

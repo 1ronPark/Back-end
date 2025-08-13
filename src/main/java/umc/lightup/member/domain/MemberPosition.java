@@ -1,10 +1,15 @@
 package umc.lightup.member.domain;
 
 import jakarta.persistence.*;
+import lombok.*;
 import umc.lightup.common.BaseEntity;
 import umc.lightup.position.domain.Position;
 
 @Entity
+@Getter
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemberPosition extends BaseEntity {
 
     @Id
@@ -22,9 +27,5 @@ public class MemberPosition extends BaseEntity {
     public MemberPosition(Member member, Position position) {
         this.member = member;
         this.position = position;
-    }
-
-    public MemberPosition() {
-
     }
 }

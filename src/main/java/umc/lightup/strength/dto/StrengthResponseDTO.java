@@ -14,7 +14,16 @@ public class StrengthResponseDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class strengthListDTO {
-        List<String> strengths;
+        List<strengthResultDTO> strengths;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class strengthResultDTO {
+        private Long strengthId;
+        private String strengthName;
     }
 
     //커스텀 강점 생성 기능 삭제

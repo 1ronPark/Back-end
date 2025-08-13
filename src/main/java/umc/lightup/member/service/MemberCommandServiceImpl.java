@@ -39,6 +39,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     private final PortfolioRepository portfolioRepository;
     private final MemberLikeRepository memberLikeRepository;
     private final ActivityRepository activityRepository;
+    private final MemberViewHistoryRepository memberViewHistoryRepository;
 
     private final AmazonS3Manager amazonS3Manager;
     private final UuidRepository uuidRepository;
@@ -79,6 +80,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     }
 
     @Override
+    @Transactional
     public MemberResponseDTO.MemberInfoDTO getMember(long id, String viewerEmail){
         // 한 번에 반환하기 위해 DTO 반환을 사용했는데 좋은 설계 방식인지는 한번 고민할 필요가 있음
         Member member = memberRepository.findById(id)
@@ -89,6 +91,19 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         List<MemberRegion> regions = memberRegionRepository.findByMember(member);
         List<Portfolio> portfolios = portfolioRepository.findByMember(member);
         List<Activity> activities = activityRepository.findByMember(member);
+
+        //조회기록 설정
+        if (viewerEmail != null && !viewerEmail.equals(member.getEmail())) {
+            int updatedResult = memberViewHistoryRepository.updateTimestamp(viewerEmail, member);
+            if (updatedResult == 0) { // update 내역이 없을 때
+                MemberViewHistory history = MemberViewHistory.builder()
+                        .fromMember(getMember(viewerEmail))
+                        .toMember(member)
+                        .build();
+                memberViewHistoryRepository.save(history);
+            }
+        }
+
         return MemberViewInfo.builder()
                 .member(member)
                 .skillNames(skills)
@@ -97,10 +112,15 @@ public class MemberCommandServiceImpl implements MemberCommandService {
                 .positionNames(positions)
                 .portfolios(portfolios)
                 .activities(activities)
-                .emailOpen(false)
-                .phoneOpen(false)
-                .pictureOpen(false)
+                .emailOpen(true)
+                .phoneOpen(true)
+                .pictureOpen(true)
                 .build().toMemberInfoDTO();
+    }
+
+    @Override
+    public List<MemberResponseDTO.HistoryInfoDTO> getHistory(Member member, long size) {
+        return memberRepository.getMemberViewHistoryInfos(member, size);
     }
 
     @Override

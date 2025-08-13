@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import umc.lightup.member.repository.MemberStrengthRepository;
+import umc.lightup.strength.converter.StrengthConverter;
 import umc.lightup.strength.domain.Strength;
+import umc.lightup.strength.dto.StrengthResponseDTO;
 import umc.lightup.strength.enums.StrengthType;
 import umc.lightup.strength.repository.StrengthRepository;
 
@@ -18,11 +20,12 @@ public class StrengthService {
     private final StrengthRepository strengthRepository;
     private final MemberStrengthRepository memberStrengthRepository;
 
-    public List<String> getStrengthsList(String positionName) {
+    public List<StrengthResponseDTO.strengthResultDTO> getStrengthsList(String positionName) {
         StrengthType strengthType = mapPositionToStrengthType(positionName);
         List<Strength> strengths = strengthRepository.findAllOrderedByStrengthType(strengthType);
+
         return strengths.stream()
-                .map(Strength::getName)
+                .map(StrengthConverter::toStrengthResultDTO)
                 .toList();
     }
 

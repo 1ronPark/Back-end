@@ -13,7 +13,9 @@ import java.util.Optional;
 
 @Repository //잠깐만 이걸 지금 추가했다는 건 이전에는 이게 없었어도 돌아갔다는 건가? 왜 돌아갔지?????
 public interface ItemApplyRepository extends JpaRepository<ItemApply, Long> {
+    boolean existsByItemId(Long itemId);
     boolean existsByMemberAndItem(Member member, Item item);
+    List<ItemApply> findByMemberId(Long memberId);
     Optional<ItemApply> findByMemberAndItem(Member member, Item item);
 
     @EntityGraph(attributePaths = {"member", "item", "item.member"})

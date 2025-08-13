@@ -1,14 +1,22 @@
 package umc.lightup.skill.converter;
 
+import umc.lightup.skill.domain.Skill;
 import umc.lightup.skill.dto.SkillResponseDTO;
 
 import java.util.List;
 
 public class SkillConverter {
 
-    public static SkillResponseDTO.skillListDTO toSkillListDTO(List<String> skills) {
+    public static SkillResponseDTO.skillListDTO toSkillListDTO(List<SkillResponseDTO.skillResultDTO> skillResultDTOList) {
         return SkillResponseDTO.skillListDTO.builder()
-                .skills(skills)
+                .skills(skillResultDTOList)
+                .build();
+    }
+
+    public static SkillResponseDTO.skillResultDTO toSkillResultDTO(Skill skill) {
+        return SkillResponseDTO.skillResultDTO.builder()
+                .skillId(skill.getId())
+                .skillName(skill.getName())
                 .build();
     }
 

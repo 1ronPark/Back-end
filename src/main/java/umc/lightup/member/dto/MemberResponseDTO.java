@@ -105,6 +105,27 @@ public class MemberResponseDTO {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class MemberHistoryInfoListDTO {
+        private List<HistoryInfoDTO> memberHistory;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class HistoryInfoDTO {
+        private long id;
+        private String name;
+        private String nickname;
+        private List<String> positions;
+        private String profileImageUrl;
+        private boolean liked;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class MemberInfoListDTO {
         List<MemberInfoSimpleDTO> members;
         long numOfTotalResults;

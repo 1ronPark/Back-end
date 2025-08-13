@@ -29,7 +29,9 @@ public class ItemResponseDTO {
     public static class ItemResultDTO {
         private Long itemId;
         private String itemName;
+//        private String schoolName;
         private String memberName;
+        private String memberProfileImageUrl;
         private String itemImageUrl;
         private LocalDate updatedAt;
         private boolean recruitStatus;
@@ -51,12 +53,14 @@ public class ItemResponseDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class MyItemResultDTO {
+        private Long itemId;
         private String itemName;
         private String introduce;
         private String itemImageUrl;
         private List<ItemCategoriesResultDTO> itemCategories;
         private boolean recruitStatus;
-//        private boolean applicantStatus;
+        private boolean applicantStatus;
+        private boolean isMyApplyItem;
     }
 
     @Getter
@@ -90,6 +94,8 @@ public class ItemResponseDTO {
         private int commentCount;
         private LocalDate updatedAt;
         private boolean likedByCurrentUser;
+        private boolean applicantStatus;
+//        private boolean suggestStatus;
     }
 
     @Getter
