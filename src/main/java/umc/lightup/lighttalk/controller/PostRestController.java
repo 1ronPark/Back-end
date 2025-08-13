@@ -76,6 +76,16 @@ public class PostRestController {
         return ApiResponse.onSuccess(PostConverter.toPostJoinResultDTO(post));
     }
 
+    @DeleteMapping("/{postId}")
+    @Operation(summary = "라잇톡 포스트 삭제 API", description = "라잇톡 포스트를 삭제하는 API입니다.")
+    public ApiResponse<Void> removePost(Authentication authentication, @PathVariable("postId") Long postId) {
+        String email = authentication.getName();
+        Member member = memberCommandService.getMember(email);
+
+        postCommandService.removePost(member, postId);
+        return ApiResponse.of(SuccessStatus._NO_CONTENT, null);
+    }
+
     @GetMapping("/{postId}")
     @Operation(summary = "특정 라잇톡 포스트 상세 조회 API", description = "특정 라잇톡 포스트 상세 조회 API 입니다. ")
     public ApiResponse<PostResponseDTO.PostInfoDTO> getPostInfo (@PathVariable("postId") @Min(1) Long postId) {

@@ -70,6 +70,14 @@ public class PostCommandServiceImpl implements PostCommandService {
     }
 
     @Override
+    @Transactional
+    public void removePost(Member member, Long postId) {
+        if (postRepository.deleteByPostMemberAndId(member, postId) == 0) {
+            throw new GeneralHandler(ErrorStatus.POST_NOT_FOUND);
+        }
+    }
+
+    @Override
     public Post getSinglePostWithComments(Long postId) {
         return postRepository.findPostWithCommentsById(postId)
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.POST_NOT_FOUND));

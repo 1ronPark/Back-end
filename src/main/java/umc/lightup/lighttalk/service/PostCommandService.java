@@ -17,6 +17,7 @@ public interface PostCommandService {
     List<PostResponseDTO.MemberPositionDTO> getPostMemberPositions(Post post);
     List<PostResponseDTO.PostImageDTO> getPostImages(Post post);
     List<PostResponseDTO.PostCommentResultDTO> getPostComments(Post post);
+    void removePost(Member member, Long postId);
     void addPostLike(Member member, Long postId);
     void removePostLike(String email, Long itemId);
     Set<Long> findPostLikes(Long memberId);

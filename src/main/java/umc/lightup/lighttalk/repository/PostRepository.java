@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import umc.lightup.lighttalk.domain.Post;
+import umc.lightup.member.domain.Member;
 
 import java.util.Optional;
 
@@ -29,4 +30,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Modifying
     @Query("update Post p set p.likes = p.likes - 1 where p.id = :postId")
     int decreasePostLike(@Param("postId") Long postId);
+
+    int deleteByPostMemberAndId(Member member, Long postId);
 }
