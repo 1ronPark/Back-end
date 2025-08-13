@@ -5,6 +5,11 @@ import umc.lightup.item.domain.Item;
 import umc.lightup.item.domain.ItemApply;
 import umc.lightup.member.domain.Member;
 
+import java.util.List;
+
 public interface ItemApplyRepository extends JpaRepository<ItemApply, Long> {
+    ItemApply findByMemberAndItem(Member member, Item item);
+    boolean existsByItemId(Long itemId);
     boolean existsByMemberAndItem(Member member, Item item);
+    List<ItemApply> findByMemberId(Long memberId);
 }

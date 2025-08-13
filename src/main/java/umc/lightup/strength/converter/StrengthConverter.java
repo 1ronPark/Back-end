@@ -1,14 +1,22 @@
 package umc.lightup.strength.converter;
 
+import umc.lightup.strength.domain.Strength;
 import umc.lightup.strength.dto.StrengthResponseDTO;
 
 import java.util.List;
 
 public class StrengthConverter {
 
-    public static StrengthResponseDTO.strengthListDTO toStrengthListDTO(List<String> strengths) {
+    public static StrengthResponseDTO.strengthListDTO toStrengthListDTO(List<StrengthResponseDTO.strengthResultDTO> strengthResultDTOList) {
         return StrengthResponseDTO.strengthListDTO.builder()
-                .strengths(strengths)
+                .strengths(strengthResultDTOList)
+                .build();
+    }
+
+    public static StrengthResponseDTO.strengthResultDTO toStrengthResultDTO(Strength strength) {
+        return StrengthResponseDTO.strengthResultDTO.builder()
+                .strengthId(strength.getId())
+                .strengthName(strength.getName())
                 .build();
     }
 

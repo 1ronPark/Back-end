@@ -26,6 +26,7 @@ import umc.lightup.position.repository.PositionRepository;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -129,19 +130,34 @@ public class ItemCommandServiceImpl implements ItemCommandService {
 
     @Override
     public List<ItemResponseDTO.MyItemResultDTO> getMyItems(Member member) {
+        //내가 만든 프로젝트 가져오기
         List<Item> myItemList = itemRepository.findByMember(member);
-        List<ItemCategory> itemCategories = itemCategoryRepository.findByItems(myItemList);
+
+        //내가 지원한 프로젝트 가져오기
+        List<Item> appliedItemList = itemApplyRepository.findByMemberId(member.getId()).stream()
+                .map(ItemApply::getItem)
+                .toList();
+
+        //필요한 프로젝트들 모두 합치기
+        List<Item> allItems = Stream.concat(myItemList.stream(), appliedItemList.stream())
+                .toList();
+
+        List<ItemCategory> itemCategories = itemCategoryRepository.findByItems(allItems);
         Map<Long, List<ItemCategory>> categoryMap = itemCategories.stream()
                 .collect(Collectors.groupingBy(ic -> ic.getItem().getId()));
 
-        return myItemList.stream()
+        return allItems.stream()
             .map(item -> {
                 String itemImageUrl = item.getItemProfileImageUrl();
 
                 List<ItemResponseDTO.ItemCategoriesResultDTO> itemCategoriesResultDTOList = categoryMap.getOrDefault(item.getId(), List.of()).stream()
                         .map(ItemConverter::toItemCategoriesResultDTO)
                         .toList();
-                return ItemConverter.toMyItemResultDTO(item, itemImageUrl, itemCategoriesResultDTOList);
+
+                boolean applicantStatus = itemApplyRepository.existsByItemId(item.getId());
+                boolean isMyApplyItem = !item.getMember().equals(member);
+
+                return ItemConverter.toMyItemResultDTO(item, itemImageUrl, itemCategoriesResultDTOList, applicantStatus, isMyApplyItem);
             })
             .toList();
     }
@@ -241,6 +257,16 @@ public class ItemCommandServiceImpl implements ItemCommandService {
                 .status(ItemApplyStatus.PENDING)
                 .appliedAt(LocalDateTime.now())
                 .build());
+    }
+
+    @Override
+    public boolean getItemApplyStatus(Member member, Item item) {
+        if (!itemApplyRepository.existsByMemberAndItem(member, item)) {
+            return false;
+        }
+
+        ItemApplyStatus itemApplyStatus = itemApplyRepository.findByMemberAndItem(member, item).getStatus();
+        return itemApplyStatus.equals(ItemApplyStatus.PENDING);
     }
 
     @Override

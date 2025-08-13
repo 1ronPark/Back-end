@@ -68,6 +68,10 @@ public class Item extends BaseEntity {
     private List<ItemComment> itemComments = new ArrayList<>();
 
     @Builder.Default
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    private List<ItemApply> itemApplyList = new ArrayList<>();
+
+    @Builder.Default
     @Column(nullable = false)
     private Long viewCount = 0L;
 

@@ -14,7 +14,16 @@ public class SkillResponseDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class skillListDTO {
-        List<String> skills;
+        List<skillResultDTO> skills;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class skillResultDTO {
+        private Long skillId;
+        private String skillName;
     }
 
     //커스텀 스킬 기능 삭제
