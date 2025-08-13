@@ -56,4 +56,10 @@ public class MemberConverter {
                 .fileUrl(portfolio.getFileUrl())
                 .build();
     }
+
+    public static MemberResponseDTO.MemberHistoryInfoListDTO toMemberHistoryInfoListDTO(List<MemberResponseDTO.HistoryInfoDTO> memberHistory) {
+        return MemberResponseDTO.MemberHistoryInfoListDTO.builder()
+                .memberHistory(memberHistory)
+                .build();
+    }
 }

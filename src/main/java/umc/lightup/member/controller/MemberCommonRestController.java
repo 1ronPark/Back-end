@@ -9,6 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import umc.lightup.api.ApiResponse;
 import umc.lightup.api.code.status.SuccessStatus;
+import umc.lightup.member.converter.MemberConverter;
 import umc.lightup.member.domain.Member;
 import umc.lightup.member.dto.MemberRequestDTO;
 import umc.lightup.member.dto.MemberResponseDTO;
@@ -111,6 +112,23 @@ public class MemberCommonRestController {
                 .limit(limit)
                 .build();
         return ApiResponse.onSuccess(memberCommandService.searchMember(member, request));
+    }
+
+
+    @GetMapping("/recent")
+    @Operation(
+            summary = "최근 조회한 회원 조회 API",
+            description = "최근 조회한 회원 내역을 조회하는 API입니다. 로그인이 필수입니다.",
+            security = {@SecurityRequirement(name = "JWT TOKEN")}
+    )
+    public ApiResponse<MemberResponseDTO.MemberHistoryInfoListDTO> searchHistory(
+            Authentication authentication,
+            @RequestParam(value = "size", defaultValue = "5") @Positive Long size) {
+        String email = authentication.getName();
+        Member member = memberCommandService.getMember(email);
+        return ApiResponse.onSuccess(
+                MemberConverter.toMemberHistoryInfoListDTO(
+                        memberCommandService.getHistory(member, size)));
     }
 
     @PostMapping("/{memberId}/like")
