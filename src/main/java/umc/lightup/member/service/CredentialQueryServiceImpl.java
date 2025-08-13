@@ -87,8 +87,8 @@ public class CredentialQueryServiceImpl implements CredentialQueryService {
     }
 
     @Override
-    public MemberResponseDTO.LoginResultDTO loginMemberByGoogle(String authCode) {
-        OAuth2ResponseDTO.GoogleUserinfoResponseDTO userinfo = getGoogleUserinfo(authCode);
+    public MemberResponseDTO.LoginResultDTO loginMemberByGoogle(String authCode, String redirectUrl) {
+        OAuth2ResponseDTO.GoogleUserinfoResponseDTO userinfo = getGoogleUserinfo(authCode, redirectUrl);
 
         Credential credential = credentialRepository
                 .findByCredentialTypeAndCredential(CredentialType.GOOGLE, userinfo.getSub())
@@ -99,8 +99,8 @@ public class CredentialQueryServiceImpl implements CredentialQueryService {
 
     @Override
     @Transactional
-    public MemberResponseDTO.LoginResultDTO callbackMemberByGoogle(String authCode) {
-        OAuth2ResponseDTO.GoogleUserinfoResponseDTO userinfo = getGoogleUserinfo(authCode);
+    public MemberResponseDTO.LoginResultDTO callbackMemberByGoogle(String authCode, String redirectUrl) {
+        OAuth2ResponseDTO.GoogleUserinfoResponseDTO userinfo = getGoogleUserinfo(authCode, redirectUrl);
 
         Optional<Credential> optionalCredential = credentialRepository
                 .findByCredentialTypeAndCredential(CredentialType.GOOGLE, userinfo.getSub());
@@ -112,8 +112,8 @@ public class CredentialQueryServiceImpl implements CredentialQueryService {
     }
 
     @Override
-    public MemberResponseDTO.LoginResultDTO loginMemberByKakao(String authCode) {
-        OAuth2ResponseDTO.KakaoUserinfoResponseDTO userinfo = getKakaoUserinfo(authCode);
+    public MemberResponseDTO.LoginResultDTO loginMemberByKakao(String authCode, String redirectUrl) {
+        OAuth2ResponseDTO.KakaoUserinfoResponseDTO userinfo = getKakaoUserinfo(authCode, redirectUrl);
 
         Credential credential = credentialRepository
                 .findByCredentialTypeAndCredential(CredentialType.KAKAO, Long.toString(userinfo.getId()))
@@ -124,8 +124,8 @@ public class CredentialQueryServiceImpl implements CredentialQueryService {
 
     @Override
     @Transactional
-    public MemberResponseDTO.LoginResultDTO callbackMemberByKakao(String authCode) {
-        OAuth2ResponseDTO.KakaoUserinfoResponseDTO userinfo = getKakaoUserinfo(authCode);
+    public MemberResponseDTO.LoginResultDTO callbackMemberByKakao(String authCode, String redirectUrl) {
+        OAuth2ResponseDTO.KakaoUserinfoResponseDTO userinfo = getKakaoUserinfo(authCode, redirectUrl);
 
         Optional<Credential> optionalCredential = credentialRepository
                 .findByCredentialTypeAndCredential(CredentialType.KAKAO, Long.toString(userinfo.getId()));
@@ -136,8 +136,8 @@ public class CredentialQueryServiceImpl implements CredentialQueryService {
 
     @Override
     @Transactional
-    public Member joinMemberByGoogle(String authCode) {
-        return joinMemberByGoogle(getGoogleUserinfo(authCode));
+    public Member joinMemberByGoogle(String authCode, String redirectUrl) {
+        return joinMemberByGoogle(getGoogleUserinfo(authCode, redirectUrl));
     }
 
     private Member joinMemberByGoogle(OAuth2ResponseDTO.GoogleUserinfoResponseDTO userinfo) {
@@ -161,8 +161,8 @@ public class CredentialQueryServiceImpl implements CredentialQueryService {
 
     @Override
     @Transactional
-    public Member joinMemberByKakao(String authCode) {
-        return joinMemberByKakao(getKakaoUserinfo(authCode));
+    public Member joinMemberByKakao(String authCode, String redirectUrl) {
+        return joinMemberByKakao(getKakaoUserinfo(authCode, redirectUrl));
     }
 
     private Member joinMemberByKakao(OAuth2ResponseDTO.KakaoUserinfoResponseDTO userinfo) {
@@ -190,10 +190,10 @@ public class CredentialQueryServiceImpl implements CredentialQueryService {
 
     @Override
     @Transactional
-    public Member addGoogleLogin(Member member, String authCode) {
+    public Member addGoogleLogin(Member member, String authCode, String redirectUrl) {
         if (credentialRepository.existsByCredentialTypeAndMember(CredentialType.GOOGLE, member))
             throw new GeneralHandler(ErrorStatus.CREDENTIAL_ALREADY_EXIST);
-        OAuth2ResponseDTO.GoogleUserinfoResponseDTO userinfo = getGoogleUserinfo(authCode);
+        OAuth2ResponseDTO.GoogleUserinfoResponseDTO userinfo = getGoogleUserinfo(authCode, redirectUrl);
         if (credentialRepository.existsByCredentialTypeAndCredential(CredentialType.GOOGLE, userinfo.getSub()))
             throw new GeneralHandler(ErrorStatus.CREDENTIAL_ALREADY_USED);
 
@@ -208,10 +208,10 @@ public class CredentialQueryServiceImpl implements CredentialQueryService {
 
     @Override
     @Transactional
-    public Member addKakaoLogin(Member member, String authCode) {
+    public Member addKakaoLogin(Member member, String authCode, String redirectUrl) {
         if (credentialRepository.existsByCredentialTypeAndMember(CredentialType.KAKAO, member))
             throw new GeneralHandler(ErrorStatus.CREDENTIAL_ALREADY_EXIST);
-        OAuth2ResponseDTO.KakaoUserinfoResponseDTO userinfo = getKakaoUserinfo(authCode);
+        OAuth2ResponseDTO.KakaoUserinfoResponseDTO userinfo = getKakaoUserinfo(authCode, redirectUrl);
         if (credentialRepository.existsByCredentialTypeAndCredential(CredentialType.KAKAO, Long.toString(userinfo.getId())))
             throw new GeneralHandler(ErrorStatus.CREDENTIAL_ALREADY_USED);
 
@@ -321,13 +321,13 @@ public class CredentialQueryServiceImpl implements CredentialQueryService {
         return MemberConverter.toSelectCredentialInfoResultDTO(credentials);
     }
 
-    private OAuth2ResponseDTO.GoogleUserinfoResponseDTO getGoogleUserinfo(String authCode) {
+    private OAuth2ResponseDTO.GoogleUserinfoResponseDTO getGoogleUserinfo(String authCode, String redirectUrl) {
         OAuth2RequestDTO.GoogleOAuth2RequestDTO oauth2Request =
                 OAuth2RequestDTO.GoogleOAuth2RequestDTO.builder()
                         .code(authCode)
                         .client_id(googleClientId)
                         .client_secret(googleClientSecret)
-                        .redirect_uri(googleRedirectUri)
+                        .redirect_uri(redirectUrl == null ? googleRedirectUri : redirectUrl)
                         .grant_type("authorization_code")
                         .build();
         ResponseEntity<OAuth2ResponseDTO.GoogleOAuth2ResponseDTO> oauth2Response =
@@ -345,13 +345,13 @@ public class CredentialQueryServiceImpl implements CredentialQueryService {
         return userinfo.getBody();
     }
 
-    private OAuth2ResponseDTO.KakaoUserinfoResponseDTO getKakaoUserinfo(String authCode) {
+    private OAuth2ResponseDTO.KakaoUserinfoResponseDTO getKakaoUserinfo(String authCode, String redirectUrl) {
         OAuth2RequestDTO.KakaoOAuth2RequestDTO oauth2Request =
                 OAuth2RequestDTO.KakaoOAuth2RequestDTO.builder()
                         .code(authCode)
                         .client_id(kakaoClientId)
                         .client_secret(kakaoClientSecret)
-                        .redirect_uri(kakaoRedirectUri)
+                        .redirect_uri(redirectUrl == null ? kakaoRedirectUri : redirectUrl)
                         .grant_type("authorization_code")
                         .build();
         ResponseEntity<OAuth2ResponseDTO.KakaoOAuth2ResponseDTO> oauth2Response =

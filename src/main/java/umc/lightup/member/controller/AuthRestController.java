@@ -48,10 +48,11 @@ public class AuthRestController {
     @Operation(summary = "유저 소셜로그인을 통한 회원가입 API",description = "유저가 소셜로그인으로 회원가입하는 API입니다.")
     public ApiResponse<MemberResponseDTO.JoinResultDTO> joinByOAuth(
             @PathVariable("oauth") CredentialType oauth,
-            @RequestParam("authCode") @NotBlank String authCode) {
+            @RequestParam("authCode") @NotBlank String authCode,
+            @RequestParam("redirectUrl") String redirectUrl) {
         Member member = switch (oauth) {
-            case GOOGLE -> credentialQueryService.joinMemberByGoogle(authCode);
-            case KAKAO -> credentialQueryService.joinMemberByKakao(authCode);
+            case GOOGLE -> credentialQueryService.joinMemberByGoogle(authCode, redirectUrl);
+            case KAKAO -> credentialQueryService.joinMemberByKakao(authCode, redirectUrl);
             case PASSWORD -> throw new GeneralHandler(ErrorStatus._BAD_REQUEST);
         };
         return ApiResponse.onSuccess(MemberResponseDTO.joinResultDTOBuilder()
@@ -65,10 +66,11 @@ public class AuthRestController {
             description = "유저가 소셜로그인으로 로그인/회원가입하는 API입니다. 계정 정보가 있으면 로그인, 없으면 회원가입으로 처리됩니다.")
     public ApiResponse<MemberResponseDTO.LoginResultDTO> callbackByOAuth(
             @PathVariable("oauth") CredentialType oauth,
-            @RequestParam("authCode") @NotBlank String authCode) {
+            @RequestParam("authCode") @NotBlank String authCode,
+            @RequestParam("redirectUrl") String redirectUrl) {
         MemberResponseDTO.LoginResultDTO loginResult = switch (oauth) {
-            case GOOGLE -> credentialQueryService.callbackMemberByGoogle(authCode);
-            case KAKAO -> credentialQueryService.callbackMemberByKakao(authCode);
+            case GOOGLE -> credentialQueryService.callbackMemberByGoogle(authCode, redirectUrl);
+            case KAKAO -> credentialQueryService.callbackMemberByKakao(authCode, redirectUrl);
             case PASSWORD -> throw new GeneralHandler(ErrorStatus._BAD_REQUEST);
         };
         return ApiResponse.onSuccess(loginResult);
@@ -78,10 +80,11 @@ public class AuthRestController {
     @Operation(summary = "유저 소셜로그인 API",description = "유저가 소셜로그인하는 API입니다.")
     public ApiResponse<MemberResponseDTO.LoginResultDTO> loginByOAuth
             (@PathVariable("oauth") CredentialType oauth,
-             @RequestParam("authCode") @NotBlank String authCode) {
+             @RequestParam("authCode") @NotBlank String authCode,
+             @RequestParam("redirectUrl") String redirectUrl) {
         MemberResponseDTO.LoginResultDTO loginResult = switch (oauth) {
-            case GOOGLE -> credentialQueryService.loginMemberByGoogle(authCode);
-            case KAKAO -> credentialQueryService.loginMemberByKakao(authCode);
+            case GOOGLE -> credentialQueryService.loginMemberByGoogle(authCode, redirectUrl);
+            case KAKAO -> credentialQueryService.loginMemberByKakao(authCode, redirectUrl);
             case PASSWORD -> throw new GeneralHandler(ErrorStatus._BAD_REQUEST);
         };
         return ApiResponse.onSuccess(loginResult);
@@ -95,12 +98,13 @@ public class AuthRestController {
     public ApiResponse<Void> addLogin
             (Authentication authentication,
              @PathVariable("oauth") CredentialType oauth,
-             @RequestParam("authCode") @NotBlank String authCode) {
+             @RequestParam("authCode") @NotBlank String authCode,
+             @RequestParam("redirectUrl") String redirectUrl) {
         String email = authentication.getName();
         Member member = memberCommandService.getMember(email);
         switch (oauth) {
-            case GOOGLE -> credentialQueryService.addGoogleLogin(member, authCode);
-            case KAKAO -> credentialQueryService.addKakaoLogin(member, authCode);
+            case GOOGLE -> credentialQueryService.addGoogleLogin(member, authCode, redirectUrl);
+            case KAKAO -> credentialQueryService.addKakaoLogin(member, authCode, redirectUrl);
             case PASSWORD -> credentialQueryService.addPasswordLogin(member, authCode);
         };
         return ApiResponse.of(SuccessStatus._NO_CONTENT, null);
