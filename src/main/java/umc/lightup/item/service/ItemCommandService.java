@@ -20,13 +20,17 @@ public interface ItemCommandService {
     Item createItem(Member member, ItemRequestDTO.ItemJoinRequestDTO request, MultipartFile itemProfileImage, MultipartFile itemPlanFile);
     Item getSingleItem(Long itemId);
     Item getSingleItemWithComments(Long itemId);
-    ItemApply applyItem(Member member, Item item);
+    ItemApply applyItem(Member member, long itemId);
     boolean getItemLike(long memberId, long itemId);
     void addItemLike(Member member, long itemId);
     void removeItemLike(String email, long itemId);
     void updateItemHistory(Member member, Item item);
+    void acceptItemApply(Member itemOwner,
+                         ItemRequestDTO.AcceptItemApplyRequestDTO acceptItemApplyRequestDTO);
+    List<ItemResponseDTO.ItemApplyStatusDTO> getItemApplyStatus(String email);
     ItemApply offerItem(Member offeringMember, long offeredMemberId, long itemId);
-    void acceptItemOffer(Member offeredMember, long itemId, boolean accept);
+    void acceptItemOffer(Member offeredMember,
+                         ItemRequestDTO.AcceptItemOfferRequestDTO acceptItemOfferRequestDTO);
     ItemComment createItemComment(Member member, Long itemId, ItemRequestDTO.ItemCommentRequestDTO request);
     void removeItemComment(Member member, Long commentId);
     Set<Long> findItemLikes(long memberId);

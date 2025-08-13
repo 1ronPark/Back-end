@@ -71,7 +71,23 @@ public class ItemRequestDTO {
 
     @Getter
     @Setter
+    public static class AcceptItemApplyRequestDTO {
+        @NotNull
+        private Long itemApplyId; //재지원 기능을 만들지는 모르겠으나 만드려면 이걸로 받아야 함
+//        @NotNull
+//        private Long itemId;
+//        @NotNull
+//        // 왜 내가 ExistMember를 안 만들었지??? 물론 만들면 성능은 떨어짐
+//        private Long memberId;
+        @NotNull
+        private Boolean accept;
+    }
+
+    @Getter
+    @Setter
     public static class OfferPositionRequestDTO {
+        @NotNull
+        private Long itemId;
         @NotNull
         // 왜 내가 ExistMember를 안 만들었지??? 물론 만들면 성능은 떨어짐
         private Long memberId;
@@ -80,6 +96,8 @@ public class ItemRequestDTO {
     @Getter
     @Setter
     public static class AcceptItemOfferRequestDTO {
+        @NotNull
+        private Long itemApplyId; //재지원 기능을 만들지는 모르겠으나 만드려면 이걸로 받아야 함
         @NotNull
         private Boolean accept;
     }

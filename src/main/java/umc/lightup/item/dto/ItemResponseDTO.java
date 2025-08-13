@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import umc.lightup.member.enums.Gender;
+import umc.lightup.item.enums.ItemApplyStatus;
 import umc.lightup.member.enums.Mbti;
 
 import java.time.LocalDate;
@@ -128,6 +128,32 @@ public class ItemResponseDTO {
     public static class ItemApplyResultDTO {
         private LocalDateTime appliedAt;
         private String message;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ItemApplyStatusListDTO {
+        private List<ItemApplyStatusDTO> itemApplyStatuses;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ItemApplyStatusDTO {
+        private boolean itemOwned;
+        private long itemId;
+        private String itemName;
+        private String itemImageUrl;
+        private String itemOwnerUsername;
+        private Long memberId;
+        private String memberUsername;
+        private String memberProfileImageUrl;
+        private long applyId;
+        private boolean fromOwner;
+        private ItemApplyStatus applyStatus;
     }
 
     @Getter

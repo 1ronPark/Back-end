@@ -239,10 +239,28 @@ public class ItemCommandServiceImpl implements ItemCommandService {
 
     @Override
     @Transactional
-    public ItemApply applyItem(Member member, Item item) {
+    public ItemApply applyItem(Member member, long itemId) {
+        Item item = itemRepository.findByIdWithOwner(itemId)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.ITEM_NOT_FOUND));
         if (itemApplyRepository.existsByMemberAndItem(member, item)) {
             throw new GeneralHandler(ErrorStatus.DUPLICATE_ITEM_APPLY);
         }
+
+        //알림 전송
+        NotificationEventRequestDTO.NotificationEventDTO eventDTO =
+                NotificationEventRequestDTO.NotificationEventDTO.builder()
+                        .senderId(member.getId())
+                        .receiverId(item.getMember().getId())
+                        .notificationType(NotificationType.INVITE)
+                        .message(member.getNameNotNull() +
+                                "님에게서 " +
+                                item.getName() +
+                                "에 지원했어요!")
+                        .referenceType(ReferenceType.ITEM)
+                        .referenceId(item.getId())
+                        .build();
+        notificationCommandService.saveNotification(eventDTO);
+        notificationEventSender.send(eventDTO);
 
         return itemApplyRepository.save(ItemApply.builder()
                 .member(member)
@@ -250,6 +268,62 @@ public class ItemCommandServiceImpl implements ItemCommandService {
                 .status(ItemApplyStatus.PENDING)
                 .appliedAt(LocalDateTime.now())
                 .build());
+    }
+
+    @Override
+    @Transactional
+    public void acceptItemApply(Member itemOwner,
+                                ItemRequestDTO.AcceptItemApplyRequestDTO acceptItemApplyRequestDTO) {
+        ItemApply itemApply = itemApplyRepository.findById(acceptItemApplyRequestDTO.getItemApplyId().longValue())
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.ITEM_APPLY_NOT_FOUND));
+        if (!itemOwner.equals(itemApply.getItem().getMember())) //owner가 맞는지 확인
+            throw new GeneralHandler(ErrorStatus.NOT_MY_ITEM);
+        if (itemApply.isFromOwner()) //제안이 아닌 지원인지 확인
+            throw new GeneralHandler(ErrorStatus.NOT_APPLIED);
+        if (itemApply.getStatus() != ItemApplyStatus.PENDING) //이미 수락 여부를 결정했는지 확인
+            throw new GeneralHandler(ErrorStatus.ALREADY_CHOSE_OFFER_ACCEPTANCE);
+
+        if (acceptItemApplyRequestDTO.getAccept()) itemApply.setStatus(ItemApplyStatus.ACCEPTED);
+        else itemApply.setStatus(ItemApplyStatus.REJECTED);
+
+        //알림 전송
+        NotificationEventRequestDTO.NotificationEventDTO eventDTO =
+                NotificationEventRequestDTO.NotificationEventDTO.builder()
+                        .senderId(itemOwner.getId())
+                        .receiverId(itemApply.getMember().getId())
+                        .notificationType(NotificationType.INVITE)
+                        .message(itemOwner.getNameNotNull() +
+                                        "님이 " +
+                                        itemApply.getItem().getName() +
+                                        "의 지원에 대해 응답했어요! 응답을 확인해보세요!"
+                                // 이렇게 보내는 게 좋은가? 다른 좋은 Message 없나?
+                                // 그렇다고 알림에서부터 수락/거절 사실을 통보하면 마음아플 것 같음...
+                                // 취업준비할 때 거절은 이를 돌려 말하는 것처럼...
+                        )
+                        .referenceType(ReferenceType.ITEM)
+                        .referenceId(itemApply.getItem().getId())
+                        .build();
+        notificationCommandService.saveNotification(eventDTO);
+        notificationEventSender.send(eventDTO);
+    }
+
+    @Override
+    public List<ItemResponseDTO.ItemApplyStatusDTO> getItemApplyStatus(String email) {
+        return itemApplyRepository.findAllByMemberEmail(email)
+                .stream().map(i -> ItemResponseDTO.ItemApplyStatusDTO.builder()
+                        .itemOwned(i.getItem().getMember() != null && i.getItem().getMember().getEmail().equals(email))
+                        .itemId(i.getItem().getId())
+                        .itemName(i.getItem().getName())
+                        .itemImageUrl(i.getItem().getItemProfileImageUrl())
+                        .itemOwnerUsername(i.getItem().getMember() == null ? null : i.getItem().getMember().getNameNotNull())
+                        .memberId(i.getMember() == null ? null : i.getMember().getId())
+                        .memberUsername(i.getMember() == null ? null : i.getMember().getNameNotNull())
+                        .memberProfileImageUrl(i.getMember() == null ? null : i.getMember().getProfileImageUrl())
+                        .applyId(i.getId())
+                        .fromOwner(i.isFromOwner())
+                        .applyStatus(i.getStatus())
+                        .build())
+                .toList();
     }
 
     @Override
@@ -293,35 +367,33 @@ public class ItemCommandServiceImpl implements ItemCommandService {
 
     @Override
     @Transactional
-    public void acceptItemOffer(Member offeredMember, long itemId, boolean accept) {
-        Item item = itemRepository.findByIdWithOwner(itemId) //Owner Id가 notification에 사용됨
-                .orElseThrow(() -> new GeneralHandler(ErrorStatus.ITEM_NOT_FOUND));
-        ItemApply itemApply = itemApplyRepository.findByMemberAndItem(offeredMember, item)
+    public void acceptItemOffer(Member offeredMember, ItemRequestDTO.AcceptItemOfferRequestDTO acceptItemOfferRequestDTO) {
+        ItemApply itemApply = itemApplyRepository.findById(acceptItemOfferRequestDTO.getItemApplyId().longValue())
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.ITEM_APPLY_NOT_FOUND));
-        if (!itemApply.isFromOwner())
+        if (!itemApply.isFromOwner() || !offeredMember.equals(itemApply.getMember()))
             throw new GeneralHandler(ErrorStatus.NOT_OFFERED);
         if (itemApply.getStatus() != ItemApplyStatus.PENDING)
             throw new GeneralHandler(ErrorStatus.ALREADY_CHOSE_OFFER_ACCEPTANCE);
 
-        if (accept) itemApply.setStatus(ItemApplyStatus.ACCEPTED);
+        if (acceptItemOfferRequestDTO.getAccept()) itemApply.setStatus(ItemApplyStatus.ACCEPTED);
         else itemApply.setStatus(ItemApplyStatus.REJECTED);
 
         //알림 전송
         NotificationEventRequestDTO.NotificationEventDTO eventDTO =
                 NotificationEventRequestDTO.NotificationEventDTO.builder()
                         .senderId(offeredMember.getId())
-                        .receiverId(item.getMember().getId())
+                        .receiverId(itemApply.getItem().getMember().getId())
                         .notificationType(NotificationType.INVITE)
                         .message(offeredMember.getNameNotNull() +
                                 "님이 " +
-                                item.getName() +
-                                "의 요청에 대해 응답했어요! 응답을 확인해보세요!"
+                                itemApply.getItem().getName() +
+                                "의 제안에 대해 응답했어요! 응답을 확인해보세요!"
                                 // 이렇게 보내는 게 좋은가? 다른 좋은 Message 없나?
                                 // 그렇다고 알림에서부터 수락/거절 사실을 통보하면 마음아플 것 같음...
                                 // 취업준비할 때 거절은 이를 돌려 말하는 것처럼...
                         )
                         .referenceType(ReferenceType.ITEM)
-                        .referenceId(item.getId())
+                        .referenceId(itemApply.getItem().getId())
                         .build();
         notificationCommandService.saveNotification(eventDTO);
         notificationEventSender.send(eventDTO);

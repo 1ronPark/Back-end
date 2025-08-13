@@ -41,7 +41,9 @@ public class SecurityConfig {
                                 "/api/v1/members/login/path/**",
                                 "/api/v1/notification/{notificationId}",
                                 "/api/v1/members/*/like",
-                                "/api/v1/items/*/offer"
+                                "/api/v1/items/offer",
+                                "/api/v1/items/apply",
+                                "/api/v1/items/*/apply"
                         )
                         .authenticated()
                         .anyRequest().permitAll()
