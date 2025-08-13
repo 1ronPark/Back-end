@@ -22,6 +22,8 @@ public class ItemConverter {
                 .itemId(item.getId())
                 .itemName(item.getName())
                 .memberName(item.getMember().getName())
+//                .schoolName(item.getMember().getSchool().getName())
+                .memberProfileImageUrl(item.getMember().getProfileImageUrl())
                 .itemImageUrl(itemImageUrl)
                 .updatedAt(item.getUpdatedAt().toLocalDate())
                 .recruitStatus(item.isProjectStatus())
@@ -37,7 +39,7 @@ public class ItemConverter {
                 .build();
     }
 
-    public static ItemResponseDTO.MyItemResultDTO toMyItemResultDTO(Item item, String itemImageUrl, List<ItemResponseDTO.ItemCategoriesResultDTO> itemCategoriesResultDTOList, boolean applicantStatus) {
+    public static ItemResponseDTO.MyItemResultDTO toMyItemResultDTO(Item item, String itemImageUrl, List<ItemResponseDTO.ItemCategoriesResultDTO> itemCategoriesResultDTOList, boolean applicantStatus, boolean isMyApplyItem) {
         return ItemResponseDTO.MyItemResultDTO.builder()
                 .itemId(item.getId())
                 .itemName(item.getName())
@@ -46,6 +48,7 @@ public class ItemConverter {
                 .itemCategories(itemCategoriesResultDTOList)
                 .recruitStatus(item.isProjectStatus())
                 .applicantStatus(applicantStatus)
+                .isMyApplyItem(isMyApplyItem)
                 .build();
     }
 

@@ -29,7 +29,9 @@ public class ItemResponseDTO {
     public static class ItemResultDTO {
         private Long itemId;
         private String itemName;
+//        private String schoolName;
         private String memberName;
+        private String memberProfileImageUrl;
         private String itemImageUrl;
         private LocalDate updatedAt;
         private boolean recruitStatus;
@@ -58,6 +60,7 @@ public class ItemResponseDTO {
         private List<ItemCategoriesResultDTO> itemCategories;
         private boolean recruitStatus;
         private boolean applicantStatus;
+        private boolean isMyApplyItem;
     }
 
     @Getter
