@@ -21,6 +21,7 @@ public class Post extends BaseEntity {
     private Long id;
 
     @Lob
+    @Setter
     @Column(nullable = false)
     private String content;
 

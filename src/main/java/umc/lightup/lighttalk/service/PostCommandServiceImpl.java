@@ -49,24 +49,35 @@ public class PostCommandServiceImpl implements PostCommandService {
         Post savedPost = postRepository.save(post);
 
         if (postImages != null && !postImages.isEmpty()) {
-            for (MultipartFile image : postImages) {
-
-                String uuid = UUID.randomUUID().toString();
-                Uuid savedUuid = uuidRepository.save(Uuid.builder()
-                        .uuid(uuid).build());
-
-                String postImageURL = s3Manager.uploadFile(s3Manager.generatePostImageKeyName(savedUuid), image);
-
-                PostImage postImage = PostImage.builder()
-                        .post(post)
-                        .imageUrl(postImageURL)
-                        .build();
-
-                postImageRepository.save(postImage);
-            }
+            uploadImagesToS3(postImages, post);
         }
 
         return savedPost;
+    }
+
+    @Override
+    @Transactional
+    public Post changePost(Member member, Long postId, PostRequestDTO.PostChangeRequestDTO request, List<MultipartFile> changePostImages) {
+        Post findPost = postRepository.findById(postId)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.POST_NOT_FOUND));
+
+        if (!findPost.getPostMember().equals(member)) {
+            throw new GeneralHandler(ErrorStatus.POST_UPDATE_FORBIDDEN);
+        }
+
+        findPost.setContent(request.getContent());
+
+        if (changePostImages != null && !changePostImages.isEmpty()) {
+            List<PostImage> oldImages = postImageRepository.findByPost(findPost);
+            /*for (PostImage oldImage : oldImages) {
+                s3Manager.deleteFile(oldImage.getImageUrl()); // S3에서 삭제
+            }*/
+            postImageRepository.deleteAll(oldImages);
+
+            uploadImagesToS3(changePostImages, findPost);
+        }
+
+        return findPost;
     }
 
     @Override
@@ -166,5 +177,23 @@ public class PostCommandServiceImpl implements PostCommandService {
 
                     return PostConverter.toPostResultDTO(post, memberPositionDTOList, postImageDTOList, commentCount, liked);
                 }).toList();
+    }
+
+
+    private void uploadImagesToS3(List<MultipartFile> changePostImages, Post findPost) {
+        for (MultipartFile image : changePostImages) {
+            String uuid = UUID.randomUUID().toString();
+            Uuid savedUuid = uuidRepository.save(Uuid.builder()
+                    .uuid(uuid).build());
+
+            String postImageURL = s3Manager.uploadFile(s3Manager.generatePostImageKeyName(savedUuid), image);
+
+            PostImage postImage = PostImage.builder()
+                    .post(findPost)
+                    .imageUrl(postImageURL)
+                    .build();
+
+            postImageRepository.save(postImage);
+        }
     }
 }

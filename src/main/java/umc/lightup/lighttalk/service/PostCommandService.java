@@ -12,6 +12,7 @@ import java.util.Set;
 
 public interface PostCommandService {
     Post createPost(Member member, PostRequestDTO.PostJoinRequestDTO request, List<MultipartFile> postImages);
+    Post changePost(Member member, Long postId, PostRequestDTO.PostChangeRequestDTO request, List<MultipartFile> changePostImages);
     Post getSinglePostWithComments(Long postId);
     List<PostResponseDTO.PostResultDTO> getAllPosts(Pageable pageable, Set<Long> likedPostIds);
     List<PostResponseDTO.MemberPositionDTO> getPostMemberPositions(Post post);
