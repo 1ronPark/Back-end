@@ -141,7 +141,10 @@ public class ItemCommandServiceImpl implements ItemCommandService {
                 List<ItemResponseDTO.ItemCategoriesResultDTO> itemCategoriesResultDTOList = categoryMap.getOrDefault(item.getId(), List.of()).stream()
                         .map(ItemConverter::toItemCategoriesResultDTO)
                         .toList();
-                return ItemConverter.toMyItemResultDTO(item, itemImageUrl, itemCategoriesResultDTOList);
+
+                boolean applicantStatus = itemApplyRepository.existsByItemId(item.getId());
+
+                return ItemConverter.toMyItemResultDTO(item, itemImageUrl, itemCategoriesResultDTOList, applicantStatus);
             })
             .toList();
     }
@@ -241,6 +244,16 @@ public class ItemCommandServiceImpl implements ItemCommandService {
                 .status(ItemApplyStatus.PENDING)
                 .appliedAt(LocalDateTime.now())
                 .build());
+    }
+
+    @Override
+    public boolean getItemApplyStatus(Member member, Item item) {
+        if (!itemApplyRepository.existsByMemberAndItem(member, item)) {
+            return false;
+        }
+
+        ItemApplyStatus itemApplyStatus = itemApplyRepository.findByMemberAndItem(member, item).getStatus();
+        return itemApplyStatus.equals(ItemApplyStatus.PENDING);
     }
 
     @Override

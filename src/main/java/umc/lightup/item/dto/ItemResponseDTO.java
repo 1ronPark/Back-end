@@ -51,12 +51,13 @@ public class ItemResponseDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class MyItemResultDTO {
+        private Long itemId;
         private String itemName;
         private String introduce;
         private String itemImageUrl;
         private List<ItemCategoriesResultDTO> itemCategories;
         private boolean recruitStatus;
-//        private boolean applicantStatus;
+        private boolean applicantStatus;
     }
 
     @Getter
@@ -90,6 +91,8 @@ public class ItemResponseDTO {
         private int commentCount;
         private LocalDate updatedAt;
         private boolean likedByCurrentUser;
+        private boolean applicantStatus;
+//        private boolean suggestStatus;
     }
 
     @Getter

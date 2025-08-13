@@ -37,14 +37,15 @@ public class ItemConverter {
                 .build();
     }
 
-    public static ItemResponseDTO.MyItemResultDTO toMyItemResultDTO(Item item, String itemImageUrl, List<ItemResponseDTO.ItemCategoriesResultDTO> itemCategoriesResultDTOList) {
+    public static ItemResponseDTO.MyItemResultDTO toMyItemResultDTO(Item item, String itemImageUrl, List<ItemResponseDTO.ItemCategoriesResultDTO> itemCategoriesResultDTOList, boolean applicantStatus) {
         return ItemResponseDTO.MyItemResultDTO.builder()
+                .itemId(item.getId())
                 .itemName(item.getName())
                 .introduce(item.getIntroduce())
                 .itemImageUrl(itemImageUrl)
                 .itemCategories(itemCategoriesResultDTOList)
                 .recruitStatus(item.isProjectStatus())
-//                .applicantStatus()
+                .applicantStatus(applicantStatus)
                 .build();
     }
 
@@ -54,7 +55,7 @@ public class ItemConverter {
                 .build();
     }
 
-    public static ItemResponseDTO.ItemInfoDTO toItemInfoDTO(Item item, List<ItemResponseDTO.ItemRegionResultDTO> itemRegionResultDTOList, List<ItemResponseDTO.ItemCategoriesResultDTO> itemCategoriesResultDTOList, List<ItemResponseDTO.RecruitPositionResultDTO> recruitPositionResultDTOList, List<ItemResponseDTO.ItemCommentResultDTO> itemCommentResultDTOList, int commentCount, boolean itemLike) {
+    public static ItemResponseDTO.ItemInfoDTO toItemInfoDTO(Item item, List<ItemResponseDTO.ItemRegionResultDTO> itemRegionResultDTOList, List<ItemResponseDTO.ItemCategoriesResultDTO> itemCategoriesResultDTOList, List<ItemResponseDTO.RecruitPositionResultDTO> recruitPositionResultDTOList, List<ItemResponseDTO.ItemCommentResultDTO> itemCommentResultDTOList, int commentCount, boolean itemLike, boolean itemApplyStatus) {
         return ItemResponseDTO.ItemInfoDTO.builder()
                 .introduce(item.getIntroduce())
                 .itemName(item.getName())
@@ -73,6 +74,7 @@ public class ItemConverter {
                 .commentCount(commentCount)
                 .updatedAt(item.getUpdatedAt().toLocalDate())
                 .likedByCurrentUser(itemLike)
+                .applicantStatus(itemApplyStatus)
                 .build();
     }
 
