@@ -144,6 +144,7 @@ public class ItemCommandServiceImpl implements ItemCommandService {
 
         //내가 지원한 프로젝트 가져오기
         List<Item> appliedItemList = itemApplyRepository.findByMemberId(member.getId()).stream()
+                .filter(itemApply -> !itemApply.isFromOwner())
                 .map(ItemApply::getItem)
                 .toList();
 
