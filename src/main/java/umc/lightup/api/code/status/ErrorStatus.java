@@ -103,12 +103,14 @@ public enum ErrorStatus implements BaseErrorCode {
 
     //Post 관련 에러
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "POST4000", "포스트가 존재하지 않습니다."),
+    POST_UPDATE_FORBIDDEN(HttpStatus.FORBIDDEN, "POST4001", "포스트 수정 권한이 없습니다."),
 
     //PostImage 관련 에러
     TOO_MANY_POST_IMAGE(HttpStatus.BAD_REQUEST, "POST_IMAGE4000", "이미지는 3개까지만 업로드 가능합니다."),
 
     //PostComment 관련 에러
     POST_COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "POST_COMMENT4000", "해당 포스트의 댓글이 존재하지 않습니다."),
+    POST_COMMENT_UPDATE_FORBIDDEN(HttpStatus.FORBIDDEN, "POST_COMMENT4001", "해당 댓글의 수정 권한이 없습니다."),
 
     //PostLike 관련 에러
     MY_POST_LIKE(HttpStatus.BAD_REQUEST, "POSTLIKE4000", "자신의 포스트에는 좋아요를 누를 수 없습니다."),

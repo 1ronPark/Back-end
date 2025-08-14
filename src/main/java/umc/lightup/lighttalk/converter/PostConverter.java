@@ -16,6 +16,12 @@ public class PostConverter {
                 .build();
     }
 
+    public static PostResponseDTO.PostChangeResultDTO toPostChangeResultDTO(Post post) {
+        return PostResponseDTO.PostChangeResultDTO.builder()
+                .postId(post.getId())
+                .build();
+    }
+
     public static PostResponseDTO.PostInfoDTO toPostInfoDTO (Post post, List<PostResponseDTO.MemberPositionDTO> memberPositionDTOList, List<PostResponseDTO.PostImageDTO> postImageDTOList, List<PostResponseDTO.PostCommentResultDTO> postCommentResultDTOList) {
         return PostResponseDTO.PostInfoDTO.builder()
                 .authorName(post.getPostMember().getName())

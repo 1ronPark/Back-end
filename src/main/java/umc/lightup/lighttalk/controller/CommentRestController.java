@@ -34,6 +34,19 @@ public class CommentRestController {
         return ApiResponse.onSuccess(CommentConverter.toCommentJoinResultDTO(comment));
     }
 
+    @PutMapping("/comments/{commentId}")
+    @Operation(summary = "라잇톡 포스트 댓글 수정 API", description = "라잇톡 특정 포스트의 댓글을 수정하는 API 입니다.")
+    public ApiResponse<CommentResponseDTO.CommentChangeResultDTO> changePostComment(
+            Authentication authentication,
+            @PathVariable("commentId") Long commentId,
+            @RequestBody CommentRequestDTO.CommentChangeDTO request) {
+        String email = authentication.getName();
+        Member member = memberCommandService.getMember(email);
+
+        Comment comment = commentCommandService.changeComment(commentId, member, request);
+        return ApiResponse.onSuccess(CommentConverter.toCommentChangeResultDTO(comment));
+    }
+
     @DeleteMapping("/comments/{commentId}")
     @Operation(summary = "라잇톡 포스트의 댓글 삭제 API", description = "라잇톡 포스트의 댓글 삭제 API입니다.")
     public ApiResponse<Void> removePostComment(Authentication authentication, @PathVariable("commentId") Long commentId) {
