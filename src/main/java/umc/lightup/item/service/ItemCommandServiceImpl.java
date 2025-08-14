@@ -288,34 +288,12 @@ public class ItemCommandServiceImpl implements ItemCommandService {
 
     @Override
     public boolean getItemApplyStatus(Member member, Item item) {
-        if (!itemApplyRepository.existsByMemberAndItem(member, item)) {
-            return false;
-        }
-
-        ItemApply itemApply = itemApplyRepository.findByMemberAndItem(member, item)
-                .orElseThrow(() -> new GeneralHandler(ErrorStatus.ITEM_APPLY_NOT_FOUND));
-
-        if (itemApply.isFromOwner()) {
-            return false;
-        }
-
-        return itemApply.getStatus().equals(ItemApplyStatus.PENDING);
+        return checkItemApply(member, item, false);
     }
 
     @Override
     public boolean getItemSuggestStatus(Member member, Item item) {
-        if (!itemApplyRepository.existsByMemberAndItem(member, item)) {
-            return false;
-        }
-
-        ItemApply itemApply = itemApplyRepository.findByMemberAndItem(member, item)
-                .orElseThrow(() -> new GeneralHandler(ErrorStatus.ITEM_APPLY_NOT_FOUND));
-
-        if (!itemApply.isFromOwner()) {
-            return false;
-        }
-
-        return itemApply.getStatus().equals(ItemApplyStatus.PENDING);
+        return checkItemApply(member, item, true);
     }
 
     @Override
@@ -488,4 +466,13 @@ public class ItemCommandServiceImpl implements ItemCommandService {
                 .map(ItemConverter::toItemCategoriesResultDTO)
                 .toList();
     }
+
+
+    private boolean checkItemApply(Member member, Item item, boolean isFromOwnerExpected) {
+        return itemApplyRepository.findByMemberAndItem(member, item)
+                .filter(itemApply -> itemApply.isFromOwner() == isFromOwnerExpected)
+                .filter(itemApply -> itemApply.getStatus().equals(ItemApplyStatus.PENDING))
+                .isPresent();
+    }
+
 }
