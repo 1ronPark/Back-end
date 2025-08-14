@@ -55,16 +55,17 @@ public class MemberCommonRestController {
     @GetMapping("/{memberId}")
     @Operation(
             summary = "회원(타인) 정보 조회 API",
-            description = "타인의 회원 정보를 조회하는 API입니다." +
-                    " 프로젝트에 참여했을 때 일부 데이터를 추가로 공개하는 작업은 아직 진행하지 않았습니다.",
+            description = "타인의 회원 정보를 조회하는 API입니다.",
             security = { @SecurityRequirement(name = "JWT TOKEN")}
     )
     public ApiResponse<MemberResponseDTO.MemberInfoDTO> getMemberInfo(Authentication authentication,
                                                                       @PathVariable("memberId") long id) {
-        String email = null;
-        if (authentication != null)
-            email = authentication.getName();
-        return ApiResponse.onSuccess(memberCommandService.getMember(id, email));
+        Member member = null;
+        if (authentication != null) {
+            String email = authentication.getName();
+            member = memberCommandService.getMember(email);
+        }
+        return ApiResponse.onSuccess(memberCommandService.getMember(id, member));
     }
 
     @GetMapping("/search")

@@ -11,4 +11,6 @@ public interface MemberRepositoryCustom {
             (Member requestedMember, MemberRequestDTO.MemberSearchRequestDTO options);
     List<MemberResponseDTO.HistoryInfoDTO> getMemberViewHistoryInfos
             (Member requestedMember, long size);
+    MemberResponseDTO.MemberInfoDTO getSingleMemberInfo
+            (Member requestedMember, long id);
 }

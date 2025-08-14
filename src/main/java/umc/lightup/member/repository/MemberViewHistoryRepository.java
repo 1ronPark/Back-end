@@ -18,4 +18,9 @@ public interface MemberViewHistoryRepository extends JpaRepository<MemberViewHis
             "WHERE mvh.fromMember.id = (SELECT m.id FROM Member m WHERE m.email = :fromMemberEmail) " +
             "AND mvh.toMember = :toMember")
     int updateTimestamp(@Param("fromMemberEmail") String fromMemberEmail, @Param("toMember") Member toMember);
+    @Modifying
+    @Query("UPDATE MemberViewHistory mvh SET mvh.updatedAt = CURRENT_TIMESTAMP " +
+            "WHERE mvh.fromMember = :fromMember " +
+            "AND mvh.toMember.id = :toMemberId")
+    int updateTimestamp(@Param("fromMember") Member fromMember, @Param("toMemberId") long toMemberId);
 }
