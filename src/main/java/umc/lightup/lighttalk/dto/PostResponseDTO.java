@@ -22,6 +22,14 @@ public class PostResponseDTO {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class PostChangeResultDTO {
+        private Long postId;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class PostInfoDTO {
         private String authorName;
         private List<MemberPositionDTO> positionName;

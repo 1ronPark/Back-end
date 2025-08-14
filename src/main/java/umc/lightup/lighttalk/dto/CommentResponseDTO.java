@@ -14,4 +14,12 @@ public class CommentResponseDTO {
     public static class CommentJoinResultDTO {
         private Long commentId;
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CommentChangeResultDTO {
+        private Long commentId;
+    }
 }

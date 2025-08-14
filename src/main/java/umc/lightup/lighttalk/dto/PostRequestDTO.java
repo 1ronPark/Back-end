@@ -12,4 +12,11 @@ public class PostRequestDTO {
         @NotBlank
         private String content;
     }
+
+    @Getter
+    @Setter
+    public static class PostChangeRequestDTO {
+        @NotBlank
+        private String content;
+    }
 }

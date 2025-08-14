@@ -21,10 +21,15 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     @Query("select distinct i from Item i left join fetch i.itemComments ic left join fetch ic.commentMember where i.id = :itemId")
     Optional<Item> findByIdWithCommentsAndCommentMembers(@Param("itemId") Long itemId);
 
+    //fetch join 하는 것과 안 하는 것이 둘 다 필요해 별도 쿼리로 작성
+    @Query("select i from Item i join fetch i.member m where i.id = :itemId")
+    Optional<Item> findByIdWithOwner(@Param("itemId") long itemId);
+
     @Modifying
     @Query("update Item i set i.viewCount = i.viewCount + 1 where i.id = :itemId")
     int increaseViewCount(@Param("itemId") Long itemId);
     int deleteByMemberAndId(Member member, Long itemId);
 
     Page<Item> findAll(Pageable pageable);
+    boolean existsByIdAndMember(long id, Member member);
 }

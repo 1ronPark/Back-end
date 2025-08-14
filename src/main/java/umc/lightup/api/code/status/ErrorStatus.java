@@ -74,6 +74,12 @@ public enum ErrorStatus implements BaseErrorCode {
 
     //ItemApply 관련 에러
     DUPLICATE_ITEM_APPLY(HttpStatus.BAD_REQUEST, "ITEMAPPLY4000", "이미 지원한 프로젝트입니다."),
+    SELF_ITEM_APPLY(HttpStatus.BAD_REQUEST, "ITEMAPPLY4001", "자신의 프로젝트에 대한 요청입니다."),
+    ITEM_APPLY_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEMAPPLY4002", "프로젝트 지원이나 제안 기록을 찾을 수 없습니다."),
+    NOT_OFFERED(HttpStatus.BAD_REQUEST, "ITEMAPPLY4003", "참여를 제안받은 프로젝트가 아닙니다."),
+    ALREADY_CHOSE_OFFER_ACCEPTANCE(HttpStatus.BAD_REQUEST, "ITEMAPPLY4004", "프로젝트 참여 여부를 이미 결정했습니다."),
+    NOT_APPLIED(HttpStatus.BAD_REQUEST, "ITEMAPPLY4005", "다른 사용자의 지원이 아닙니다."),
+    NOT_MY_ITEM(HttpStatus.BAD_REQUEST, "ITEMAPPLY4006", "자신의 프로젝트가 아닙니다."),
 
     //ItemComment 관련 에러
     ITEM_COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEMCOMMENT4000", "해당 댓글이 존재하지 않습니다."),
@@ -105,12 +111,14 @@ public enum ErrorStatus implements BaseErrorCode {
 
     //Post 관련 에러
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "POST4000", "포스트가 존재하지 않습니다."),
+    POST_UPDATE_FORBIDDEN(HttpStatus.FORBIDDEN, "POST4001", "포스트 수정 권한이 없습니다."),
 
     //PostImage 관련 에러
     TOO_MANY_POST_IMAGE(HttpStatus.BAD_REQUEST, "POST_IMAGE4000", "이미지는 3개까지만 업로드 가능합니다."),
 
     //PostComment 관련 에러
     POST_COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "POST_COMMENT4000", "해당 포스트의 댓글이 존재하지 않습니다."),
+    POST_COMMENT_UPDATE_FORBIDDEN(HttpStatus.FORBIDDEN, "POST_COMMENT4001", "해당 댓글의 수정 권한이 없습니다."),
 
     //PostLike 관련 에러
     MY_POST_LIKE(HttpStatus.BAD_REQUEST, "POSTLIKE4000", "자신의 포스트에는 좋아요를 누를 수 없습니다."),

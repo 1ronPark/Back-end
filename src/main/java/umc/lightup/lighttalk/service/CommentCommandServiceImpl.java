@@ -39,6 +39,21 @@ public class CommentCommandServiceImpl implements CommentCommandService{
 
     @Override
     @Transactional
+    public Comment changeComment(Long commentId, Member member, CommentRequestDTO.CommentChangeDTO request) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.POST_COMMENT_NOT_FOUND));
+
+        if (!comment.getCommentMember().equals(member)) {
+            throw new GeneralHandler(ErrorStatus.POST_COMMENT_UPDATE_FORBIDDEN);
+        }
+
+        comment.setContent(request.getContent());
+
+        return comment;
+    }
+
+    @Override
+    @Transactional
     public void removePostComment(Member member, Long commentId) {
         if (commentRepository.deleteByCommentMemberAndId(member, commentId) == 0) {
             throw new GeneralHandler(ErrorStatus.POST_COMMENT_NOT_FOUND);

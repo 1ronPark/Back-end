@@ -21,13 +21,19 @@ public interface ItemCommandService {
     Item changeItem(Member member, Long itemId, ItemRequestDTO.ItemChangeRequestDTO request, MultipartFile itemProfileImage, MultipartFile itemPlanFile);
     Item getSingleItem(Long itemId);
     Item getSingleItemWithComments(Long itemId);
-    ItemApply applyItem(Member member, Item item);
+    ItemApply applyItem(Member member, long itemId);
     boolean getItemApplyStatus(Member member, Item item);
     boolean getItemLike(long memberId, long itemId);
     void removeItem(Member member, Long itemId);
     void addItemLike(Member member, long itemId);
     void removeItemLike(String email, long itemId);
     void updateItemHistory(Member member, Item item);
+    void acceptItemApply(Member itemOwner,
+                         ItemRequestDTO.AcceptItemApplyRequestDTO acceptItemApplyRequestDTO);
+    List<ItemResponseDTO.ItemApplyStatusDTO> getItemApplyStatus(String email);
+    ItemApply offerItem(Member offeringMember, long offeredMemberId, long itemId);
+    void acceptItemOffer(Member offeredMember,
+                         ItemRequestDTO.AcceptItemOfferRequestDTO acceptItemOfferRequestDTO);
     ItemComment createItemComment(Member member, Long itemId, ItemRequestDTO.ItemCommentRequestDTO request);
     void removeItemComment(Member member, Long commentId);
     Set<Long> findItemLikes(long memberId);

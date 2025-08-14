@@ -12,4 +12,11 @@ public class CommentRequestDTO {
         @NotBlank
         private String content;
     }
+
+    @Getter
+    @Setter
+    public static class CommentChangeDTO {
+        @NotBlank
+        private String content;
+    }
 }

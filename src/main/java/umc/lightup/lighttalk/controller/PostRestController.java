@@ -76,6 +76,36 @@ public class PostRestController {
         return ApiResponse.onSuccess(PostConverter.toPostJoinResultDTO(post));
     }
 
+    @PatchMapping(value = "/{postId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @Operation(summary = "라잇톡 포스트 수정 API" , description = "라잇톡 포스트 수정 API 입니다. 이미지는 최대 3개까지만 업로드 가능합니다.")
+    public ApiResponse<PostResponseDTO.PostChangeResultDTO> changePost(
+            Authentication authentication,
+            @PathVariable("postId") Long postId,
+            @Parameter(content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
+            @RequestPart("request") @Valid PostRequestDTO.PostChangeRequestDTO request,
+            @RequestPart(value = "postImages", required = false) List<MultipartFile> postImages) {
+        String email = authentication.getName();
+        Member member = memberCommandService.getMember(email);
+
+        //업로드 이미지가 3개 초과인지 검증
+        if (postImages != null && postImages.size() > 3) {
+            throw new GeneralHandler(ErrorStatus.TOO_MANY_POST_IMAGE);
+        }
+
+        Post post = postCommandService.changePost(member, postId, request, postImages);
+        return ApiResponse.onSuccess(PostConverter.toPostChangeResultDTO(post));
+    }
+
+    @DeleteMapping("/{postId}")
+    @Operation(summary = "라잇톡 포스트 삭제 API", description = "라잇톡 포스트를 삭제하는 API입니다.")
+    public ApiResponse<Void> removePost(Authentication authentication, @PathVariable("postId") Long postId) {
+        String email = authentication.getName();
+        Member member = memberCommandService.getMember(email);
+
+        postCommandService.removePost(member, postId);
+        return ApiResponse.of(SuccessStatus._NO_CONTENT, null);
+    }
+
     @GetMapping("/{postId}")
     @Operation(summary = "특정 라잇톡 포스트 상세 조회 API", description = "특정 라잇톡 포스트 상세 조회 API 입니다. ")
     public ApiResponse<PostResponseDTO.PostInfoDTO> getPostInfo (@PathVariable("postId") @Min(1) Long postId) {
