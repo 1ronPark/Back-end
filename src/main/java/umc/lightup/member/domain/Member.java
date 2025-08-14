@@ -21,9 +21,11 @@ import java.util.List;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false) //Member에 대한 Equals 적용을 위해 필요함
 public class Member extends BaseEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include //Id만 비교하면 끝이라서 Include와 onlyExplicitlyIncluded = true 설정 진행
     private Long id;
 
     @Column(length = 20) //소셜로그인 회원가입 시 안 들어올 수 있음
@@ -111,6 +113,12 @@ public class Member extends BaseEntity implements UserDetails {
     @Override
     public String getUsername() {
         return getEmail();
+    }
+
+    public String getNameNotNull() {
+        if (getNickname() != null) return getNickname();
+        else if (getName() != null) return getName();
+        else return getEmail();
     }
 
 //    @Column(length = 32)

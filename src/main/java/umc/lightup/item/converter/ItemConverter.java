@@ -117,6 +117,37 @@ public class ItemConverter {
                 .build();
     }
 
+    public static ItemResponseDTO.ItemApplyStatusListDTO toItemApplyStatusListDTO
+            (List<ItemResponseDTO.ItemApplyStatusDTO> itemApplyStatusDTO) {
+        return ItemResponseDTO.ItemApplyStatusListDTO.builder()
+                .itemApplyStatuses(itemApplyStatusDTO)
+                .build();
+    }
+
+    public static ItemResponseDTO.ItemApplyStatusDTO toItemApplyStatusDTO (ItemApply itemApply, Member member) {
+        Member itemOwner = itemApply.getItem().getMember();
+        Member targetMember = itemApply.getMember();
+        return ItemResponseDTO.ItemApplyStatusDTO.builder()
+                .itemOwned(member.equals(itemOwner))
+                .itemId(itemApply.getItem().getId())
+                .itemName(itemApply.getItem().getName())
+                .itemImageUrl(itemApply.getItem().getItemProfileImageUrl())
+                .itemOwnerUsername(itemOwner == null ? null : itemOwner.getUsername())
+                .memberId(targetMember == null ? null : targetMember.getId())
+                .memberUsername(targetMember == null ? null : targetMember.getNameNotNull())
+                .memberProfileImageUrl(targetMember == null ? null : targetMember.getProfileImageUrl())
+                .applyId(itemApply.getId())
+                .fromOwner(itemApply.isFromOwner())
+                .applyStatus(itemApply.getStatus())
+                .build();
+    }
+
+    public static ItemResponseDTO.ItemOfferResultDTO toItemOfferResultDTO (ItemApply itemApply) {
+        return ItemResponseDTO.ItemOfferResultDTO.builder()
+                .appliedAt(itemApply.getAppliedAt())
+                .build();
+    }
+
     public static ItemResponseDTO.ItemCommentResultDTO toItemCommentResultDTO (ItemComment itemComment) {
         return ItemResponseDTO.ItemCommentResultDTO.builder()
                 .itemCommentId(itemComment.getId())
