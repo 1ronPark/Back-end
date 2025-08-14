@@ -1,6 +1,9 @@
 package umc.lightup.aws.s3;
 
+import com.amazonaws.AmazonServiceException;
+import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +38,25 @@ public class AmazonS3Manager {
         }
 
         return amazonS3.getUrl(amazonConfig.getBucket(), keyName).toString();
+    }
+
+    public void deleteFile(String imageUrl) {
+        String keyName = extractKeyNameFromUrl(imageUrl);
+
+        try {
+            amazonS3.deleteObject(new DeleteObjectRequest(amazonConfig.getBucket(), keyName));
+            log.info("Deleted file from S3: {}", keyName);
+        } catch (AmazonServiceException e) {
+            log.error("AWS error while deleting file: {}", e.getErrorMessage());
+            throw e;
+        } catch (SdkClientException e) {
+            log.error("Client error while deleting file: {}", e.getMessage());
+            throw e;
+        }
+    }
+
+    private String extractKeyNameFromUrl(String url) {
+        return url.substring(url.indexOf(".com/") + 5);
     }
 
     public String generateItemProfileImageKeyName(Uuid uuid) {
