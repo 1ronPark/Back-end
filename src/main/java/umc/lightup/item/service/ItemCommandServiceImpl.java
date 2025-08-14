@@ -238,6 +238,7 @@ public class ItemCommandServiceImpl implements ItemCommandService {
 
         //내가 지원한 프로젝트 가져오기
         List<Item> appliedItemList = itemApplyRepository.findByMemberId(member.getId()).stream()
+                .filter(itemApply -> !itemApply.isFromOwner())
                 .map(ItemApply::getItem)
                 .toList();
 
@@ -382,14 +383,12 @@ public class ItemCommandServiceImpl implements ItemCommandService {
 
     @Override
     public boolean getItemApplyStatus(Member member, Item item) {
-        if (!itemApplyRepository.existsByMemberAndItem(member, item)) {
-            return false;
-        }
+        return checkItemApply(member, item, false);
+    }
 
-        ItemApplyStatus itemApplyStatus = itemApplyRepository.findByMemberAndItem(member, item)
-                .orElseThrow(()->new GeneralHandler(ErrorStatus.ITEM_APPLY_NOT_FOUND))
-                .getStatus();
-        return itemApplyStatus.equals(ItemApplyStatus.PENDING);
+    @Override
+    public boolean getItemSuggestStatus(Member member, Item item) {
+        return checkItemApply(member, item, true);
     }
 
     @Override
@@ -564,6 +563,12 @@ public class ItemCommandServiceImpl implements ItemCommandService {
     }
 
 
+    private boolean checkItemApply(Member member, Item item, boolean isFromOwnerExpected) {
+        return itemApplyRepository.findByMemberAndItem(member, item)
+                .filter(itemApply -> itemApply.isFromOwner() == isFromOwnerExpected && itemApply.getStatus().equals(ItemApplyStatus.PENDING))
+                .isPresent();
+    }
+
     private void uploadItemPlanFileToS3(MultipartFile itemPlanFile, Item item) {
         String uuid = UUID.randomUUID().toString();
         Uuid savedUuid = uuidRepository.save(Uuid.builder()
@@ -581,4 +586,5 @@ public class ItemCommandServiceImpl implements ItemCommandService {
         String itemProfileImageUrl = s3Manager.uploadFile(s3Manager.generateItemProfileImageKeyName(savedUuid), itemProfileImage);
         item.uploadItemProfile(itemProfileImageUrl);
     }
+  
 }

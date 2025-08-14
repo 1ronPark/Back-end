@@ -65,7 +65,12 @@ public class ItemConverter {
                 .build();
     }
 
-    public static ItemResponseDTO.ItemInfoDTO toItemInfoDTO(Item item, List<ItemResponseDTO.ItemRegionResultDTO> itemRegionResultDTOList, List<ItemResponseDTO.ItemCategoriesResultDTO> itemCategoriesResultDTOList, List<ItemResponseDTO.RecruitPositionResultDTO> recruitPositionResultDTOList, List<ItemResponseDTO.ItemCommentResultDTO> itemCommentResultDTOList, int commentCount, boolean itemLike, boolean itemApplyStatus) {
+    public static ItemResponseDTO.ItemInfoDTO toItemInfoDTO(Item item,
+                                                            List<ItemResponseDTO.ItemRegionResultDTO> itemRegionResultDTOList,
+                                                            List<ItemResponseDTO.ItemCategoriesResultDTO> itemCategoriesResultDTOList,
+                                                            List<ItemResponseDTO.RecruitPositionResultDTO> recruitPositionResultDTOList,
+                                                            List<ItemResponseDTO.ItemCommentResultDTO> itemCommentResultDTOList,
+                                                            int commentCount, boolean itemLike, boolean itemApplyStatus, boolean itemSuggestStatus) {
         return ItemResponseDTO.ItemInfoDTO.builder()
                 .introduce(item.getIntroduce())
                 .itemName(item.getName())
@@ -85,6 +90,7 @@ public class ItemConverter {
                 .updatedAt(item.getUpdatedAt().toLocalDate())
                 .likedByCurrentUser(itemLike)
                 .applicantStatus(itemApplyStatus)
+                .suggestStatus(itemSuggestStatus)
                 .build();
     }
 
