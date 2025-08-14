@@ -76,7 +76,7 @@ public class PostRestController {
         return ApiResponse.onSuccess(PostConverter.toPostJoinResultDTO(post));
     }
 
-    @PutMapping(value = "/{postId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PatchMapping(value = "/{postId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @Operation(summary = "라잇톡 포스트 수정 API" , description = "라잇톡 포스트 수정 API 입니다. 이미지는 최대 3개까지만 업로드 가능합니다.")
     public ApiResponse<PostResponseDTO.PostChangeResultDTO> changePost(
             Authentication authentication,
