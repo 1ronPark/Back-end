@@ -22,6 +22,7 @@ public interface ItemCommandService {
     Item getSingleItemWithComments(Long itemId);
     ItemApply applyItem(Member member, long itemId);
     boolean getItemApplyStatus(Member member, Item item);
+    boolean getItemSuggestStatus(Member member, Item item);
     boolean getItemLike(long memberId, long itemId);
     void addItemLike(Member member, long itemId);
     void removeItemLike(String email, long itemId);

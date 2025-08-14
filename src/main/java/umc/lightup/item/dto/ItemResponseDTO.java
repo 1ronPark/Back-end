@@ -95,7 +95,7 @@ public class ItemResponseDTO {
         private LocalDate updatedAt;
         private boolean likedByCurrentUser;
         private boolean applicantStatus;
-//        private boolean suggestStatus;
+        private boolean suggestStatus;
     }
 
     @Getter

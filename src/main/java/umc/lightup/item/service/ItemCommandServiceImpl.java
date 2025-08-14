@@ -292,10 +292,30 @@ public class ItemCommandServiceImpl implements ItemCommandService {
             return false;
         }
 
-        ItemApplyStatus itemApplyStatus = itemApplyRepository.findByMemberAndItem(member, item)
-                .orElseThrow(()->new GeneralHandler(ErrorStatus.ITEM_APPLY_NOT_FOUND))
-                .getStatus();
-        return itemApplyStatus.equals(ItemApplyStatus.PENDING);
+        ItemApply itemApply = itemApplyRepository.findByMemberAndItem(member, item)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.ITEM_APPLY_NOT_FOUND));
+
+        if (itemApply.isFromOwner()) {
+            return false;
+        }
+
+        return itemApply.getStatus().equals(ItemApplyStatus.PENDING);
+    }
+
+    @Override
+    public boolean getItemSuggestStatus(Member member, Item item) {
+        if (!itemApplyRepository.existsByMemberAndItem(member, item)) {
+            return false;
+        }
+
+        ItemApply itemApply = itemApplyRepository.findByMemberAndItem(member, item)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.ITEM_APPLY_NOT_FOUND));
+
+        if (!itemApply.isFromOwner()) {
+            return false;
+        }
+
+        return itemApply.getStatus().equals(ItemApplyStatus.PENDING);
     }
 
     @Override
