@@ -13,19 +13,24 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.stereotype.Repository;
 import umc.lightup.api.code.status.ErrorStatus;
 import umc.lightup.config.QueryDSLTemplate;
 import umc.lightup.exception.handler.GeneralHandler;
 import umc.lightup.member.domain.*;
+import umc.lightup.member.dto.ActivityInfoDTO;
 import umc.lightup.member.dto.MemberRequestDTO;
 import umc.lightup.member.dto.MemberResponseDTO;
+import umc.lightup.member.dto.PortfolioInfoDTO;
 import umc.lightup.member.enums.Mbti;
+import umc.lightup.member.enums.Role;
 import umc.lightup.position.domain.QPosition;
 import umc.lightup.region.domain.QRegion;
 import umc.lightup.skill.domain.QSkill;
 import umc.lightup.strength.domain.QStrength;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,6 +49,8 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom{
     private final QStrength strength = QStrength.strength;
     private final QMemberStrength memberStrength = QMemberStrength.memberStrength;
     private final QMemberViewHistory memberViewHistory = QMemberViewHistory.memberViewHistory;
+    private final QPortfolio portfolio = QPortfolio.portfolio;
+    private final QActivity activity = QActivity.activity;
 
     private final QueryDSLTemplate queryDSLTemplate;
     private final ObjectMapper objectMapper;
@@ -317,6 +324,198 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom{
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
                 throw new GeneralHandler(ErrorStatus._INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
+
+    @Override
+    public MemberResponseDTO.MemberInfoDTO getSingleMemberInfo
+            (Member requestedMember, long id) {
+        // JSON_OBJECTAGG 구현 버전
+
+        BooleanExpression likedCondition;
+        if (requestedMember == null) likedCondition = Expressions.FALSE;
+        else likedCondition = getLikedCondition(requestedMember);
+
+        return Optional.ofNullable(jpaQueryFactory
+                        .select(Projections.constructor(SingleMemberLikeDTO.class,
+                                member.id,
+                                member.profileTitle,
+                                member.name,
+                                member.nickname,
+                                member.age,
+                                member.gender,
+                                member.birth,
+                                member.role,
+                                member.mbti,
+                                member.selfIntroduce,
+                                member.school, //이거 school API 나오면 한 번 수정해야 할텐데
+
+                                // Positions 집계
+                                JPAExpressions
+                                        .select(queryDSLTemplate.jsonArrayAgg(position.name))
+                                        .from(memberPosition)
+                                        .join(memberPosition.position, position)
+                                        .where(memberPosition.member.id.eq(member.id)),
+
+                                // Regions 집계
+                                JPAExpressions
+                                        .select(queryDSLTemplate.jsonArrayAgg(
+                                                queryDSLTemplate.jsonObject(
+                                                        Expressions.constant("siDo"), memberRegion.siDo,
+                                                        Expressions.constant("siGunGu"), memberRegion.siGunGu
+                                                )
+                                        ))
+                                        .from(memberRegion)
+                                        .where(memberRegion.member.id.eq(member.id)),
+
+                                // Skills 집계
+                                JPAExpressions
+                                        .select(queryDSLTemplate.jsonArrayAgg(skill.name))
+                                        .from(memberSkill)
+                                        .join(memberSkill.skill, skill)
+                                        .where(memberSkill.member.id.eq(member.id)),
+
+                                // Strengths 집계
+                                JPAExpressions
+                                        .select(queryDSLTemplate.jsonArrayAgg(strength.name))
+                                        .from(memberStrength)
+                                        .join(memberStrength.strength, strength)
+                                        .where(memberStrength.member.id.eq(member.id)),
+
+                                // Portfolios 집계
+                                JPAExpressions
+                                        .select(queryDSLTemplate.jsonArrayAgg(
+                                                queryDSLTemplate.jsonObject(
+                                                        Expressions.constant("name"), portfolio.name,
+                                                        Expressions.constant("fileUrl"), portfolio.fileUrl
+                                                )
+                                        ))
+                                        .from(portfolio)
+                                        .where(portfolio.member.id.eq(member.id)),
+
+                                // Activities 집계
+                                JPAExpressions
+                                        .select(queryDSLTemplate.jsonArrayAgg(
+                                                queryDSLTemplate.jsonObject(
+                                                        Expressions.constant("name"), activity.name,
+                                                        Expressions.constant("startDate"), activity.startDate,
+                                                        Expressions.constant("endDate"), activity.endDate
+                                                )
+                                        ))
+                                        .from(activity)
+                                        .where(activity.member.id.eq(member.id)),
+
+                                member.email,
+                                member.phoneNumber,
+                                member.profileImageUrl,
+                                likedCondition.as("liked")))
+                        .from(member)
+                        .where(member.id.eq(id))
+                        .fetchOne())
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND))
+                .toMemberInfoDTO(objectMapper); //왜 Nullable 경고가 나오지?
+    }
+
+    @Getter
+    @AllArgsConstructor
+    //private 사용 불가
+    public static class SingleMemberLikeDTO {
+        private long id;
+        private String profileTitle;
+        private String name;
+        private String nickname;
+        private Integer age;
+        private Boolean gender;
+        private LocalDate birth;
+        private Role role;
+        private Byte mbti;
+        private String selfIntroduce;
+        private String school;
+        private String positionsJson;
+        private String regionsJson;
+        private String skillsJson;
+        private String strengthsJson;
+        private String portfoliosJson;
+        private String activitiesJson;
+        private String email;
+        private String phoneNumber;
+        private String profileImageUrl;
+        private boolean liked;
+
+        public MemberResponseDTO.MemberInfoDTO toMemberInfoDTO(ObjectMapper objectMapper) {
+            try {
+                //null이 가능하다 했으니 null check 진행
+                List<String> positions;
+                if (positionsJson == null || positionsJson.isBlank()) positions = List.of();
+                else positions = objectMapper.readValue(positionsJson, new TypeReference<>(){});
+
+                List<MemberResponseDTO.singleRegionResultDTO> regions;
+                if (regionsJson == null || regionsJson.isBlank()) regions = List.of();
+                else regions = objectMapper.readValue(regionsJson, new TypeReference<>(){});
+
+                List<String> skills;
+                if (skillsJson == null || skillsJson.isBlank()) skills = List.of();
+                else skills = objectMapper.readValue(skillsJson, new TypeReference<>(){});
+
+                List<String> strengths;
+                if (strengthsJson == null || strengthsJson.isBlank()) strengths = List.of();
+                else strengths = objectMapper.readValue(strengthsJson, new TypeReference<>(){});
+
+                List<PortfolioInfoDTO> portfolios;
+                if (portfoliosJson == null || portfoliosJson.isBlank()) portfolios = List.of();
+                else portfolios = objectMapper.readValue(portfoliosJson, new TypeReference<>(){});
+
+                List<ActivityInfoDTO> activities;
+                if (activitiesJson == null || activitiesJson.isBlank()) activities = List.of();
+                else activities = objectMapper.readValue(activitiesJson,
+                                new TypeReference<List<ActivityInfoDBIODTO>>(){})
+                        .stream()
+                        .map(ActivityInfoDBIODTO::toActivityInfoDTO)
+                        .toList();
+
+                return MemberResponseDTO.MemberInfoDTO.builder()
+                        .id(id)
+                        .profileTitle(profileTitle)
+                        .name(name)
+                        .nickname(nickname)
+                        .age(age)
+                        .gender(gender)
+                        .birth(birth)
+                        .role(role)
+                        .mbti(Mbti.fromByte(mbti))
+                        .positions(positions) // <> 내부 생략 가능
+                        .regions(regions)
+                        .skills(skills)
+                        .strengths(strengths)
+                        .portfolios(portfolios)
+                        .activities(activities)
+                        .email(email)
+                        .phoneNumber(phoneNumber)
+                        .profileImageUrl(profileImageUrl)
+                        .liked(liked)
+                        .build();
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+                throw new GeneralHandler(ErrorStatus._INTERNAL_SERVER_ERROR);
+            }
+        }
+
+        @Setter
+        @Getter
+        @AllArgsConstructor
+        public static class ActivityInfoDBIODTO {
+            private String name;
+            private LocalDate startDate;
+            private LocalDate endDate;
+
+            private ActivityInfoDTO toActivityInfoDTO() {
+                return ActivityInfoDTO.builder()
+                        .name(name)
+                        .startDate(startDate)
+                        .hasEndDate(endDate != null)
+                        .endDate(endDate)
+                        .build();
             }
         }
     }

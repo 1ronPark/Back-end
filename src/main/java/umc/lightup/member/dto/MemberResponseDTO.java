@@ -99,6 +99,7 @@ public class MemberResponseDTO {
         private String email;
         private String phoneNumber;
         private String profileImageUrl;
+        private boolean liked;
     }
 
     @Getter

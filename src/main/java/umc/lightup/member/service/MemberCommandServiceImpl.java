@@ -50,11 +50,15 @@ public class MemberCommandServiceImpl implements MemberCommandService {
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
     }
 
+    private Member getMember(long toMemberId) {
+        return memberRepository.findById(toMemberId)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
+    }
+
     @Override
     @Transactional
     public void selectPosition(Long memberId, String positionName) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member member = getMember(memberId);
         Position position = positionRepository.findByName(positionName)
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.POSITION_NOT_FOUND));
 
@@ -68,8 +72,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     @Override
     @Transactional
     public void deletePosition(Long memberId, String positionName) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member member = getMember(memberId);
         Position position = positionRepository.findByName(positionName)
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.POSITION_NOT_FOUND));
 
@@ -81,41 +84,48 @@ public class MemberCommandServiceImpl implements MemberCommandService {
 
     @Override
     @Transactional
-    public MemberResponseDTO.MemberInfoDTO getMember(long id, String viewerEmail){
-        // 한 번에 반환하기 위해 DTO 반환을 사용했는데 좋은 설계 방식인지는 한번 고민할 필요가 있음
-        Member member = memberRepository.findById(id)
-                .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
-        List<String> skills = memberSkillRepository.findSkillNameByMember(member);
-        List<String> strengths = memberStrengthRepository.findStrengthNameByMember(member);
-        List<String> positions = memberPositionRepository.findPositionNameByMember(member);
-        List<MemberRegion> regions = memberRegionRepository.findByMember(member);
-        List<Portfolio> portfolios = portfolioRepository.findByMember(member);
-        List<Activity> activities = activityRepository.findByMember(member);
+    public MemberResponseDTO.MemberInfoDTO getMember(long id, Member requestedMember) {
+//        // 한 번에 반환하기 위해 DTO 반환을 사용했는데 좋은 설계 방식인지는 한번 고민할 필요가 있음
+//        Member member = getMember(id);
+//        List<String> skills = memberSkillRepository.findSkillNameByMember(member);
+//        List<String> strengths = memberStrengthRepository.findStrengthNameByMember(member);
+//        List<String> positions = memberPositionRepository.findPositionNameByMember(member);
+//        List<MemberRegion> regions = memberRegionRepository.findByMember(member);
+//        List<Portfolio> portfolios = portfolioRepository.findByMember(member);
+//        List<Activity> activities = activityRepository.findByMember(member);
+
+        MemberResponseDTO.MemberInfoDTO memberInfo =
+                memberRepository.getSingleMemberInfo(requestedMember, id);
 
         //조회기록 설정
-        if (viewerEmail != null && !viewerEmail.equals(member.getEmail())) {
-            int updatedResult = memberViewHistoryRepository.updateTimestamp(viewerEmail, member);
-            if (updatedResult == 0) { // update 내역이 없을 때
-                MemberViewHistory history = MemberViewHistory.builder()
-                        .fromMember(getMember(viewerEmail))
-                        .toMember(member)
-                        .build();
-                memberViewHistoryRepository.save(history);
+        if (requestedMember != null) {
+            long toMemberId = memberInfo.getId();
+            if (!requestedMember.getId().equals(toMemberId)) {
+                int updatedResult = memberViewHistoryRepository.updateTimestamp(requestedMember, toMemberId);
+                if (updatedResult == 0) { // update 내역이 없을 때
+                    MemberViewHistory history = MemberViewHistory.builder()
+                            .fromMember(requestedMember)
+                            .toMember(getMember(toMemberId)) //아 그냥 FK만 가지고 만들면 안되나?
+                            .build();
+                    memberViewHistoryRepository.save(history);
+                }
             }
         }
 
-        return MemberViewInfo.builder()
-                .member(member)
-                .skillNames(skills)
-                .strengthNames(strengths)
-                .regions(regions)
-                .positionNames(positions)
-                .portfolios(portfolios)
-                .activities(activities)
-                .emailOpen(true)
-                .phoneOpen(true)
-                .pictureOpen(true)
-                .build().toMemberInfoDTO();
+        return memberInfo;
+
+//        return MemberViewInfo.builder()
+//                .member(member)
+//                .skillNames(skills)
+//                .strengthNames(strengths)
+//                .regions(regions)
+//                .positionNames(positions)
+//                .portfolios(portfolios)
+//                .activities(activities)
+//                .emailOpen(true)
+//                .phoneOpen(true)
+//                .pictureOpen(true)
+//                .build().toMemberInfoDTO();
     }
 
     @Override
@@ -313,8 +323,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     public void addMemberLike(Member fromMember, long toMemberId) {
         if (fromMember.getId() == toMemberId)
             throw new GeneralHandler(ErrorStatus.SELF_LIKE);
-        Member toMember = memberRepository.findById(toMemberId) //아 괜히 검색쿼리 더 날리고 싶지 않은데
-                .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member toMember = getMember(toMemberId); //아 괜히 검색쿼리 더 날리고 싶지 않은데
         if (memberLikeRepository.existsByFromMemberIdAndToMemberId(fromMember.getId(), toMemberId))
             throw new GeneralHandler(ErrorStatus.ALREADY_LIKED);
         memberLikeRepository.save(MemberLike.builder()

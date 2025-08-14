@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface MemberCommandService {
     Member getMember(String email);
-    MemberResponseDTO.MemberInfoDTO getMember(long id, String viewerEmail);
+    MemberResponseDTO.MemberInfoDTO getMember(long id, Member requestedMember);
     List<MemberResponseDTO.HistoryInfoDTO> getHistory(Member member, long size);
     Member putMember(String email, MemberRequestDTO.ChangeDto request);
     MemberResponseDTO.MyProfileDTO getMemberProfile(Member member);
