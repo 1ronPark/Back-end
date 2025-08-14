@@ -64,6 +64,7 @@ public enum ErrorStatus implements BaseErrorCode {
 
     //Item 관련 에러
     ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEM4000", "프로젝트가 존재하지 않습니다."),
+    ITEM_UPDATE_FORBIDDEN(HttpStatus.FORBIDDEN, "ITEM4001", "프로젝트를 수정할 권한이 없습니다."),
 
     //ItemLike 관련 에러
     MY_ITEM_LIKE(HttpStatus.BAD_REQUEST, "ITEMLIKE4000", "자신의 프로젝트에는 좋아요를 누를 수 없습니다."),

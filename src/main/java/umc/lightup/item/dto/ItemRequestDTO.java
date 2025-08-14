@@ -40,6 +40,25 @@ public class ItemRequestDTO {
 
     @Getter
     @Setter
+    public static class ItemChangeRequestDTO {
+        private String name;
+        private String introduce;
+        private String extraLink1;
+        private String extraLink2;
+        private String description;
+        @Size(max = 3, message = "프로젝트 카테고리는 최대 3개까지 선택할 수 있습니다.")
+        @Valid
+        private List<ItemCategoryRequestDTO> itemCategories;
+        private Boolean projectStatus;
+        @Size(max = 3, message = "협업 지역은 최대 3개까지 선택할 수 있습니다.")
+        @Valid
+        private List<CollaborationRegionRequestDTO> collaborationRegions;
+        @Valid
+        private List<RecruitPositionRequestDTO> recruitPositions;
+    }
+
+    @Getter
+    @Setter
     public static class ItemCategoryRequestDTO {
         @NotBlank
         private String itemCategory;
