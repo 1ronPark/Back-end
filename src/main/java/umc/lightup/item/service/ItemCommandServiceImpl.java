@@ -471,8 +471,7 @@ public class ItemCommandServiceImpl implements ItemCommandService {
 
     private boolean checkItemApply(Member member, Item item, boolean isFromOwnerExpected) {
         return itemApplyRepository.findByMemberAndItem(member, item)
-                .filter(itemApply -> itemApply.isFromOwner() == isFromOwnerExpected)
-                .filter(itemApply -> itemApply.getStatus().equals(ItemApplyStatus.PENDING))
+                .filter(itemApply -> itemApply.isFromOwner() == isFromOwnerExpected && itemApply.getStatus().equals(ItemApplyStatus.PENDING))
                 .isPresent();
     }
 
