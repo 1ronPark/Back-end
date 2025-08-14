@@ -189,6 +189,21 @@ public class ItemCommandServiceImpl implements ItemCommandService {
     }
 
     @Override
+    @Transactional
+    public void removeItem(Member member, Long itemId) {
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.ITEM_NOT_FOUND));
+
+        if (!item.getMember().equals(member)) {
+            throw new GeneralHandler(ErrorStatus.NOT_MY_ITEM);
+        }
+
+        if (itemRepository.deleteByMemberAndId(member, itemId) == 0) {
+            throw new GeneralHandler(ErrorStatus.ITEM_NOT_FOUND);
+        }
+    }
+
+    @Override
     public Set<Long> findItemLikes(long memberId) {
         return itemLikeRepository.findItemIdsLikedByMemberId(memberId);
     }

@@ -96,6 +96,14 @@ public class ItemRestController {
         return ApiResponse.onSuccess(ItemConverter.toItemChangeResultDTO(member, item));
     }
 
+    @DeleteMapping("/{itemId}")
+    @Operation(summary = "본인 프로젝트 삭제 API", description = "본인의 프로젝트를 삭제할 수 있는 API 입니다.")
+    public ApiResponse<Void> removeItem(Authentication authentication, @PathVariable("itemId") Long itemId) {
+        Member member = memberCommandService.getMember(authentication.getName());
+        itemCommandService.removeItem(member, itemId);
+        return ApiResponse.of(SuccessStatus._NO_CONTENT, null);
+    }
+
     @GetMapping("/{itemId}")
     @Operation(summary = "특정 프로젝트 상세 조회 API", description = "특정 프로젝트를 상세 조회하는 API 입니다.")
     public ApiResponse<ItemResponseDTO.ItemInfoDTO> getItemInfo(Authentication authentication, @PathVariable("itemId") @Min(1) Long itemId) {
