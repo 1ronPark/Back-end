@@ -22,41 +22,49 @@ public class Item extends BaseEntity {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
+    @Setter
     @Column(length = 40, nullable = false)
     private String name;
 
+    @Setter
     @Column(length = 50, nullable = false)
     private String introduce;
 
+    @Setter
     @Lob
     @Column(nullable = false)
     private String description;
 
     @Builder.Default
-    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemCategory> itemCategories = new ArrayList<>();
 
+    @Setter
     @Column(name = "project_status", nullable = false)
     private boolean projectStatus;
 
+    @Setter
     @Column(nullable = false)
     private String itemProfileImageUrl;
 
+    @Setter
     @Column(nullable = false)
     private String itemPlanFileUrl;
 
+    @Setter
     @Column(name = "extra_link1")
     private String extraLink1;
 
+    @Setter
     @Column(name = "extra_link2")
     private String extraLink2;
 
     @Builder.Default
-    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemRegion> itemRegions = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RecruitPosition> recruitPositions = new ArrayList<>();
 
     @Builder.Default
@@ -99,5 +107,17 @@ public class Item extends BaseEntity {
     public void addRecruitPosition(RecruitPosition recruitPosition) {
         this.recruitPositions.add(recruitPosition);
         recruitPosition.assignItem(this);
+    }
+
+    public void clearItemCategories() {
+        this.itemCategories.clear();
+    }
+
+    public void clearItemRegions() {
+        this.itemRegions.clear();
+    }
+
+    public void clearRecruitPositions() {
+        this.recruitPositions.clear();
     }
 }

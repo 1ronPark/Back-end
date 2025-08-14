@@ -83,6 +83,28 @@ public class ItemRestController {
         return ApiResponse.onSuccess(ItemConverter.toItemJoinResultDTO(member, item));
     }
 
+    @PatchMapping(value = "/{itemId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @Operation(summary = "본인 프로젝트 수정 API", description = "Item을 수정할 수 있는 API입니다. 값이 새로 들어온 데이터들만 변경하기 때문에 사용자가 건드리지 않은 값이라면 json 필드 자체를 없애주셔야 합니다. 필드를 없애지 않고 그냥 기본값으로 보내거나 빈 필드를 보낼 경우 그냥 데이터가 삭제됩니다!! Item 프로필 이미지와 Item 기획서는 업로드할 시에 업데이트 되며 업로드하지 않으면 기존 데이터가 유지됩니다.")
+    public ApiResponse<ItemResponseDTO.ItemChangeResultDTO> changeItem(
+            Authentication authentication,
+            @PathVariable("itemId") Long itemId,
+            @Parameter(content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
+            @RequestPart("request") @Valid ItemRequestDTO.ItemChangeRequestDTO request,
+            @RequestPart(value = "itemProfileImage", required = false) MultipartFile itemProfileImage,
+            @RequestPart(value = "itemPlanFile", required = false) MultipartFile itemPlanFile) {
+        Member member = memberCommandService.getMember(authentication.getName());
+        Item item = itemCommandService.changeItem(member, itemId, request, itemProfileImage, itemPlanFile);
+        return ApiResponse.onSuccess(ItemConverter.toItemChangeResultDTO(member, item));
+    }
+
+    @DeleteMapping("/{itemId}")
+    @Operation(summary = "본인 프로젝트 삭제 API", description = "본인의 프로젝트를 삭제할 수 있는 API 입니다.")
+    public ApiResponse<Void> removeItem(Authentication authentication, @PathVariable("itemId") Long itemId) {
+        Member member = memberCommandService.getMember(authentication.getName());
+        itemCommandService.removeItem(member, itemId);
+        return ApiResponse.of(SuccessStatus._NO_CONTENT, null);
+    }
+
     @GetMapping("/{itemId}")
     @Operation(summary = "특정 프로젝트 상세 조회 API", description = "특정 프로젝트를 상세 조회하는 API 입니다.")
     public ApiResponse<ItemResponseDTO.ItemInfoDTO> getItemInfo(Authentication authentication, @PathVariable("itemId") @Min(1) Long itemId) {

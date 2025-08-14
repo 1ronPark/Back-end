@@ -26,6 +26,15 @@ public class ItemResponseDTO {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class ItemChangeResultDTO {
+        private Long memberId;
+        private String itemName;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class ItemResultDTO {
         private Long itemId;
         private String itemName;
