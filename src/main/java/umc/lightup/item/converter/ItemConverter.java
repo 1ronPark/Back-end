@@ -17,6 +17,13 @@ public class ItemConverter {
                 .build();
     }
 
+    public static ItemResponseDTO.ItemChangeResultDTO toItemChangeResultDTO(Member member, Item item) {
+        return ItemResponseDTO.ItemChangeResultDTO.builder()
+                .memberId(member.getId())
+                .itemName(item.getName())
+                .build();
+    }
+
     public static ItemResponseDTO.ItemResultDTO toItemResultDTO(Item item, String itemImageUrl, int commentCount, boolean itemLike) {
         return ItemResponseDTO.ItemResultDTO.builder()
                 .itemId(item.getId())

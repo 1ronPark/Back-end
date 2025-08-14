@@ -61,21 +61,11 @@ public class ItemCommandServiceImpl implements ItemCommandService {
         Item item = ItemConverter.toItem(request, member);
 
         if (itemProfileImage != null) {
-            String uuid = UUID.randomUUID().toString();
-            Uuid savedUuid = uuidRepository.save(Uuid.builder()
-                    .uuid(uuid).build());
-
-            String itemProfileImageUrl = s3Manager.uploadFile(s3Manager.generateItemProfileImageKeyName(savedUuid), itemProfileImage);
-            item.uploadItemProfile(itemProfileImageUrl);
+            uploadItemProfileImageToS3(itemProfileImage, item);
         }
 
         if (itemPlanFile != null) {
-            String uuid = UUID.randomUUID().toString();
-            Uuid savedUuid = uuidRepository.save(Uuid.builder()
-                    .uuid(uuid).build());
-
-            String itemPlanFileUrl = s3Manager.uploadFile(s3Manager.generateItemFileKeyName(savedUuid), itemPlanFile);
-            item.uploadItemPlanFile(itemPlanFileUrl);
+            uploadItemPlanFileToS3(itemPlanFile, item);
         }
 
         for (ItemRequestDTO.ItemCategoryRequestDTO dto : request.getItemCategories()) {
@@ -116,6 +106,110 @@ public class ItemCommandServiceImpl implements ItemCommandService {
         }
 
         return itemRepository.save(item);
+    }
+
+    @Override
+    @Transactional
+    public Item changeItem(Member member, Long itemId,
+                           ItemRequestDTO.ItemChangeRequestDTO request,
+                           MultipartFile itemProfileImage, MultipartFile itemPlanFile) {
+
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.ITEM_NOT_FOUND));
+
+        if (!item.getMember().equals(member)) {
+            throw new GeneralHandler(ErrorStatus.ITEM_UPDATE_FORBIDDEN);
+        }
+
+        if (request.getName() != null) {
+            item.setName(request.getName());
+        }
+        if (request.getIntroduce() != null) {
+            item.setIntroduce(request.getIntroduce());
+        }
+        if (request.getDescription() != null) {
+        item.setDescription(request.getDescription());
+        }
+        item.setProjectStatus(request.getProjectStatus());
+        if (request.getExtraLink1() != null) {
+            item.setExtraLink1(request.getExtraLink1());
+        }
+        if (request.getExtraLink2() != null) {
+            item.setExtraLink2(request.getExtraLink2());
+        }
+
+        if (itemProfileImage != null) {
+            item.setItemProfileImageUrl(itemProfileImage.toString());
+            uploadItemProfileImageToS3(itemProfileImage, item);
+        }
+
+        if (itemPlanFile != null) {
+            item.setItemPlanFileUrl(itemPlanFile.toString());
+            uploadItemPlanFileToS3(itemPlanFile, item);
+        }
+
+        if (request.getItemCategories() != null) {
+            item.clearItemCategories();
+            for (ItemRequestDTO.ItemCategoryRequestDTO dto : request.getItemCategories()) {
+                CategoryType categoryType = CategoryType.toCategoryType(dto.getItemCategory());
+                ItemCategory itemCategory = ItemCategory.builder()
+                        .item(item)
+                        .categoryType(categoryType)
+                        .build();
+
+                item.addItemCategory(itemCategory);
+            }
+        }
+
+        if (request.getCollaborationRegions() != null) {
+            item.clearItemRegions();
+            for (ItemRequestDTO.CollaborationRegionRequestDTO dto : request.getCollaborationRegions()) {
+                ItemRegion itemRegion = ItemRegion.builder()
+                        .item(item)
+                        .siDo(dto.getSiDo())
+                        .siGunGu(dto.getSiGunGu() == null ? "전체" : dto.getSiGunGu())
+                        .build();
+
+                item.addItemRegion(itemRegion);
+            }
+        }
+
+        if (request.getRecruitPositions() != null) {
+            item.clearRecruitPositions();
+            for (ItemRequestDTO.RecruitPositionRequestDTO dto : request.getRecruitPositions()) {
+                Long positionId = dto.getPositionId();
+                Position position = positionRepository.findById(positionId)
+                        .orElseThrow(() -> new GeneralHandler(ErrorStatus.POSITION_NOT_FOUND));
+
+                RecruitPosition recruitPosition = RecruitPosition.builder()
+                        .item(item)
+                        .position(position)
+                        .mainTasks(dto.getMainTasks())
+                        .preferentialTreatment(dto.getPreferentialTreatment())
+                        .preferMbti(dto.getPreferMbti())
+                        .recruitNumber(dto.getRecruitNumber())
+                        .build();
+
+                item.addRecruitPosition(recruitPosition);
+            }
+        }
+
+        return itemRepository.save(item);
+    }
+
+    @Override
+    @Transactional
+    public void removeItem(Member member, Long itemId) {
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.ITEM_NOT_FOUND));
+
+        if (!item.getMember().equals(member)) {
+            throw new GeneralHandler(ErrorStatus.NOT_MY_ITEM);
+        }
+
+        if (itemRepository.deleteByMemberAndId(member, itemId) == 0) {
+            throw new GeneralHandler(ErrorStatus.ITEM_NOT_FOUND);
+        }
     }
 
     @Override
@@ -475,4 +569,22 @@ public class ItemCommandServiceImpl implements ItemCommandService {
                 .isPresent();
     }
 
+    private void uploadItemPlanFileToS3(MultipartFile itemPlanFile, Item item) {
+        String uuid = UUID.randomUUID().toString();
+        Uuid savedUuid = uuidRepository.save(Uuid.builder()
+                .uuid(uuid).build());
+
+        String itemPlanFileUrl = s3Manager.uploadFile(s3Manager.generateItemFileKeyName(savedUuid), itemPlanFile);
+        item.uploadItemPlanFile(itemPlanFileUrl);
+    }
+
+    private void uploadItemProfileImageToS3(MultipartFile itemProfileImage, Item item) {
+        String uuid = UUID.randomUUID().toString();
+        Uuid savedUuid = uuidRepository.save(Uuid.builder()
+                .uuid(uuid).build());
+
+        String itemProfileImageUrl = s3Manager.uploadFile(s3Manager.generateItemProfileImageKeyName(savedUuid), itemProfileImage);
+        item.uploadItemProfile(itemProfileImageUrl);
+    }
+  
 }
