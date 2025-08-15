@@ -69,9 +69,9 @@ public class PostCommandServiceImpl implements PostCommandService {
 
         if (changePostImages != null && !changePostImages.isEmpty()) {
             List<PostImage> oldImages = postImageRepository.findByPost(findPost);
-            /*for (PostImage oldImage : oldImages) {
-                s3Manager.deleteFile(oldImage.getImageUrl()); // S3에서 삭제
-            }*/
+            for (PostImage oldImage : oldImages) {
+                s3Manager.deleteFile(oldImage.getImageUrl());
+            }
             postImageRepository.deleteAll(oldImages);
 
             uploadImagesToS3(changePostImages, findPost);
@@ -83,9 +83,19 @@ public class PostCommandServiceImpl implements PostCommandService {
     @Override
     @Transactional
     public void removePost(Member member, Long postId) {
-        if (postRepository.deleteByPostMemberAndId(member, postId) == 0) {
-            throw new GeneralHandler(ErrorStatus.POST_NOT_FOUND);
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.POST_NOT_FOUND));
+
+        if (!post.getPostMember().equals(member)) {
+            throw new GeneralHandler(ErrorStatus.NOT_MY_POST);
         }
+
+        List<PostImage> postImages = postImageRepository.findByPost(post);
+        for (PostImage image : postImages) {
+            s3Manager.deleteFile(image.getImageUrl());
+        }
+
+        postRepository.deleteById(postId);
     }
 
     @Override

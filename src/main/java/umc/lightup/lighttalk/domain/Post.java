@@ -38,12 +38,12 @@ public class Post extends BaseEntity {
     private School school;*/
 
     @Builder.Default
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     @BatchSize(size = 100)
     private List<Comment> postComments = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     @BatchSize(size = 50)
     private List<PostImage> postImages = new ArrayList<>();
 }
