@@ -90,8 +90,8 @@ public class ItemResponseDTO {
         private String itemProfileImageUrl;
         private String memberName;
         private String nickName;
-        private boolean gender;
-        private int age;
+        private Boolean gender;
+        private Integer age;
         private Mbti mbti;
         private String email;
         private String school;
