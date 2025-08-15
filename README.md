@@ -7,6 +7,17 @@
 | [배현우] | [최경수] | [정현승] |
 | [팀장] | [팀원] | [팀원] |
 
+##  🔧 기술 스택
+Spring Boot,
+MySQL,
+Spring Data JPA,
+Jwt,
+SSE,
+Java mail sender,
+Spring cloud openfeign,
+Thymeleaf
+
+
 ## 📁 디렉토리 구조
 ```bash
 ├─.github
