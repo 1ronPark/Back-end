@@ -3,6 +3,7 @@ package umc.lightup.item.repository;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import umc.lightup.item.domain.Item;
 import umc.lightup.item.domain.ItemApply;
@@ -23,5 +24,5 @@ public interface ItemApplyRepository extends JpaRepository<ItemApply, Long> {
     @Query("select ia " + //Username만 아니었어도 여기서 사영(select)을 진행했을 듯, 지금은 하기 귀찮음
             "from ItemApply ia join fetch ia.member m join fetch ia.item i join fetch i.member im " +
             "where m.email = :memberEmail or im.email = :memberEmail")
-    List<ItemApply> findAllByMemberEmail(String memberEmail);
+    List<ItemApply> findAllByMemberEmail(@Param("memberEmail") String memberEmail);
 }
