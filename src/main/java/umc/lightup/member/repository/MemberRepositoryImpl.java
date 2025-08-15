@@ -276,6 +276,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom{
                         getLikedCondition(requestedMember).as("liked")))
                 .from(memberViewHistory)                    // memberViewHistory에서 시작
                 .join(memberViewHistory.toMember, member)   // member와 조인
+                .where(memberViewHistory.fromMember.eq(requestedMember))
                 .orderBy(memberViewHistory.updatedAt.desc())
                 .offset(0)
                 .limit(size)
