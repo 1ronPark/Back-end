@@ -17,7 +17,7 @@ import java.util.Optional;
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-    @EntityGraph(attributePaths = {"postComments", "postComments.commentMember"})
+    @EntityGraph(attributePaths = {"postMember", "postComments", "postComments.commentMember"})
     Optional<Post> findPostWithCommentsById(@NonNull Long postId);
 
     @Query("select p from Post p left join fetch p.postMember pm ")
