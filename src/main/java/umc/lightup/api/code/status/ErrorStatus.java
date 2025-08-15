@@ -82,6 +82,12 @@ public enum ErrorStatus implements BaseErrorCode {
     //MemberRegion 관련 에러
     MEMBER_REGION_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER_REGION4000", "선택 지역이 존재하지 않습니다."),
 
+    //School 관련에러
+    SCHOOL_NOT_FOUND(HttpStatus.NOT_FOUND, "SCHOOL4000", "해당 학교를 찾을 수 없습니다."),
+    SCHOOL_EMAIL_NOT_FOUND(HttpStatus.NOT_FOUND, "SCHOOL4002", "해당 이메일과 관련된 인증코드가 존재하지 않습니다."),
+    SCHOOL_DOMAIN_NOT_FOUND(HttpStatus.BAD_REQUEST, "SCHOOL4003", "해당 학교의 이메일이 아닙니다. 올바른 이메일을 적어주세요"),
+    SCHOOL_EMAIL_EXPIRED(HttpStatus.BAD_REQUEST, "SCHOOL4004", "이메일 유효기간이 초과했습니다."),
+
     //Email 관련 에러
     EMAIL_SEND_FAIL(HttpStatus.SERVICE_UNAVAILABLE, "EMAIL5003", "이메일 전송에 실패했습니다.")
     ;
