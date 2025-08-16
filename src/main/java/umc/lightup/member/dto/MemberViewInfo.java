@@ -110,7 +110,6 @@ public class MemberViewInfo {
                 .email(member.getEmail())
                 .age(member.getAge())
                 .gender(member.getGender())
-                .school(member.getSchool())
                 .mbti(Mbti.fromByte(member.getMbti()))
                 .profileImageUrl(member.getProfileImageUrl())
                 .selfIntroduce(member.getSelfIntroduce())
