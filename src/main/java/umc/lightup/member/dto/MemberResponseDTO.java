@@ -1,7 +1,6 @@
 package umc.lightup.member.dto;
 
 import lombok.*;
-import umc.lightup.member.domain.Member;
 import umc.lightup.member.enums.CredentialType;
 import umc.lightup.member.enums.Mbti;
 import umc.lightup.member.enums.Role;
@@ -49,6 +48,7 @@ public class MemberResponseDTO {
         private String phoneNumber;
         private String selfIntroduce;
         private String profileImageUrl;
+        private String profileTitle;
     }
 
     @Getter
@@ -296,22 +296,5 @@ public class MemberResponseDTO {
 
     public static MemberPositionDeleteResultDTO.MemberPositionDeleteResultDTOBuilder memberPositionDeleteResultDTOBuilder() {
         return MemberPositionDeleteResultDTO.builder();
-    }
-  
-    public static MyInfoDTO toMyInfoDTO(Member member) {
-        return MyInfoDTO.builder()
-                .id(member.getId())
-                .name(member.getName())
-                .email(member.getEmail())
-                .nickname(member.getNickname())
-                .age(member.getAge())
-                .role(member.getRole())
-                .mbti(Mbti.fromByte(member.getMbti()))
-                .birth(member.getBirth())
-                .gender(member.getGender())
-                .phoneNumber(member.getPhoneNumber())
-                .selfIntroduce(member.getSelfIntroduce())
-                .profileImageUrl(member.getProfileImageUrl())
-                .build();
     }
 }

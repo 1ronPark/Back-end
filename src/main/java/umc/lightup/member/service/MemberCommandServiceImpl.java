@@ -20,6 +20,8 @@ import umc.lightup.strength.repository.StrengthRepository;
 import umc.lightup.position.domain.Position;
 import umc.lightup.position.repository.PositionRepository;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -147,7 +149,39 @@ public class MemberCommandServiceImpl implements MemberCommandService {
                 !member.getNickname().equals(request.getNickname()) &&
                 isNicknameExist(request.getNickname()))
             throw new GeneralHandler(ErrorStatus.DUPLICATE_NICKNAME);
-        return memberRepository.save(request.toMember(member.getId()));
+        member.setName(request.getName());
+        member.setNickname(request.getNickname());
+        member.setGender(request.getGender());
+        member.setBirth(request.getBirth());
+        member.setAge((int) request.getBirth().until(LocalDate.now(), ChronoUnit.YEARS));
+        member.setRole(request.getRole());
+        member.setMbti(request.getMbti().toByte());
+        member.setEmail(request.getEmail());
+        member.setPhoneNumber(request.getPhoneNumber());
+        member.setProfileTitle(request.getProfileTitle());
+        return member; //dirty checking 이용
+    }
+
+    @Override
+    @Transactional
+    public Member putMemberBasic(String email, MemberRequestDTO.BasicChangeDto request) {
+        Member member = getMember(email);
+        if (!request.getEmail().equals(member.getEmail()) &&
+                isEmailExist(request.getEmail()))
+            throw new GeneralHandler(ErrorStatus.DUPLICATE_EMAIL);
+        if (!request.getPhoneNumber().equals(member.getPhoneNumber()) &&
+                isPhoneNumberExist(request.getPhoneNumber()))
+            throw new GeneralHandler(ErrorStatus.DUPLICATE_PHONE_NUMBER);
+        if (member.getNickname() != null &&
+                !member.getNickname().equals(request.getNickname()) &&
+                isNicknameExist(request.getNickname()))
+            throw new GeneralHandler(ErrorStatus.DUPLICATE_NICKNAME);
+        member.setNickname(request.getNickname());
+        member.setMbti(request.getMbti().toByte());
+        member.setEmail(request.getEmail());
+        member.setPhoneNumber(request.getPhoneNumber());
+        member.setProfileTitle(request.getProfileTitle());
+        return member; //dirty checking 이용
     }
 
     @Override
@@ -170,7 +204,6 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     @Transactional
     public MemberResponseDTO.MyProfileDTO putMemberProfile(Member member, MemberRequestDTO.ProfileChangeDto request) {
         member.setSelfIntroduce(request.getSelfIntroduction());
-        member.setProfileTitle(request.getProfileTitle());
         activityRepository.removeAllByMember(member);
         memberRepository.save(member);
         List<Activity> activities = activityRepository.saveAll(request.getActivities().stream()
