@@ -84,7 +84,6 @@ public class MemberRequestDTO {
         @NotEmpty
         @Pattern(regexp = "0[1-8]\\d{0,1}-\\d{3,4}-\\d{4,5}")
         private String phoneNumber;
-        @NotEmpty
         @Size(max = 80)
         private String profileTitle;
     }
@@ -107,7 +106,6 @@ public class MemberRequestDTO {
         @NotEmpty
         @Pattern(regexp = "0[1-8]\\d{0,1}-\\d{3,4}-\\d{4,5}")
         private String phoneNumber;
-        @NotEmpty
         @Size(max = 80)
         private String profileTitle;
     }

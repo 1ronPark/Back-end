@@ -70,9 +70,7 @@ public class MemberMyProfileRestController {
     )
     public ApiResponse<MemberResponseDTO.MyProfileDTO> getMemberProfile(
             Authentication authentication) {
-        String email = authentication.getName();
-        Member member = memberCommandService.getMember(email);
-        return ApiResponse.onSuccess(memberCommandService.getMemberProfile(member));
+        return ApiResponse.onSuccess(memberCommandService.getMemberProfile(authentication.getName()));
     }
 
     @PutMapping("/me/profile")
@@ -84,10 +82,8 @@ public class MemberMyProfileRestController {
     public ApiResponse<MemberResponseDTO.MyProfileDTO> changeMemberProfile(
             Authentication authentication,
             @RequestBody @Valid MemberRequestDTO.ProfileChangeDto request) {
-        String email = authentication.getName();
-        Member member = memberCommandService.getMember(email);
         if (request.getActivities() == null) request.setActivities(List.of()); //nullable하니 오류 방지를 위함
-        return ApiResponse.onSuccess(memberCommandService.putMemberProfile(member, request));
+        return ApiResponse.onSuccess(memberCommandService.putMemberProfile(authentication.getName(), request));
     }
 
     @PostMapping(value = "/me/profile/image/edit", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})

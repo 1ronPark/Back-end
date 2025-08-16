@@ -11,11 +11,12 @@ import java.util.List;
 public interface MemberCommandService {
     Member getMember(String email);
     MemberResponseDTO.MemberInfoDTO getMember(long id, Member requestedMember);
+    Member getMemberWithSchool(String email);
     List<MemberResponseDTO.HistoryInfoDTO> getHistory(Member member, long size);
     Member putMember(String email, MemberRequestDTO.ChangeDto request);
     Member putMemberBasic(String email, MemberRequestDTO.BasicChangeDto request);
-    MemberResponseDTO.MyProfileDTO getMemberProfile(Member member);
-    MemberResponseDTO.MyProfileDTO putMemberProfile(Member member, MemberRequestDTO.ProfileChangeDto request);
+    MemberResponseDTO.MyProfileDTO getMemberProfile(String email);
+    MemberResponseDTO.MyProfileDTO putMemberProfile(String email, MemberRequestDTO.ProfileChangeDto request);
     String saveMemberProfileImage(Member member, MultipartFile profileImage);
     Portfolio savePortfolio(Member member, String name, MultipartFile portfolioFile);
     Portfolio savePortfolio(Member member, String name, String portfolioLink);

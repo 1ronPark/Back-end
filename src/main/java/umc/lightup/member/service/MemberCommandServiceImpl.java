@@ -52,6 +52,12 @@ public class MemberCommandServiceImpl implements MemberCommandService {
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
     }
 
+    @Override
+    public Member getMemberWithSchool(String email){
+        return memberRepository.findByEmailJoinFetchSchool(email)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
+    }
+
     private Member getMember(long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
@@ -138,7 +144,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     @Override
     @Transactional
     public Member putMember(String email, MemberRequestDTO.ChangeDto request) {
-        Member member = getMember(email);
+        Member member = getMemberWithSchool(email);
         if (!request.getEmail().equals(member.getEmail()) &&
                 isEmailExist(request.getEmail()))
             throw new GeneralHandler(ErrorStatus.DUPLICATE_EMAIL);
@@ -165,7 +171,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     @Override
     @Transactional
     public Member putMemberBasic(String email, MemberRequestDTO.BasicChangeDto request) {
-        Member member = getMember(email);
+        Member member = getMemberWithSchool(email);
         if (!request.getEmail().equals(member.getEmail()) &&
                 isEmailExist(request.getEmail()))
             throw new GeneralHandler(ErrorStatus.DUPLICATE_EMAIL);
@@ -185,7 +191,9 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     }
 
     @Override
-    public MemberResponseDTO.MyProfileDTO getMemberProfile(Member member) {
+    public MemberResponseDTO.MyProfileDTO getMemberProfile(String email) {
+        Member member = memberRepository.findByEmailJoinFetchSchool(email)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
         return MemberViewInfo.builder()
                 .member(member)
                 .skills(memberSkillRepository.findSkillByMember(member))
@@ -202,7 +210,9 @@ public class MemberCommandServiceImpl implements MemberCommandService {
 
     @Override
     @Transactional
-    public MemberResponseDTO.MyProfileDTO putMemberProfile(Member member, MemberRequestDTO.ProfileChangeDto request) {
+    public MemberResponseDTO.MyProfileDTO putMemberProfile(String email, MemberRequestDTO.ProfileChangeDto request) {
+        Member member = memberRepository.findByEmailJoinFetchSchool(email)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
         member.setSelfIntroduce(request.getSelfIntroduction());
         activityRepository.removeAllByMember(member);
         memberRepository.save(member);
