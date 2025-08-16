@@ -91,7 +91,7 @@ public class SchoolQueryServiceImpl implements SchoolQueryService {
 
 
   // 인증코드 생성 함수
-  public String generateRandomCode(int length) {
+  public final String generateRandomCode(int length) {
     String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     SecureRandom random = new SecureRandom();
     StringBuilder sb = new StringBuilder(length);

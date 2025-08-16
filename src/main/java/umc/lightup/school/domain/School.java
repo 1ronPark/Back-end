@@ -17,6 +17,6 @@ public class School {
   @Column(nullable = false, unique = true, length = 50)
   private String name;
 
-  @Column(nullable = true, length = 50)
+  @Column(length = 50)
   private String domain;
 }

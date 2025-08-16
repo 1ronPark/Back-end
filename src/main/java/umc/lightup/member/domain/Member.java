@@ -56,9 +56,6 @@ public class Member extends BaseEntity implements UserDetails {
     @JoinColumn(name = "school_id")
     private School school;
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<SchoolEmailVerification> emailVerifications = new ArrayList<>();
-
     @Column(unique = true, length = 20)
     private String phoneNumber;
 

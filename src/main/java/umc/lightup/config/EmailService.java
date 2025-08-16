@@ -66,7 +66,7 @@ public class EmailService {
             javaMailSender.send(mail);
         } catch (Exception e) {
             e.printStackTrace();
-//            throw new GeneralHandler(ErrorStatus.EMAIL_SEND_FAIL);
+            throw new GeneralHandler(ErrorStatus.EMAIL_SEND_FAIL);
         }
     }
 }

@@ -54,8 +54,8 @@ public class SchoolRestController {
   })
   public ApiResponse<Void> sendSchoolEmail(
           Authentication authentication,
-          @RequestParam @NotNull Long schoolId,
-          @RequestParam @NotBlank @Email String email){
+          @RequestParam(name = "schoolId") @NotNull Long schoolId,
+          @RequestParam(name = "email") @NotBlank @Email String email){
     Member member = memberCommandService.getMember(authentication.getName());
     schoolQueryService.sendEmailVerification(member, schoolId, email);
     return ApiResponse.of(SuccessStatus._SEND_COMPLETE, null);
@@ -71,8 +71,8 @@ public class SchoolRestController {
           @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200",description = "OK, 성공"),
   })
   public ApiResponse<Void> verifyEmail(
-          @RequestParam @NotBlank @Email String email,
-          @RequestParam @NotNull String code
+          @RequestParam(name = "email") @NotBlank @Email String email,
+          @RequestParam(name = "code") @NotNull String code
   ) {
     schoolQueryService.verifyEmail(email, code);
     return ApiResponse.of(SuccessStatus._OK, null);
