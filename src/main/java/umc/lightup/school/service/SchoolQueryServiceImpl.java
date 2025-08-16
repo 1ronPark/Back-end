@@ -85,6 +85,11 @@ public class SchoolQueryServiceImpl implements SchoolQueryService {
       throw new GeneralHandler(ErrorStatus.SCHOOL_EMAIL_EXPIRED);
     }
 
+    // 인증코드 비교 로직
+    if(!schoolEmailVerification.getVerificationCode().equals(code)){
+      throw new GeneralHandler(ErrorStatus.SCHOOL_EMAIL_NOT_CORRECT);
+    }
+
     schoolEmailVerification.setVerified(true);
     schoolEmailVerificationRepository.save(schoolEmailVerification);
   }
