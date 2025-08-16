@@ -79,7 +79,6 @@ public class MemberRequestDTO {
         @NotEmpty
         @Email
         private String email;
-        private String school;
         @NotEmpty
         @Pattern(regexp = "0[1-8]\\d{0,1}-\\d{3,4}-\\d{4,5}")
         private String phoneNumber;
@@ -94,7 +93,6 @@ public class MemberRequestDTO {
                     .role(this.role)
                     .mbti(this.mbti.toByte())
                     .email(this.email)
-                    .school(this.school)
                     .phoneNumber(this.phoneNumber)
                     .age((int) this.birth.until(LocalDate.now(), ChronoUnit.YEARS))
                     .build();
