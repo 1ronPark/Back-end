@@ -9,10 +9,9 @@ import umc.lightup.member.dto.MemberResponseDTO;
 import java.util.List;
 
 public interface MemberCommandService {
-    Member joinMember(MemberRequestDTO.JoinDto request);
-    MemberResponseDTO.LoginResultDTO loginMember(MemberRequestDTO.PasswordLoginRequestDTO request);
     Member getMember(String email);
-    MemberResponseDTO.MemberInfoDTO getMember(long id, String viewerEmail);
+    MemberResponseDTO.MemberInfoDTO getMember(long id, Member requestedMember);
+    List<MemberResponseDTO.HistoryInfoDTO> getHistory(Member member, long size);
     Member putMember(String email, MemberRequestDTO.ChangeDto request);
     MemberResponseDTO.MyProfileDTO getMemberProfile(Member member);
     MemberResponseDTO.MyProfileDTO putMemberProfile(Member member, MemberRequestDTO.ProfileChangeDto request);
@@ -20,6 +19,7 @@ public interface MemberCommandService {
     Portfolio savePortfolio(Member member, String name, MultipartFile portfolioFile);
     Portfolio savePortfolio(Member member, String name, String portfolioLink);
     void removePortfolio(String memberEmail, long portFolioId);
+    MemberResponseDTO.MemberInfoListDTO searchMember(Member member, MemberRequestDTO.MemberSearchRequestDTO options);
     String selectSkill(Long skillId,Member member);
     void removeMemberSkill(Long skillId, Long memberId);
     String selectStrength(Long strengthId,Member member);

@@ -1,9 +1,6 @@
 package umc.lightup.member.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,19 +8,11 @@ import umc.lightup.api.code.status.ErrorStatus;
 import umc.lightup.aws.s3.AmazonS3Manager;
 import umc.lightup.common.Uuid;
 import umc.lightup.common.repository.UuidRepository;
-import umc.lightup.config.JwtTokenProvider;
 import umc.lightup.exception.handler.GeneralHandler;
 import umc.lightup.member.converter.MemberConverter;
 import umc.lightup.member.domain.*;
-import umc.lightup.member.dto.MemberRequestDTO;
-import umc.lightup.member.dto.MemberResponseDTO;
-import umc.lightup.member.dto.MemberViewInfo;
-import umc.lightup.member.enums.CredentialType;
-import umc.lightup.member.repository.CredentialRepository;
-import umc.lightup.member.repository.MemberPositionRepository;
-import umc.lightup.member.repository.MemberRepository;
-import umc.lightup.member.repository.MemberSkillRepository;
-import umc.lightup.member.repository.MemberStrengthRepository;
+import umc.lightup.member.dto.*;
+import umc.lightup.member.repository.*;
 import umc.lightup.skill.domain.Skill;
 import umc.lightup.skill.repository.SkillRepository;
 import umc.lightup.strength.domain.Strength;
@@ -32,10 +21,6 @@ import umc.lightup.position.domain.Position;
 import umc.lightup.position.repository.PositionRepository;
 
 import java.util.ArrayList;
-import java.util.Collections;
-
-import umc.lightup.member.repository.*;
-
 import java.util.List;
 import java.util.UUID;
 
@@ -44,7 +29,6 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 public class MemberCommandServiceImpl implements MemberCommandService {
     private final MemberRepository memberRepository;
-    private final CredentialRepository credentialRepository;
     private final MemberPositionRepository memberPositionRepository;
     private final MemberSkillRepository memberSkillRepository;
     private final MemberStrengthRepository memberStrengthRepository;
@@ -55,47 +39,10 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     private final PortfolioRepository portfolioRepository;
     private final MemberLikeRepository memberLikeRepository;
     private final ActivityRepository activityRepository;
+    private final MemberViewHistoryRepository memberViewHistoryRepository;
 
-    private final PasswordEncoder passwordEncoder;
-    private final JwtTokenProvider jwtTokenProvider;
     private final AmazonS3Manager amazonS3Manager;
     private final UuidRepository uuidRepository;
-
-
-    @Override
-    @Transactional
-    public Member joinMember(MemberRequestDTO.JoinDto request) {
-        Credential credential = request.toCredential(passwordEncoder);
-        Member member = credential.getMember();
-        Member saved = memberRepository.save(member);
-        credentialRepository.save(credential);
-        return saved;
-    }
-
-    @Override
-    public MemberResponseDTO.LoginResultDTO loginMember(MemberRequestDTO.PasswordLoginRequestDTO request) {
-        Credential credential = credentialRepository
-                .findByCredentialTypeAndEmail(CredentialType.PASSWORD, request.getEmail())
-                .orElseThrow(()-> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
-
-        Member member = credential.getMember(); //주객전도가 되긴 했으나 한 번의 쿼리로 데이터를 가져오기 위한 가장 편한 방법임
-
-        if(!passwordEncoder.matches(request.getPassword(), credential.getCredential())) {
-            throw new GeneralHandler(ErrorStatus.INVALID_PASSWORD);
-        }
-
-        Authentication authentication = new UsernamePasswordAuthenticationToken(
-                member.getEmail(), null,
-                Collections.singleton(() -> member.getRole().name())
-        );
-
-        String accessToken = jwtTokenProvider.generateToken(authentication);
-
-        return MemberResponseDTO.loginResultDTOBuilder()
-                .memberId(member.getId())
-                .accessToken(accessToken)
-                .build();
-    }
 
     @Override
     public Member getMember(String email){
@@ -103,16 +50,20 @@ public class MemberCommandServiceImpl implements MemberCommandService {
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
     }
 
+    private Member getMember(long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
+    }
+
     @Override
     @Transactional
     public void selectPosition(Long memberId, String positionName) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member member = getMember(memberId);
         Position position = positionRepository.findByName(positionName)
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.POSITION_NOT_FOUND));
 
         if (memberPositionRepository.existsByMemberIdAndPositionId(memberId, position.getId())){
-            throw new GeneralHandler(ErrorStatus._BAD_REQUEST);
+            throw new GeneralHandler(ErrorStatus.DUPLICATED_POSITION_SELECT);
         }
 
         memberPositionRepository.save(new MemberPosition(member, position));
@@ -121,40 +72,65 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     @Override
     @Transactional
     public void deletePosition(Long memberId, String positionName) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member member = getMember(memberId);
         Position position = positionRepository.findByName(positionName)
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.POSITION_NOT_FOUND));
 
         MemberPosition memberPosition = memberPositionRepository.findByMemberIdAndPositionId(memberId, position.getId())
-                .orElseThrow(() -> new GeneralHandler(ErrorStatus._BAD_REQUEST));
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_POSITION_NOT_FOUND));
 
         memberPositionRepository.delete(memberPosition);
     }
 
     @Override
-    public MemberResponseDTO.MemberInfoDTO getMember(long id, String viewerEmail){
-        // 한 번에 반환하기 위해 DTO 반환을 사용했는데 좋은 설계 방식인지는 한번 고민할 필요가 있음
-        Member member = memberRepository.findById(id)
-                .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
-        List<String> skills = memberSkillRepository.findSkillNameByMember(member);
-        List<String> strengths = memberStrengthRepository.findStrengthNameByMember(member);
-        List<String> positions = memberPositionRepository.findPositionNameByMember(member);
-        List<MemberRegion> regions = memberRegionRepository.findByMember(member);
-        List<Portfolio> portfolios = portfolioRepository.findByMember(member);
-        List<Activity> activities = activityRepository.findByMember(member);
-        return MemberViewInfo.builder()
-                .member(member)
-                .skillNames(skills)
-                .strengthNames(strengths)
-                .regions(regions)
-                .positionNames(positions)
-                .portfolios(portfolios)
-                .activities(activities)
-                .emailOpen(false)
-                .phoneOpen(false)
-                .pictureOpen(false)
-                .build().toMemberInfoDTO();
+    @Transactional
+    public MemberResponseDTO.MemberInfoDTO getMember(long id, Member requestedMember) {
+//        // 한 번에 반환하기 위해 DTO 반환을 사용했는데 좋은 설계 방식인지는 한번 고민할 필요가 있음
+//        Member member = getMember(id);
+//        List<String> skills = memberSkillRepository.findSkillNameByMember(member);
+//        List<String> strengths = memberStrengthRepository.findStrengthNameByMember(member);
+//        List<String> positions = memberPositionRepository.findPositionNameByMember(member);
+//        List<MemberRegion> regions = memberRegionRepository.findByMember(member);
+//        List<Portfolio> portfolios = portfolioRepository.findByMember(member);
+//        List<Activity> activities = activityRepository.findByMember(member);
+
+        MemberResponseDTO.MemberInfoDTO memberInfo =
+                memberRepository.getSingleMemberInfo(requestedMember, id);
+
+        //조회기록 설정
+        if (requestedMember != null) {
+            long toMemberId = memberInfo.getId();
+            if (!requestedMember.getId().equals(toMemberId)) {
+                int updatedResult = memberViewHistoryRepository.updateTimestamp(requestedMember, toMemberId);
+                if (updatedResult == 0) { // update 내역이 없을 때
+                    MemberViewHistory history = MemberViewHistory.builder()
+                            .fromMember(requestedMember)
+                            .toMember(getMember(toMemberId)) //아 그냥 FK만 가지고 만들면 안되나?
+                            .build();
+                    memberViewHistoryRepository.save(history);
+                }
+            }
+        }
+
+        return memberInfo;
+
+//        return MemberViewInfo.builder()
+//                .member(member)
+//                .skillNames(skills)
+//                .strengthNames(strengths)
+//                .regions(regions)
+//                .positionNames(positions)
+//                .portfolios(portfolios)
+//                .activities(activities)
+//                .emailOpen(true)
+//                .phoneOpen(true)
+//                .pictureOpen(true)
+//                .build().toMemberInfoDTO();
+    }
+
+    @Override
+    public List<MemberResponseDTO.HistoryInfoDTO> getHistory(Member member, long size) {
+        return memberRepository.getMemberViewHistoryInfos(member, size);
     }
 
     @Override
@@ -266,6 +242,15 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     }
 
     @Override
+    public MemberResponseDTO.MemberInfoListDTO searchMember(
+            Member member,
+            MemberRequestDTO.MemberSearchRequestDTO options) {
+        if (options.getRegions() == null) options.setRegions(List.of());
+        if (options.getPositions() == null) options.setPositions(List.of());
+        return memberRepository.getMemberInfos(member, options);
+    }
+
+    @Override
     @Transactional
     public String selectSkill(Long skillId, Member member) {
         Skill foundSkill = skillRepository.findById(skillId)
@@ -312,6 +297,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     @Override
     @Transactional
     public List<MemberResponseDTO.singleRegionResultDTO> selectRegions(Member member, MemberRequestDTO.MemberRegionListRequestDTO request) {
+        member = getMember(member.getId());
         List<MemberResponseDTO.singleRegionResultDTO> resultDTOList = new ArrayList<>();
         for (MemberRequestDTO.MemberRegionRequestDTO dto : request.getMemberRegions()) {
             MemberRegion memberRegion = MemberRegion.builder()
@@ -338,8 +324,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     public void addMemberLike(Member fromMember, long toMemberId) {
         if (fromMember.getId() == toMemberId)
             throw new GeneralHandler(ErrorStatus.SELF_LIKE);
-        Member toMember = memberRepository.findById(toMemberId) //아 괜히 검색쿼리 더 날리고 싶지 않은데
-                .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND));
+        Member toMember = getMember(toMemberId); //아 괜히 검색쿼리 더 날리고 싶지 않은데
         if (memberLikeRepository.existsByFromMemberIdAndToMemberId(fromMember.getId(), toMemberId))
             throw new GeneralHandler(ErrorStatus.ALREADY_LIKED);
         memberLikeRepository.save(MemberLike.builder()

@@ -3,6 +3,7 @@ package umc.lightup.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -34,13 +35,20 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests((requests) -> requests
+                        .requestMatchers(HttpMethod.GET, "/api/v1/items/search", "/api/v1/light-talk/posts/search").permitAll()
                         .requestMatchers("/api/v1/members/me",
                                 "/api/v1/members/me/**",
                                 "/api/v1/members/password/change",
-                                "/api/v1/notification/{notificationId}",
                                 "/api/v1/school",
                                 "/api/v1/school/verifyEmail",
-                                "/api/v1/members/*/like")
+                                "/api/v1/members/login/path",
+                                "/api/v1/members/login/path/**",
+                                "/api/v1/members/history",
+                                "/api/v1/notification/{notificationId}",
+                                "/api/v1/members/*/like",
+                                "/api/v1/items/**",
+                                "/api/v1/light-talk/posts/**"
+                                )
                         .authenticated()
                         .anyRequest().permitAll()
                 )
@@ -63,8 +71,12 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5173"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedOrigins(List.of(
+                "http://localhost:5173",
+                "http://localhost:3000",
+                "https://starlight-up-hyewonimdang-hyewons-projects-4a1d0b91.vercel.app",
+                "https://lightup.it.kr"));
+        config.setAllowedMethods(List.of("GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 

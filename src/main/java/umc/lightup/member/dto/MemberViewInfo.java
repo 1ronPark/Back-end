@@ -6,6 +6,7 @@ import umc.lightup.member.domain.Activity;
 import umc.lightup.member.domain.Member;
 import umc.lightup.member.domain.MemberRegion;
 import umc.lightup.member.domain.Portfolio;
+import umc.lightup.member.enums.Mbti;
 import umc.lightup.skill.domain.Skill;
 import umc.lightup.strength.domain.Strength;
 
@@ -55,7 +56,7 @@ public class MemberViewInfo {
                 .nickname(member.getNickname())
                 .age(member.getAge())
                 .role(member.getRole())
-                .mbti(member.getMbti())
+                .mbti(Mbti.fromByte(member.getMbti()))
                 .birth(member.getBirth())
                 .gender(member.getGender())
                 .selfIntroduce(member.getSelfIntroduce())
@@ -109,7 +110,8 @@ public class MemberViewInfo {
                 .email(member.getEmail())
                 .age(member.getAge())
                 .gender(member.getGender())
-                .mbti(member.getMbti())
+                .school(member.getSchool())
+                .mbti(Mbti.fromByte(member.getMbti()))
                 .profileImageUrl(member.getProfileImageUrl())
                 .selfIntroduce(member.getSelfIntroduce())
                 .skills(skills.stream()
