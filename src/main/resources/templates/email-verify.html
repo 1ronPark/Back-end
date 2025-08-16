@@ -5,7 +5,9 @@
     <title>이메일 인증 안내</title>
 </head>
 <body>
-<h2><span th:text="${userName} + '님, 인증코드가 발송되었습니다'"></span></h2>
-<p>인증코드: <b th:text="${code}"></b></p>
+<h2 th:text="${userName} + '님, 학교 인증코드가 발송되었습니다.'">고객님, 인증번호가 발송되었습니다.</h2>
+<p>학교 인증 코드: <b th:text="${code}">code</b></p>
+<p>Light up 페이지에 학교인증 코드를 입력해주세요.</p>
+<p>감사합니다.</p>
 </body>
 </html>
