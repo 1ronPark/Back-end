@@ -22,8 +22,8 @@ public class StrengthRestController {
             summary = "유저의 강점 조회 API",
             description = "유저가 강점을 선택하기 전에 드롭다운으로 강점들을 조회하는 API입니다."
     )
-    public ApiResponse<StrengthResponseDTO.strengthListDTO> getStrengths(@RequestParam String positionName) {
-        List<String> strengthsList = strengthService.getStrengthsList(positionName);
+    public ApiResponse<StrengthResponseDTO.strengthListDTO> getStrengths(@RequestParam("positionName") String positionName) {
+        List<StrengthResponseDTO.strengthResultDTO> strengthsList = strengthService.getStrengthsList(positionName);
         return ApiResponse.onSuccess(StrengthConverter.toStrengthListDTO(strengthsList));
     }
 

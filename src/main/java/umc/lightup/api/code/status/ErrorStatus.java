@@ -25,6 +25,15 @@ public enum ErrorStatus implements BaseErrorCode {
     NOT_IMAGE(HttpStatus.BAD_REQUEST, "MEMBER4008", "이미지 파일이 아닙니다."), //MEMBER4007 에러를 만들었던 기억이 있는데 왜 없지?
     NO_CREDENTIAL(HttpStatus.INTERNAL_SERVER_ERROR, "MEMBER5000", "저장된 패스워드가 없습니다."),
 
+    // Credential 관련 에러
+    CREDENTIAL_NOT_FOUND(HttpStatus.BAD_REQUEST, "CREDENTIAL4000", "해당 형태의 로그인 정보를 찾을 수 없습니다."),
+    ALREADY_SIGNED_IN_EMAIL(HttpStatus.BAD_REQUEST, "CREDENTIAL4001", "이미 동일한 이메일로 가입된 회원이 있습니다."),
+    CREDENTIAL_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "CREDENTIAL4002", "이미 해당 방법으로 소셜로그인이 연결되어 있습니다."),
+    CREDENTIAL_ALREADY_USED(HttpStatus.BAD_REQUEST, "CREDENTIAL4003", "이미 다른 계정에 소셜로그인이 연결되어 있습니다."),
+    ONLY_CREDENTIAL_REMAIN(HttpStatus.BAD_REQUEST, "CREDENTIAL4004", "현재 유일한 로그인 방법이 하나밖에 없습니다. 로그인 방법을 지우면 로그인이 불가합니다."),
+    INVALID_AUTH_CODE(HttpStatus.BAD_REQUEST, "CREDENTIAL4005", "auth code가 올바르지 않습니다."),
+    AUTH_NOT_GRANTED(HttpStatus.BAD_REQUEST, "CREDENTIAL4006", "소셜로그인의 권한이 부족합니다. 필요한 모든 권한 제공에 동의했는지 확인해 주세요."),
+
     //Notification 관련 에러
     NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "NOTIFICATION4001", "해당 알림이 존재하지 않습니다. "),
   
@@ -55,6 +64,8 @@ public enum ErrorStatus implements BaseErrorCode {
 
     //Item 관련 에러
     ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEM4000", "프로젝트가 존재하지 않습니다."),
+    ITEM_UPDATE_FORBIDDEN(HttpStatus.FORBIDDEN, "ITEM4001", "프로젝트를 수정할 권한이 없습니다."),
+    NOT_MY_ITEM(HttpStatus.FORBIDDEN, "ITEM4002", "내 프로젝트가 아닙니다."),
 
     //ItemLike 관련 에러
     MY_ITEM_LIKE(HttpStatus.BAD_REQUEST, "ITEMLIKE4000", "자신의 프로젝트에는 좋아요를 누를 수 없습니다."),
@@ -63,6 +74,14 @@ public enum ErrorStatus implements BaseErrorCode {
 
     //ItemApply 관련 에러
     DUPLICATE_ITEM_APPLY(HttpStatus.BAD_REQUEST, "ITEMAPPLY4000", "이미 지원한 프로젝트입니다."),
+    SELF_ITEM_APPLY(HttpStatus.BAD_REQUEST, "ITEMAPPLY4001", "자신의 프로젝트에 대한 요청입니다."),
+    ITEM_APPLY_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEMAPPLY4002", "프로젝트 지원이나 제안 기록을 찾을 수 없습니다."),
+    NOT_OFFERED(HttpStatus.BAD_REQUEST, "ITEMAPPLY4003", "참여를 제안받은 프로젝트가 아닙니다."),
+    ALREADY_CHOSE_OFFER_ACCEPTANCE(HttpStatus.BAD_REQUEST, "ITEMAPPLY4004", "프로젝트 참여 여부를 이미 결정했습니다."),
+    NOT_APPLIED(HttpStatus.BAD_REQUEST, "ITEMAPPLY4005", "다른 사용자의 지원이 아닙니다."),
+
+    //ItemComment 관련 에러
+    ITEM_COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEMCOMMENT4000", "해당 댓글이 존재하지 않습니다."),
 
     //ItemViewHistory 관련 에러
     ITEM_VIEW_HISTORY_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEMVIEWHISTORY4000", "프로젝트 조회 내역이 존재하지 않습니다."),
@@ -72,6 +91,10 @@ public enum ErrorStatus implements BaseErrorCode {
 
     //ItemCategory 관련 에러
     ITEM_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEMCATEGORY4000", "해당 아이템 카테고리가 존재하지 않습니다."),
+
+    //MemberPosition 관련 에러
+    MEMBER_POSITION_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER_POSITION4000", "해당 포지션을 선택하지 않았습니다."),
+    DUPLICATED_POSITION_SELECT(HttpStatus.NOT_FOUND, "MEMBER_POSITION4001", "이미 선택한 포지션입니다."),
 
     //MemberSkill 관련 에러
     MEMBER_SKILL_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER_SKILL4000", "유저의 스킬이 존재하지 않습니다."),
@@ -91,7 +114,29 @@ public enum ErrorStatus implements BaseErrorCode {
     SCHOOL_EMAIL_ALREADY_VERIFIED(HttpStatus.CONFLICT, "SCHOOL4006", "이미 인증된 이메일입니다."),
 
     //Email 관련 에러
-    EMAIL_SEND_FAIL(HttpStatus.SERVICE_UNAVAILABLE, "EMAIL5003", "이메일 전송에 실패했습니다.")
+    EMAIL_SEND_FAIL(HttpStatus.SERVICE_UNAVAILABLE, "EMAIL5003", "이메일 전송에 실패했습니다."),
+
+    //Post 관련 에러
+    POST_NOT_FOUND(HttpStatus.NOT_FOUND, "POST4000", "포스트가 존재하지 않습니다."),
+    POST_UPDATE_FORBIDDEN(HttpStatus.FORBIDDEN, "POST4001", "포스트 수정 권한이 없습니다."),
+    NOT_MY_POST(HttpStatus.FORBIDDEN, "POST4002", "내 포스트가 아닙니다."),
+
+    //PostImage 관련 에러
+    TOO_MANY_POST_IMAGE(HttpStatus.BAD_REQUEST, "POST_IMAGE4000", "이미지는 3개까지만 업로드 가능합니다."),
+
+    //PostComment 관련 에러
+    POST_COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "POST_COMMENT4000", "해당 포스트의 댓글이 존재하지 않습니다."),
+    POST_COMMENT_UPDATE_FORBIDDEN(HttpStatus.FORBIDDEN, "POST_COMMENT4001", "해당 댓글의 수정 권한이 없습니다."),
+
+    //PostLike 관련 에러
+    MY_POST_LIKE(HttpStatus.BAD_REQUEST, "POSTLIKE4000", "자신의 포스트에는 좋아요를 누를 수 없습니다."),
+    POST_ALREADY_LIKED(HttpStatus.BAD_REQUEST, "POSTLIKE4001", "이미 좋아요를 누른 포스트입니다."),
+    POST_LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "POSTLIKE4002", "포스트 좋아요가 존재하지 않습니다."),
+
+    //CommentLike 관련 에러
+    MY_COMMENT_LIKE(HttpStatus.BAD_REQUEST, "COMMENTLIKE4000", "자신의 댓글에는 좋아요를 누를 수 없습니다."),
+    COMMENT_ALREADY_LIKED(HttpStatus.BAD_REQUEST, "COMMENTLIKE4001", "이미 좋아요를 누른 댓글입니다."),
+    COMMENT_LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "COMMENTLIKE4002", "해당 댓글 좋아요가 존재하지 않습니다.")
     ;
 
 

@@ -1,10 +1,22 @@
 # 🍃 Back-end Repository
-Light Up 프로젝트의 백엔드 저장소입니다. 
+대학생 창업 도모 서비스 Light Up 프로젝트의 백엔드 저장소입니다. 
 
 ## 💻 Member
 |  베가   |   수   |                현승                 |
 |:-----:|:-----:|:---------------------------------:|
 | [배현우] | [최경수] | [정현승] |
+| [팀장] | [팀원] | [팀원] |
+
+##  🔧 기술 스택
+Spring Boot,
+MySQL,
+Spring Data JPA,
+Jwt,
+SSE,
+Java mail sender,
+Spring cloud openfeign,
+Thymeleaf
+
 
 ## 📁 디렉토리 구조
 ```bash
@@ -54,3 +66,7 @@ Light Up 프로젝트의 백엔드 저장소입니다.
 |  rename  | 파일 혹은 폴더명 수정   |
 |  remove  | 파일 혹은 폴더 삭제    |
 |  chore   | 기타 변경사항        |
+
+## 📝 Server 아키텍처
+<img width="2000" height="1125" alt="프로젝트 아키텍처" src="https://github.com/user-attachments/assets/4a80fd31-f6ae-4b0e-af18-63941c3d4282" />
+

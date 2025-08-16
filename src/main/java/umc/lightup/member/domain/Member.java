@@ -8,7 +8,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import umc.lightup.AppConfig;
 import umc.lightup.common.BaseEntity;
-import umc.lightup.member.enums.Mbti;
 import umc.lightup.member.enums.Role;
 import umc.lightup.member.service.CredentialQueryService;
 import umc.lightup.school.domain.School;
@@ -24,12 +23,14 @@ import java.util.List;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false) //Member에 대한 Equals 적용을 위해 필요함
 public class Member extends BaseEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include //Id만 비교하면 끝이라서 Include와 onlyExplicitlyIncluded = true 설정 진행
     private Long id;
 
-    @Column(nullable = false, length = 20)
+    @Column(length = 20) //소셜로그인 회원가입 시 안 들어올 수 있음
     private String name;
 
     @Column(unique = true, length = 20)
@@ -45,9 +46,15 @@ public class Member extends BaseEntity implements UserDetails {
     @Column(length = 8)
     private Role role;
 
-    @Enumerated(EnumType.STRING)
-    @Column(length = 4)
-    private Mbti mbti;
+    /**
+     * E +8,
+     * N +4,
+     * F +2,
+     * P +1,
+     * 총 0(ISTJ)~15(ENFP)로 표현
+     * */
+    @Column(columnDefinition = "BIT(4)")
+    private Byte mbti;
 
     @Column(unique = true, nullable = false, length = 30)
     private String email;
@@ -112,6 +119,12 @@ public class Member extends BaseEntity implements UserDetails {
     @Override
     public String getUsername() {
         return getEmail();
+    }
+
+    public String getNameNotNull() {
+        if (getNickname() != null) return getNickname();
+        else if (getName() != null) return getName();
+        else return getEmail();
     }
 
 //    @Column(length = 32)

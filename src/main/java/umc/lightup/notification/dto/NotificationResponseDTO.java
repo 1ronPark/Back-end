@@ -30,6 +30,15 @@ public class NotificationResponseDTO {
     String message;       // 알림 메시지 내용
     String notificationType;  // 알림 종류
     Boolean isRead;           // 알림 읽음 여부
+    Long referenceId;         // 래퍼런스 아이디
+  }
+
+  @Builder
+  @Getter
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class NotificationTotal{
+    Long total;
   }
 
   @Builder

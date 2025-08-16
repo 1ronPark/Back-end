@@ -22,46 +22,66 @@ public class Item extends BaseEntity {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
+    @Setter
     @Column(length = 40, nullable = false)
     private String name;
 
+    @Setter
     @Column(length = 50, nullable = false)
     private String introduce;
 
+    @Setter
     @Lob
     @Column(nullable = false)
     private String description;
 
     @Builder.Default
-    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemCategory> itemCategories = new ArrayList<>();
 
+    @Setter
     @Column(name = "project_status", nullable = false)
     private boolean projectStatus;
 
+    @Setter
     @Column(nullable = false)
     private String itemProfileImageUrl;
 
+    @Setter
     @Column(nullable = false)
     private String itemPlanFileUrl;
 
+    @Setter
     @Column(name = "extra_link1")
     private String extraLink1;
 
+    @Setter
     @Column(name = "extra_link2")
     private String extraLink2;
 
     @Builder.Default
-    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemRegion> itemRegions = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RecruitPosition> recruitPositions = new ArrayList<>();
 
     @Builder.Default
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
     private List<ItemImage> itemImages = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    private List<ItemComment> itemComments = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    private List<ItemApply> itemApplyList = new ArrayList<>();
+
+    @Builder.Default
+    @Column(nullable = false)
+    private Long viewCount = 0L;
 
     //프로젝트에 프로젝트 프로필 이미지, 기획서를 제외하고 사진을 추가로 업로드 할 수 있게 하려면 itemImages도 필요함
     public Item uploadItemProfile(String itemProfileImageUrl) {
@@ -87,5 +107,17 @@ public class Item extends BaseEntity {
     public void addRecruitPosition(RecruitPosition recruitPosition) {
         this.recruitPositions.add(recruitPosition);
         recruitPosition.assignItem(this);
+    }
+
+    public void clearItemCategories() {
+        this.itemCategories.clear();
+    }
+
+    public void clearItemRegions() {
+        this.itemRegions.clear();
+    }
+
+    public void clearRecruitPositions() {
+        this.recruitPositions.clear();
     }
 }

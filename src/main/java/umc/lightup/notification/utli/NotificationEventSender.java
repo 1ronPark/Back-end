@@ -18,6 +18,10 @@ public class NotificationEventSender {
     NotificationEventRequestDTO.NotificationEventDTO event = new NotificationEventRequestDTO.NotificationEventDTO(
             senderId, receiverId, type, message, referenceType, referenceId
     );
+    send(event);
+  }
+
+  public void send(NotificationEventRequestDTO.NotificationEventDTO event) {
     if (TransactionSynchronizationManager.isActualTransactionActive()) {
       // 트랜잭션 존재 시, AFTER_COMMIT 이후 발행
       TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {

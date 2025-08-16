@@ -1,5 +1,6 @@
 package umc.lightup.member.converter;
 
+import umc.lightup.member.domain.Credential;
 import umc.lightup.member.domain.Member;
 import umc.lightup.member.domain.MemberRegion;
 import umc.lightup.member.domain.Portfolio;
@@ -23,6 +24,18 @@ public class MemberConverter {
                 .build();
     }
 
+    public static MemberResponseDTO.CredentialInfoResultDTO toSelectCredentialInfoResultDTO(List<Credential> credentials) {
+        return MemberResponseDTO.CredentialInfoResultDTO.builder()
+                .credentials(credentials.stream()
+                        .map(c->MemberResponseDTO.CredentialInfoDTO.builder()
+                                .credentialType(c.getCredentialType())
+                                .createdAt(c.getCreatedAt())
+                                .updatedAt(c.getUpdatedAt())
+                                .build())
+                        .toList())
+                .build();
+    }
+
     public static MemberResponseDTO.selectRegionResultsDTO toSelectRegionResultsDTO(List<MemberResponseDTO.singleRegionResultDTO> regionList) {
         return MemberResponseDTO.selectRegionResultsDTO.builder()
                 .regions(regionList)
@@ -41,6 +54,12 @@ public class MemberConverter {
                 .id(portfolio.getId())
                 .name(portfolio.getName())
                 .fileUrl(portfolio.getFileUrl())
+                .build();
+    }
+
+    public static MemberResponseDTO.MemberHistoryInfoListDTO toMemberHistoryInfoListDTO(List<MemberResponseDTO.HistoryInfoDTO> memberHistory) {
+        return MemberResponseDTO.MemberHistoryInfoListDTO.builder()
+                .memberHistory(memberHistory)
                 .build();
     }
 }

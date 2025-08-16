@@ -1,0 +1,209 @@
+package umc.lightup.lighttalk.service;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import umc.lightup.api.code.status.ErrorStatus;
+import umc.lightup.aws.s3.AmazonS3Manager;
+import umc.lightup.common.Uuid;
+import umc.lightup.common.repository.UuidRepository;
+import umc.lightup.exception.handler.GeneralHandler;
+import umc.lightup.lighttalk.converter.PostConverter;
+import umc.lightup.lighttalk.domain.Post;
+import umc.lightup.lighttalk.domain.PostImage;
+import umc.lightup.lighttalk.domain.PostLike;
+import umc.lightup.lighttalk.dto.PostRequestDTO;
+import umc.lightup.lighttalk.dto.PostResponseDTO;
+import umc.lightup.lighttalk.repository.PostImageRepository;
+import umc.lightup.lighttalk.repository.PostLikeRepository;
+import umc.lightup.lighttalk.repository.PostRepository;
+import umc.lightup.member.domain.Member;
+import umc.lightup.member.repository.MemberPositionRepository;
+
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class PostCommandServiceImpl implements PostCommandService {
+    private final PostRepository postRepository;
+    private final PostImageRepository postImageRepository;
+    private final MemberPositionRepository memberPositionRepository;
+    private final PostLikeRepository postLikeRepository;
+
+    private final UuidRepository uuidRepository;
+    private final AmazonS3Manager s3Manager;
+
+    @Override
+    @Transactional
+    public Post createPost(Member member, PostRequestDTO.PostJoinRequestDTO request, List<MultipartFile> postImages) {
+        Post post = Post.builder()
+                .content(request.getContent())
+                .postMember(member)
+                .build();
+        Post savedPost = postRepository.save(post);
+
+        if (postImages != null && !postImages.isEmpty()) {
+            uploadImagesToS3(postImages, post);
+        }
+
+        return savedPost;
+    }
+
+    @Override
+    @Transactional
+    public Post changePost(Member member, Long postId, PostRequestDTO.PostChangeRequestDTO request, List<MultipartFile> changePostImages) {
+        Post findPost = postRepository.findById(postId)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.POST_NOT_FOUND));
+
+        if (!findPost.getPostMember().equals(member)) {
+            throw new GeneralHandler(ErrorStatus.POST_UPDATE_FORBIDDEN);
+        }
+
+        findPost.setContent(request.getContent());
+
+        if (changePostImages != null && !changePostImages.isEmpty()) {
+            List<PostImage> oldImages = postImageRepository.findByPost(findPost);
+            for (PostImage oldImage : oldImages) {
+                s3Manager.deleteFile(oldImage.getImageUrl());
+            }
+            postImageRepository.deleteAll(oldImages);
+
+            uploadImagesToS3(changePostImages, findPost);
+        }
+
+        return findPost;
+    }
+
+    @Override
+    @Transactional
+    public void removePost(Member member, Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.POST_NOT_FOUND));
+
+        if (!post.getPostMember().equals(member)) {
+            throw new GeneralHandler(ErrorStatus.NOT_MY_POST);
+        }
+
+        List<PostImage> postImages = postImageRepository.findByPost(post);
+        for (PostImage image : postImages) {
+            s3Manager.deleteFile(image.getImageUrl());
+        }
+
+        postRepository.deleteById(postId);
+    }
+
+    @Override
+    public Post getSinglePostWithComments(Long postId) {
+        return postRepository.findPostWithCommentsById(postId)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.POST_NOT_FOUND));
+    }
+
+    @Override
+    public List<PostResponseDTO.MemberPositionDTO> getPostMemberPositions(Post post) {
+        Member postMember = post.getPostMember();
+        return memberPositionRepository.findPositionNameByMember(postMember).stream()
+                .map(PostConverter::toMemberPositionDTO)
+                .toList();
+    }
+
+    @Override
+    public List<PostResponseDTO.PostImageDTO> getPostImages(Post post) {
+        return postImageRepository.findByPost(post).stream()
+                .map(PostConverter::toPostImageDTO)
+                .toList();
+    }
+
+    @Override
+    public List<PostResponseDTO.PostCommentResultDTO> getPostComments(Post post) {
+        return post.getPostComments().stream()
+                .map(PostConverter::toPostCommentResultDTO)
+                .toList();
+    }
+
+    @Override
+    @Transactional
+    public void addPostLike(Member member, Long postId) {
+        Post findPost = postRepository.findById(postId)
+                .orElseThrow(() -> new GeneralHandler(ErrorStatus.POST_NOT_FOUND));
+
+        if (findPost.getPostMember().equals(member)) {
+            throw new GeneralHandler(ErrorStatus.MY_POST_LIKE);
+        }
+
+        if (postLikeRepository.existsByMemberIdAndPostId(member.getId(), postId)) {
+            throw new GeneralHandler(ErrorStatus.POST_ALREADY_LIKED);
+        }
+
+        if (postRepository.increasePostLike(postId) == 0) {
+            throw new GeneralHandler(ErrorStatus.POST_NOT_FOUND);
+        }
+
+        postLikeRepository.save(PostLike.builder()
+                .post(findPost)
+                .member(member)
+                .build());
+    }
+
+    @Override
+    @Transactional
+    public void removePostLike(String email, Long postId) {
+        if (postLikeRepository.removeByMemberEmailAndPostId(email, postId) == 0) {
+            throw new GeneralHandler(ErrorStatus.POST_LIKE_NOT_FOUND);
+        }
+
+        if (postRepository.decreasePostLike(postId) == 0) {
+            throw new GeneralHandler(ErrorStatus.POST_LIKE_NOT_FOUND);
+        }
+    }
+
+    @Override
+    public Set<Long> findPostLikes(Long memberId) {
+        return postLikeRepository.findPostIdsLikedByMemberId(memberId);
+    }
+
+    @Override
+    public List<PostResponseDTO.PostResultDTO> getAllPosts(Pageable pageable, Set<Long> likedPostIds) {
+        Page<Post> postPage = postRepository.findAllWithMember(pageable);
+
+        return postPage.stream()
+                .map(post -> {
+                    boolean liked = likedPostIds != null && likedPostIds.contains(post.getId());
+                    int commentCount = post.getPostComments().size();
+                    Member postMember = post.getPostMember();
+
+                    List<PostResponseDTO.MemberPositionDTO> memberPositionDTOList = memberPositionRepository.findPositionNameByMember(postMember).stream()
+                            .map(PostConverter::toMemberPositionDTO)
+                            .toList();
+
+                    List<PostResponseDTO.PostImageDTO> postImageDTOList = post.getPostImages().stream()
+                            .map(PostConverter::toPostImageDTO)
+                            .toList();
+
+                    return PostConverter.toPostResultDTO(post, memberPositionDTOList, postImageDTOList, commentCount, liked);
+                }).toList();
+    }
+
+
+    private void uploadImagesToS3(List<MultipartFile> changePostImages, Post findPost) {
+        for (MultipartFile image : changePostImages) {
+            String uuid = UUID.randomUUID().toString();
+            Uuid savedUuid = uuidRepository.save(Uuid.builder()
+                    .uuid(uuid).build());
+
+            String postImageURL = s3Manager.uploadFile(s3Manager.generatePostImageKeyName(savedUuid), image);
+
+            PostImage postImage = PostImage.builder()
+                    .post(findPost)
+                    .imageUrl(postImageURL)
+                    .build();
+
+            postImageRepository.save(postImage);
+        }
+    }
+}

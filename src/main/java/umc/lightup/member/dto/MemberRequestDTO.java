@@ -91,7 +91,7 @@ public class MemberRequestDTO {
                     .gender(this.gender)
                     .birth(this.birth)
                     .role(this.role)
-                    .mbti(this.mbti)
+                    .mbti(this.mbti.toByte())
                     .email(this.email)
                     .phoneNumber(this.phoneNumber)
                     .age((int) this.birth.until(LocalDate.now(), ChronoUnit.YEARS))
@@ -179,6 +179,26 @@ public class MemberRequestDTO {
 
     @Getter
     @Setter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class MemberSearchRequestDTO {
+        private List<String> positions;
+        // 글자 하나하나 받는것과 각각에 대한 boolean으로 받는 것 모두 가능한데 프론트 입장에서 뭐가 편할지 모르겠음
+        private Boolean mbtiE;
+        private Boolean mbtiN;
+        private Boolean mbtiF;
+        private Boolean mbtiP;
+        private List<MemberRegionRequestDTO> regions;
+        private Boolean onlyLiked;
+        @Positive
+        private Long page;
+        @Positive
+        private Long limit;
+    }
+
+    @Getter
+    @Setter
     public static class MemberPositionRequestDTO {
         @NotEmpty
         private String position;
@@ -209,6 +229,9 @@ public class MemberRequestDTO {
 
     @Getter
     @Setter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class MemberRegionRequestDTO {
         @NotBlank
         @ExistSiDo
