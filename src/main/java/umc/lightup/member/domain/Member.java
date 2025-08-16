@@ -30,18 +30,25 @@ public class Member extends BaseEntity implements UserDetails {
     @EqualsAndHashCode.Include //Id만 비교하면 끝이라서 Include와 onlyExplicitlyIncluded = true 설정 진행
     private Long id;
 
+    @Setter
     @Column(length = 20) //소셜로그인 회원가입 시 안 들어올 수 있음
     private String name;
 
+    @Setter
     @Column(unique = true, length = 20)
     private String nickname; // 추가
 
+    @Setter
     private Boolean gender; // 수정
 
+    // 이 필드는 삭제가 시급한데... birth로 계산할 수 있는데...
+    @Setter
     private Integer age;
 
+    @Setter
     private LocalDate birth;
 
+    @Setter
     @Enumerated(EnumType.STRING)
     @Column(length = 8)
     private Role role;
@@ -53,9 +60,11 @@ public class Member extends BaseEntity implements UserDetails {
      * P +1,
      * 총 0(ISTJ)~15(ENFP)로 표현
      * */
+    @Setter
     @Column(columnDefinition = "BIT(4)")
     private Byte mbti;
 
+    @Setter
     @Column(unique = true, nullable = false, length = 30)
     private String email;
 
@@ -63,6 +72,7 @@ public class Member extends BaseEntity implements UserDetails {
     @JoinColumn(name = "school_id")
     private School school;
 
+    @Setter
     @Column(unique = true, length = 20)
     private String phoneNumber;
 

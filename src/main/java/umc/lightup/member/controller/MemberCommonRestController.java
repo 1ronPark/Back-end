@@ -33,13 +33,14 @@ public class MemberCommonRestController {
     public ApiResponse<MemberResponseDTO.MyInfoDTO> getMyInfo(Authentication authentication) {
         String email = authentication.getName();
         Member member = memberCommandService.getMember(email);
-        return ApiResponse.onSuccess(MemberResponseDTO.toMyInfoDTO(member));
+        return ApiResponse.onSuccess(MemberConverter.toMyInfoDTO(member));
     }
 
     @PutMapping("/me")
     @Operation(
-            summary = "회원 정보 변경 API",
-            description = "회원 정보를 변경하는 API입니다. 이메일도 변경이 가능하나 인증과 관련된 사항이기에 반드시 logout을 시행해 주셔야 합니다.",
+            summary = "회원 정보 변경 API (프론트엔드 요청사항 반영 전)",
+            description = "회원 정보를 변경하는 API입니다. 이메일도 변경이 가능하나 인증과 관련된 사항이기에 반드시 logout을 시행해 주셔야 합니다." +
+                    " 생일, 성별 등이 포함된 full version입니다. 나중에 개발 추가 진행하실 때의 편의를 드리기 위해 분리했습니다.",
             security = { @SecurityRequirement(name = "JWT TOKEN")}
     )
     public ApiResponse<MemberResponseDTO.MyInfoDTO> changeMemberInfo(Authentication authentication,
@@ -49,7 +50,20 @@ public class MemberCommonRestController {
         //여기서 주의할 점은 이메일 변경되면 로그아웃이 필수이지만 백엔드에서는 아무런 처리를 해 주지 않는다는 것. 알아서 기존 token 지우고 다시 로그인 해야 함.
         //로그아웃이 필수인 이유가 jwt에 이메일을 저장하기 때문인데, 이 때문에 A와 B가 서로의 비밀번호를 몰라도 서로 이메일을 바꾸면 A는 B 계정에, B는 A 계정에 접속할 수 있음.
         String email = authentication.getName();
-        return ApiResponse.onSuccess(MemberResponseDTO.toMyInfoDTO(memberCommandService.putMember(email, request)));
+        return ApiResponse.onSuccess(MemberConverter.toMyInfoDTO(memberCommandService.putMember(email, request)));
+    }
+
+    @PutMapping("/me/basic")
+    @Operation(
+            summary = "회원 정보 변경 API (프론트엔드 요청사항 반영 후)",
+            description = "회원 정보를 변경하는 API입니다. 이메일도 변경이 가능하나 인증과 관련된 사항이기에 반드시 logout을 시행해 주셔야 합니다." +
+                    " 생일, 성별 등이 제외된 version입니다. 나중에 개발 추가 진행하실 때의 편의를 드리기 위해 분리했습니다.",
+            security = { @SecurityRequirement(name = "JWT TOKEN")}
+    )
+    public ApiResponse<MemberResponseDTO.MyInfoDTO> changeMemberInfoBasic(Authentication authentication,
+                                                                     @RequestBody @Valid MemberRequestDTO.BasicChangeDto request) {
+        String email = authentication.getName();
+        return ApiResponse.onSuccess(MemberConverter.toMyInfoDTO(memberCommandService.putMemberBasic(email, request)));
     }
 
     @GetMapping("/{memberId}")

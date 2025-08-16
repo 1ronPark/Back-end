@@ -5,10 +5,29 @@ import umc.lightup.member.domain.Member;
 import umc.lightup.member.domain.MemberRegion;
 import umc.lightup.member.domain.Portfolio;
 import umc.lightup.member.dto.MemberResponseDTO;
+import umc.lightup.member.enums.Mbti;
 
 import java.util.List;
 
 public class MemberConverter {
+
+    public static MemberResponseDTO.MyInfoDTO toMyInfoDTO(Member member) {
+        return MemberResponseDTO.MyInfoDTO.builder()
+                .id(member.getId())
+                .name(member.getName())
+                .email(member.getEmail())
+                .nickname(member.getNickname())
+                .age(member.getAge())
+                .role(member.getRole())
+                .mbti(Mbti.fromByte(member.getMbti()))
+                .birth(member.getBirth())
+                .gender(member.getGender())
+                .phoneNumber(member.getPhoneNumber())
+                .selfIntroduce(member.getSelfIntroduce())
+                .profileImageUrl(member.getProfileImageUrl())
+                .profileTitle(member.getProfileTitle())
+                .build();
+    }
 
     public static MemberResponseDTO.selectSkillResultDTO toSelectSkillResultDTO(String skillName, Member member) {
         return MemberResponseDTO.selectSkillResultDTO.builder()

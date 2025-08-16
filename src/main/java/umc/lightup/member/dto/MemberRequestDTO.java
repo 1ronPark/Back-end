@@ -16,7 +16,6 @@ import umc.lightup.region.validation.annotation.ExistSiDo;
 import umc.lightup.region.validation.annotation.ExistSiGunGu;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 public class MemberRequestDTO {
@@ -64,7 +63,9 @@ public class MemberRequestDTO {
     @AllArgsConstructor(access = AccessLevel.PROTECTED)
     public static class ChangeDto{
         @NotEmpty
+        @Size(max = 20)
         private String name;
+        @Size(max = 20)
         private String nickname;
         @NotNull
         private Boolean gender;
@@ -78,25 +79,37 @@ public class MemberRequestDTO {
         private Mbti mbti;
         @NotEmpty
         @Email
+        @Size(max = 30)
         private String email;
         @NotEmpty
         @Pattern(regexp = "0[1-8]\\d{0,1}-\\d{3,4}-\\d{4,5}")
         private String phoneNumber;
+        @NotEmpty
+        @Size(max = 80)
+        private String profileTitle;
+    }
 
-        public Member toMember(long id){
-            return Member.builder()
-                    .id(id)
-                    .name(this.name)
-                    .nickname(this.nickname)
-                    .gender(this.gender)
-                    .birth(this.birth)
-                    .role(this.role)
-                    .mbti(this.mbti.toByte())
-                    .email(this.email)
-                    .phoneNumber(this.phoneNumber)
-                    .age((int) this.birth.until(LocalDate.now(), ChronoUnit.YEARS))
-                    .build();
-        }
+    // Unique check을 하지 않은 상태
+    @Getter
+    @Setter
+    @Builder
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor(access = AccessLevel.PROTECTED)
+    public static class BasicChangeDto{
+        @Size(max = 20)
+        private String nickname;
+        @NotNull
+        private Mbti mbti;
+        @NotEmpty
+        @Email
+        @Size(max = 30)
+        private String email;
+        @NotEmpty
+        @Pattern(regexp = "0[1-8]\\d{0,1}-\\d{3,4}-\\d{4,5}")
+        private String phoneNumber;
+        @NotEmpty
+        @Size(max = 80)
+        private String profileTitle;
     }
 
     @Getter
@@ -117,9 +130,6 @@ public class MemberRequestDTO {
 //        @NotNull
 //        @Size(max = 4)
 //        private List<PortfolioInfoDTO> portfolios;
-        @NotEmpty
-        @Size(max = 80)
-        private String profileTitle;
         @Size(max = 3000) //Nullable
         private String selfIntroduction;
         private List<ActivityInfoDTO> activities;

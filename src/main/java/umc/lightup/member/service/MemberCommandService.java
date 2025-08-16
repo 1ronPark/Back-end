@@ -13,6 +13,7 @@ public interface MemberCommandService {
     MemberResponseDTO.MemberInfoDTO getMember(long id, Member requestedMember);
     List<MemberResponseDTO.HistoryInfoDTO> getHistory(Member member, long size);
     Member putMember(String email, MemberRequestDTO.ChangeDto request);
+    Member putMemberBasic(String email, MemberRequestDTO.BasicChangeDto request);
     MemberResponseDTO.MyProfileDTO getMemberProfile(Member member);
     MemberResponseDTO.MyProfileDTO putMemberProfile(Member member, MemberRequestDTO.ProfileChangeDto request);
     String saveMemberProfileImage(Member member, MultipartFile profileImage);
