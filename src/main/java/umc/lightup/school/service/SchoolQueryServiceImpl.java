@@ -47,6 +47,13 @@ public class SchoolQueryServiceImpl implements SchoolQueryService {
       throw new GeneralHandler(ErrorStatus.SCHOOL_DOMAIN_NOT_FOUND);
     }
 
+    schoolEmailVerificationRepository.findByEmail(email).ifPresent(existing -> {
+      if(!existing.isVerified() && existing.getExpiredAt().isAfter(LocalDateTime.now())){
+        throw new GeneralHandler(ErrorStatus.SCHOOL_EMAIL_ALREADY_IN_PROGRESS);
+      } else if(existing.isVerified()){
+        throw new GeneralHandler(ErrorStatus.SCHOOL_EMAIL_ALREADY_VERIFIED);
+      }
+    });
     // 랜덤 코드 생성 로직
     String randomCode = generateRandomCode(6);
 

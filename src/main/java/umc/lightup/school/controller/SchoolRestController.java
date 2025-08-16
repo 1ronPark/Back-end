@@ -75,6 +75,6 @@ public class SchoolRestController {
           @RequestParam @NotNull String code
   ) {
     schoolQueryService.verifyEmail(email, code);
-    return ApiResponse.of(SuccessStatus._NO_CONTENT, null);
+    return ApiResponse.of(SuccessStatus._OK, null);
   }
 }
