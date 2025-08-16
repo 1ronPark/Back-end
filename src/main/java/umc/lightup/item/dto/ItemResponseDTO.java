@@ -39,6 +39,7 @@ public class ItemResponseDTO {
         private Long itemId;
         private String itemName;
 //        private String schoolName;
+        private String introduce;
         private String memberName;
         private String memberProfileImageUrl;
         private String itemImageUrl;

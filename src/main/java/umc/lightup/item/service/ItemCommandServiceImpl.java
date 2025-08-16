@@ -353,6 +353,11 @@ public class ItemCommandServiceImpl implements ItemCommandService {
     public ItemApply applyItem(Member member, long itemId) {
         Item item = itemRepository.findByIdWithOwner(itemId)
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.ITEM_NOT_FOUND));
+
+        if (item.getMember().equals(member)) {
+            throw new GeneralHandler(ErrorStatus.SELF_ITEM_APPLY);
+        }
+
         if (itemApplyRepository.existsByMemberAndItem(member, item)) {
             throw new GeneralHandler(ErrorStatus.DUPLICATE_ITEM_APPLY);
         }

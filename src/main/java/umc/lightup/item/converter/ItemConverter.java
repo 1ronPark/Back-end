@@ -30,6 +30,7 @@ public class ItemConverter {
                 .itemName(item.getName())
                 .memberName(item.getMember().getName())
 //                .schoolName(item.getMember().getSchool().getName())
+                .introduce(item.getIntroduce())
                 .memberProfileImageUrl(item.getMember().getProfileImageUrl())
                 .itemImageUrl(itemImageUrl)
                 .updatedAt(item.getUpdatedAt().toLocalDate())
