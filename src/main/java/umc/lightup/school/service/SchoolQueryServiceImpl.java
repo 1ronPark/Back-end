@@ -10,6 +10,7 @@ import umc.lightup.api.code.status.ErrorStatus;
 import umc.lightup.config.EmailService;
 import umc.lightup.exception.handler.GeneralHandler;
 import umc.lightup.member.domain.Member;
+import umc.lightup.member.repository.MemberRepository;
 import umc.lightup.school.converter.SchoolConverter;
 import umc.lightup.school.domain.School;
 import umc.lightup.school.domain.SchoolEmailVerification;
@@ -28,6 +29,7 @@ public class SchoolQueryServiceImpl implements SchoolQueryService {
   private final EmailService emailService;
   private final SchoolRepository schoolRepository;
   private final SchoolEmailVerificationRepository schoolEmailVerificationRepository;
+  private final MemberRepository memberRepository;
 
   @Override
   public Page<School> getSchoolList(String keyword, Integer page, Integer size) {
@@ -90,6 +92,10 @@ public class SchoolQueryServiceImpl implements SchoolQueryService {
       throw new GeneralHandler(ErrorStatus.SCHOOL_EMAIL_NOT_CORRECT);
     }
 
+    Member member = schoolEmailVerification.getMember();
+    School school = schoolEmailVerification.getSchool();
+
+    member.setSchool(school);
     schoolEmailVerification.setVerified(true);
     schoolEmailVerificationRepository.save(schoolEmailVerification);
   }

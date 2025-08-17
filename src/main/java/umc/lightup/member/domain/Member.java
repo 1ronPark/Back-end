@@ -68,6 +68,7 @@ public class Member extends BaseEntity implements UserDetails {
     @Column(unique = true, nullable = false, length = 30)
     private String email;
 
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "school_id")
     private School school;
