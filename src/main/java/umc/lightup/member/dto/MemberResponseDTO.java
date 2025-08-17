@@ -88,6 +88,7 @@ public class MemberResponseDTO {
         private LocalDate birth;
         private Role role;
         private Mbti mbti;
+        private String school;
         private String selfIntroduce;
         private List<String> skills;
         private List<String> strengths;

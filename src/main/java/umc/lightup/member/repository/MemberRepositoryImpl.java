@@ -27,6 +27,7 @@ import umc.lightup.member.enums.Mbti;
 import umc.lightup.member.enums.Role;
 import umc.lightup.position.domain.QPosition;
 import umc.lightup.region.domain.QRegion;
+import umc.lightup.school.domain.QSchool;
 import umc.lightup.skill.domain.QSkill;
 import umc.lightup.strength.domain.QStrength;
 
@@ -51,6 +52,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom{
     private final QMemberViewHistory memberViewHistory = QMemberViewHistory.memberViewHistory;
     private final QPortfolio portfolio = QPortfolio.portfolio;
     private final QActivity activity = QActivity.activity;
+    private final QSchool school = QSchool.school;
 
     private final QueryDSLTemplate queryDSLTemplate;
     private final ObjectMapper objectMapper;
@@ -350,7 +352,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom{
                                 member.role,
                                 member.mbti,
                                 member.selfIntroduce,
-                                member.school, //이거 school API 나오면 한 번 수정해야 할텐데
+                                school.name.as("school"),
 
                                 // Positions 집계
                                 JPAExpressions
@@ -412,6 +414,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom{
                                 member.profileImageUrl,
                                 likedCondition.as("liked")))
                         .from(member)
+                        .leftJoin(member.school, school)
                         .where(member.id.eq(id))
                         .fetchOne())
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.MEMBER_NOT_FOUND))
@@ -485,6 +488,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom{
                         .birth(birth)
                         .role(role)
                         .mbti(Mbti.fromByte(mbti))
+                        .school(school)
                         .positions(positions) // <> 내부 생략 가능
                         .regions(regions)
                         .skills(skills)

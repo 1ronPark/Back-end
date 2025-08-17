@@ -32,7 +32,7 @@ public class MemberCommonRestController {
     )
     public ApiResponse<MemberResponseDTO.MyInfoDTO> getMyInfo(Authentication authentication) {
         String email = authentication.getName();
-        Member member = memberCommandService.getMember(email);
+        Member member = memberCommandService.getMemberWithSchool(email);
         return ApiResponse.onSuccess(MemberConverter.toMyInfoDTO(member));
     }
 

@@ -22,6 +22,7 @@ public class MemberConverter {
                 .mbti(Mbti.fromByte(member.getMbti()))
                 .birth(member.getBirth())
                 .gender(member.getGender())
+                .school(member.getSchool() == null ? null : member.getSchool().getName())
                 .phoneNumber(member.getPhoneNumber())
                 .selfIntroduce(member.getSelfIntroduce())
                 .profileImageUrl(member.getProfileImageUrl())
