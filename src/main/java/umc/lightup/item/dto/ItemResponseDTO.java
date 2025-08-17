@@ -38,7 +38,7 @@ public class ItemResponseDTO {
     public static class ItemResultDTO {
         private Long itemId;
         private String itemName;
-//        private String schoolName;
+        private String schoolName;
         private String introduce;
         private String memberName;
         private String memberProfileImageUrl;
@@ -95,7 +95,7 @@ public class ItemResponseDTO {
         private Integer age;
         private Mbti mbti;
         private String email;
-        private String school;
+        private String schoolName;
         private List<ItemRegionResultDTO> regions;
         private String description;
         private List<RecruitPositionResultDTO> recruitPositions;
