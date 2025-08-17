@@ -112,6 +112,7 @@ public enum ErrorStatus implements BaseErrorCode {
     SCHOOL_EMAIL_EXPIRED(HttpStatus.BAD_REQUEST, "SCHOOL4004", "이메일 유효기간이 초과했습니다."),
     SCHOOL_EMAIL_ALREADY_IN_PROGRESS(HttpStatus.CONFLICT, "SCHOOL4005", "이미 인중중인 이메일입니다."),
     SCHOOL_EMAIL_ALREADY_VERIFIED(HttpStatus.CONFLICT, "SCHOOL4006", "이미 인증된 이메일입니다."),
+    SCHOOL_EMAIL_NOT_CORRECT(HttpStatus.CONFLICT, "SCHOOL4007", "인증코드가 일치하지 않습니다."),
 
     //Email 관련 에러
     EMAIL_SEND_FAIL(HttpStatus.SERVICE_UNAVAILABLE, "EMAIL5003", "이메일 전송에 실패했습니다."),
