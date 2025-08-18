@@ -19,7 +19,7 @@ import java.util.Set;
 public interface ItemCommandService {
     Item createItem(Member member, ItemRequestDTO.ItemJoinRequestDTO request, MultipartFile itemProfileImage, MultipartFile itemPlanFile);
     Item changeItem(Member member, Long itemId, ItemRequestDTO.ItemChangeRequestDTO request, MultipartFile itemProfileImage, MultipartFile itemPlanFile);
-    Item getSingleItem(Long itemId);
+    Item getEditItem(Member member, Long itemId);
     Item getSingleItemWithComments(Long itemId);
     ItemApply applyItem(Member member, long itemId);
     boolean getItemApplyStatus(Member member, Item item);

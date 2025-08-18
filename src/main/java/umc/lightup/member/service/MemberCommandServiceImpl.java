@@ -340,7 +340,6 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     @Override
     @Transactional
     public List<MemberResponseDTO.singleRegionResultDTO> selectRegions(Member member, MemberRequestDTO.MemberRegionListRequestDTO request) {
-        member = getMember(member.getId());
         List<MemberResponseDTO.singleRegionResultDTO> resultDTOList = new ArrayList<>();
         for (MemberRequestDTO.MemberRegionRequestDTO dto : request.getMemberRegions()) {
             MemberRegion memberRegion = MemberRegion.builder()

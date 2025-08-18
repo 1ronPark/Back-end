@@ -191,4 +191,23 @@ public class ItemResponseDTO {
         private String content;
         private LocalDateTime updatedAt;
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ItemEditInfoDTO {
+        private Long itemId;
+        private String itemName;
+        private String introduce;
+        private String extraLink1;
+        private String extraLink2;
+        private String description;
+        private List<ItemCategoriesResultDTO> itemCategories;
+        private String itemProfileImageUrl;
+        private String itemPlanFileUrl;
+        private Boolean projectStatus;
+        private List<ItemRegionResultDTO> regions;
+        private List<RecruitPositionResultDTO> recruitPositions;
+    }
 }
