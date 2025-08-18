@@ -266,9 +266,15 @@ public class ItemCommandServiceImpl implements ItemCommandService {
     }
 
     @Override
-    public Item getSingleItem(Long itemId) {
-        return itemRepository.findById(itemId)
+    public Item getEditItem(Member member, Long itemId) {
+        Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new GeneralHandler(ErrorStatus.ITEM_NOT_FOUND));
+
+        if (!item.getMember().equals(member)) {
+            throw new GeneralHandler(ErrorStatus.NOT_MY_ITEM);
+        }
+
+        return item;
     }
 
     @Override

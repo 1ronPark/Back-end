@@ -178,6 +178,26 @@ public class ItemConverter {
                 .build();
     }
 
+    public static ItemResponseDTO.ItemEditInfoDTO toItemEditInfoDTO (Item item,
+                                                                     List<ItemResponseDTO.ItemCategoriesResultDTO> itemCategoriesResultDTOList,
+                                                                     List<ItemResponseDTO.ItemRegionResultDTO> itemRegionResultDTOList,
+                                                                     List<ItemResponseDTO.RecruitPositionResultDTO> recruitPositionResultDTOList) {
+        return ItemResponseDTO.ItemEditInfoDTO.builder()
+                .itemId(item.getId())
+                .itemName(item.getName())
+                .introduce(item.getIntroduce())
+                .extraLink1(item.getExtraLink1())
+                .extraLink2(item.getExtraLink2())
+                .description(item.getDescription())
+                .itemCategories(itemCategoriesResultDTOList)
+                .itemProfileImageUrl(item.getItemProfileImageUrl())
+                .itemPlanFileUrl(item.getItemPlanFileUrl())
+                .projectStatus(item.isProjectStatus())
+                .regions(itemRegionResultDTOList)
+                .recruitPositions(recruitPositionResultDTOList)
+                .build();
+    }
+
 /*    public static ItemImage toItemImage(Item item, String imageUrl) {
         return ItemImage.builder()
                 .item(item)
