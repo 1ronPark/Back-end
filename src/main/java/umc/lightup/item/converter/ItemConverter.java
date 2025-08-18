@@ -4,7 +4,6 @@ import umc.lightup.item.domain.*;
 import umc.lightup.item.dto.ItemRequestDTO;
 import umc.lightup.item.dto.ItemResponseDTO;
 import umc.lightup.member.domain.Member;
-import umc.lightup.member.domain.MemberRegion;
 import umc.lightup.member.enums.Mbti;
 
 import java.util.List;
@@ -96,10 +95,10 @@ public class ItemConverter {
                 .build();
     }
 
-    public static ItemResponseDTO.ItemRegionResultDTO toItemRegionResultDTO(MemberRegion memberRegion) {
+    public static ItemResponseDTO.ItemRegionResultDTO toItemRegionResultDTO(ItemRegion itemRegion) {
         return ItemResponseDTO.ItemRegionResultDTO.builder()
-                .siDo(memberRegion.getSiDo())
-                .siGunGu(memberRegion.getSiGunGu())
+                .siDo(itemRegion.getSiDo())
+                .siGunGu(itemRegion.getSiGunGu())
                 .build();
     }
 

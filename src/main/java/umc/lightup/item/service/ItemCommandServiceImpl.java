@@ -19,7 +19,6 @@ import umc.lightup.item.enums.CategoryType;
 import umc.lightup.item.enums.ItemApplyStatus;
 import umc.lightup.item.repository.*;
 import umc.lightup.member.domain.Member;
-import umc.lightup.member.repository.MemberRegionRepository;
 import umc.lightup.member.repository.MemberRepository;
 import umc.lightup.notification.dto.NotificationEventRequestDTO;
 import umc.lightup.notification.enums.NotificationType;
@@ -40,7 +39,7 @@ import java.util.stream.Stream;
 public class ItemCommandServiceImpl implements ItemCommandService {
 
     private final ItemRepository itemRepository;
-    private final MemberRegionRepository memberRegionRepository;
+    private final ItemRegionRepository itemRegionRepository;
     private final RecruitPositionRepository recruitPositionRepository;
     private final PositionRepository positionRepository;
     private final ItemLikeRepository itemLikeRepository;
@@ -285,9 +284,7 @@ public class ItemCommandServiceImpl implements ItemCommandService {
 
     @Override
     public List<ItemResponseDTO.ItemRegionResultDTO> getItemRegions(Item item) {
-        Member member = item.getMember();
-
-        return memberRegionRepository.findByMember(member).stream()
+        return itemRegionRepository.findByItem(item).stream()
                 .map(ItemConverter::toItemRegionResultDTO)
                 .toList();
     }
