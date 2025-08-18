@@ -104,6 +104,7 @@ public class ItemConverter {
 
     public static ItemResponseDTO.RecruitPositionResultDTO toRecruitPositionResultDTO(RecruitPosition recruitPosition) {
         return ItemResponseDTO.RecruitPositionResultDTO.builder()
+                .positionId(recruitPosition.getPosition().getId())
                 .positionName(recruitPosition.getPosition().getName())
                 .recruitNumber(recruitPosition.getRecruitNumber())
                 .mainTasks(recruitPosition.getMainTasks())
@@ -195,6 +196,7 @@ public class ItemConverter {
                 .projectStatus(item.isProjectStatus())
                 .regions(itemRegionResultDTOList)
                 .recruitPositions(recruitPositionResultDTOList)
+                .updatedAt(item.getUpdatedAt())
                 .build();
     }
 

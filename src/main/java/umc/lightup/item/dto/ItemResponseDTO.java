@@ -122,6 +122,7 @@ public class ItemResponseDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class RecruitPositionResultDTO {
+        private Long positionId;
         private String positionName;
         private Integer recruitNumber;
         private String mainTasks;
@@ -209,5 +210,6 @@ public class ItemResponseDTO {
         private Boolean projectStatus;
         private List<ItemRegionResultDTO> regions;
         private List<RecruitPositionResultDTO> recruitPositions;
+        private LocalDateTime updatedAt;
     }
 }
