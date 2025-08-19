@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import umc.lightup.item.domain.Item;
+import umc.lightup.item.enums.CategoryType;
 import umc.lightup.member.domain.Member;
 
 import java.util.List;
@@ -31,5 +32,9 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     int deleteByMemberAndId(Member member, Long itemId);
 
     Page<Item> findAll(Pageable pageable);
+
+    @Query("select i from Item i join i.itemCategories ic where ic.categoryType = :category")
+    Page<Item> findByCategory(@Param("category") CategoryType category, Pageable pageable);
+
     boolean existsByIdAndMember(long id, Member member);
 }

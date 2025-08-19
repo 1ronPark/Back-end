@@ -40,7 +40,9 @@ public interface ItemCommandService {
     Set<Long> findItemLikes(long memberId);
     int countComments(Long itemId);
 
-    List<ItemResponseDTO.ItemResultDTO> getAllItems(Pageable pageable, @Nullable Set<Long> likedItemIds);
+    List<ItemResponseDTO.ItemResultDTO> getAllItems(Pageable pageable,
+                                                    @Nullable Set<Long> likedItemIds,
+                                                    @Nullable String category);
 
     List<ItemResponseDTO.MyItemResultDTO> getMyItems(Member member);
 
@@ -51,4 +53,6 @@ public interface ItemCommandService {
     List<ItemResponseDTO.ItemCategoriesResultDTO> getItemCategories(Item item);
 
     List<ItemResponseDTO.ItemCommentResultDTO> getItemComments(Item item);
+
+//    ItemResponseDTO.ItemInfoListDTO searchItems(Member member, ItemRequestDTO.ItemSearchRequestDTO request);
 }
