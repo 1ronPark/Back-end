@@ -14,8 +14,6 @@ import org.springframework.stereotype.Repository;
 import umc.lightup.item.domain.*;
 import umc.lightup.item.dto.ItemRequestDTO;
 import umc.lightup.item.enums.CategoryType;
-import umc.lightup.member.domain.QMember;
-import umc.lightup.school.domain.QSchool;
 
 import java.util.List;
 
@@ -24,13 +22,10 @@ import java.util.List;
 public class ItemRepositoryImpl implements ItemRepositoryCustom{
     private final JPAQueryFactory jpaQueryFactory;
     private final QItem item = QItem.item;
-    private final QMember member = QMember.member;
     private final QItemCategory itemCategory = QItemCategory.itemCategory;
     private final QRecruitPosition recruitPosition = QRecruitPosition.recruitPosition;
     private final QItemRegion itemRegion = QItemRegion.itemRegion;
     private final QItemComment itemComment = QItemComment.itemComment;
-    private final QItemLike itemLike = QItemLike.itemLike;
-    private final QSchool school = QSchool.school;
 
     @Override
     public Page<Tuple> searchItems(Pageable pageable,

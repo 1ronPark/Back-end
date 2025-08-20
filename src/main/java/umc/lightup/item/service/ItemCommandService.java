@@ -2,8 +2,6 @@ package umc.lightup.item.service;
 
 import jakarta.annotation.Nullable;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.web.multipart.MultipartFile;
 import umc.lightup.item.domain.Item;
 import umc.lightup.item.domain.ItemApply;
@@ -13,7 +11,6 @@ import umc.lightup.item.dto.ItemResponseDTO;
 import umc.lightup.member.domain.Member;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 public interface ItemCommandService {
