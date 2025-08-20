@@ -1,5 +1,6 @@
 package umc.lightup.item.service;
 
+import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -217,7 +218,9 @@ public class ItemCommandServiceImpl implements ItemCommandService {
     }
 
     @Override
-    public List<ItemResponseDTO.ItemResultDTO> getAllItems(Pageable pageable, Set<Long> likedItemIds, String category) {
+    public List<ItemResponseDTO.ItemResultDTO> getAllItems(
+            Pageable pageable, Set<Long> likedItemIds, String category) {
+
         Page<Item> itemPage;
 
         if (category == null || category.isBlank()) {
@@ -229,11 +232,10 @@ public class ItemCommandServiceImpl implements ItemCommandService {
 
         return itemPage.stream()
                 .map(item -> {
-                    String itemImageUrl = item.getItemProfileImageUrl();
                     boolean liked = likedItemIds != null && likedItemIds.contains(item.getId());
                     int commentCount = itemCommentRepository.countByItemId(item.getId());
 
-                    return ItemConverter.toItemResultDTO(item, itemImageUrl, commentCount, liked);
+                    return ItemConverter.toItemResultDTO(item, commentCount, liked);
                 }).toList();
     }
 
@@ -577,13 +579,25 @@ public class ItemCommandServiceImpl implements ItemCommandService {
                 .toList();
     }
 
-/*    @Override
-    public ItemResponseDTO.ItemInfoListDTO searchItems(
-            Member member,
-            ItemRequestDTO.ItemSearchRequestDTO options) {
-        if (options.getItemRegions() == null) options.setItemRegions(List.of());
-        return itemRepository.getItemInfos(member, options);
-    }*/
+    @Override
+    public List<ItemResponseDTO.ItemResultDTO> searchItems(
+            Pageable pageable, Set<Long> likedItemIds, String category, String sort) {
+
+        Page<Tuple> tuples = itemRepository.searchItems(pageable, category, sort);
+
+        return tuples.stream()
+                .map(t -> {
+                    Item item = t.get(QItem.item);
+                    long itemCommentCount = t.get(QItemComment.itemComment.id.count());
+                    boolean liked = likedItemIds != null && likedItemIds.contains(Objects.requireNonNull(item).getId());
+                    if (item == null) {
+                        throw new GeneralHandler(ErrorStatus.ITEM_NOT_FOUND);
+                    }
+
+                    return ItemConverter.toItemResultDTO(item, (int) itemCommentCount, liked);
+                })
+                .toList();
+    }
 
     private boolean checkItemApply(Member member, Item item, boolean isFromOwnerExpected) {
         return itemApplyRepository.findByMemberAndItem(member, item)

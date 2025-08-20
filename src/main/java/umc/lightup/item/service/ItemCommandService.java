@@ -54,5 +54,5 @@ public interface ItemCommandService {
 
     List<ItemResponseDTO.ItemCommentResultDTO> getItemComments(Item item);
 
-//    ItemResponseDTO.ItemInfoListDTO searchItems(Member member, ItemRequestDTO.ItemSearchRequestDTO request);
+    List<ItemResponseDTO.ItemResultDTO> searchItems(Pageable pageable, @Nullable Set<Long> likedItemIds, @Nullable String category, String sort);
 }

@@ -212,4 +212,13 @@ public class ItemResponseDTO {
         private List<RecruitPositionResultDTO> recruitPositions;
         private LocalDateTime updatedAt;
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ItemInfoListDTO {
+        List<ItemResponseDTO.ItemResultDTO> items;
+        long numOfTotalResults;
+    }
 }
