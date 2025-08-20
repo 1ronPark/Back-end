@@ -217,8 +217,15 @@ public class ItemCommandServiceImpl implements ItemCommandService {
     }
 
     @Override
-    public List<ItemResponseDTO.ItemResultDTO> getAllItems(Pageable pageable, Set<Long> likedItemIds) {
-        Page<Item> itemPage = itemRepository.findAll(pageable);
+    public List<ItemResponseDTO.ItemResultDTO> getAllItems(Pageable pageable, Set<Long> likedItemIds, String category) {
+        Page<Item> itemPage;
+
+        if (category == null || category.isBlank()) {
+            itemPage = itemRepository.findAll(pageable);
+        } else {
+            CategoryType categoryEnum = CategoryType.toCategoryType(category);
+            itemPage = itemRepository.findByCategory(categoryEnum, pageable);
+        }
 
         return itemPage.stream()
                 .map(item -> {
@@ -570,6 +577,13 @@ public class ItemCommandServiceImpl implements ItemCommandService {
                 .toList();
     }
 
+/*    @Override
+    public ItemResponseDTO.ItemInfoListDTO searchItems(
+            Member member,
+            ItemRequestDTO.ItemSearchRequestDTO options) {
+        if (options.getItemRegions() == null) options.setItemRegions(List.of());
+        return itemRepository.getItemInfos(member, options);
+    }*/
 
     private boolean checkItemApply(Member member, Item item, boolean isFromOwnerExpected) {
         return itemApplyRepository.findByMemberAndItem(member, item)
