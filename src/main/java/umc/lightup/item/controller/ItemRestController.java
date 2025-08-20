@@ -68,7 +68,8 @@ public class ItemRestController {
             Authentication authentication,
             @RequestParam(value = "page", defaultValue = "0") @Min(1) Integer page,
             @RequestParam(value = "sort", defaultValue = "latest") String sort,
-            @RequestParam(value = "category", required = false) String category) {
+            @RequestParam(value = "category", required = false) String category,
+            @RequestParam(value = "positionId", required = false) Long positionId) {
         Pageable pageable = PageRequest.of(page - 1, DEFAULT_ITEM_PAGE_SIZE);
 
         Set<Long> likedItemIds = Collections.emptySet();
@@ -79,7 +80,7 @@ public class ItemRestController {
             likedItemIds = itemCommandService.findItemLikes(member.getId());
         }
 
-        List<ItemResponseDTO.ItemResultDTO> allItems = itemCommandService.searchItems(pageable, likedItemIds, category, sort);
+        List<ItemResponseDTO.ItemResultDTO> allItems = itemCommandService.searchItems(pageable, likedItemIds, category, positionId, sort);
         return ApiResponse.onSuccess(ItemConverter.toItemResultListDTO(allItems));
     }
 

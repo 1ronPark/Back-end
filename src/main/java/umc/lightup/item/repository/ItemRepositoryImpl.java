@@ -142,7 +142,7 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
     }
 
     @Override
-    public Page<Tuple> searchItems(Pageable pageable, String category, String sort) {
+    public Page<Tuple> searchItems(Pageable pageable, String category, Long positionId, String sort) {
         BooleanBuilder predicate = new BooleanBuilder();
 
         // 1) CategoryType 필터
@@ -159,6 +159,20 @@ public class ItemRepositoryImpl implements ItemRepositoryCustom{
                     .exists();
 
             predicate.and(categoryCondition);
+        }
+
+        // 2) Position 필터
+        if (positionId != null) {
+            BooleanExpression positionCondition = JPAExpressions
+                    .selectOne()
+                    .from(recruitPosition)
+                    .where(
+                            recruitPosition.item.eq(item),
+                            recruitPosition.position.id.eq(positionId)
+                    )
+                    .exists();
+
+            predicate.and(positionCondition);
         }
 
         OrderSpecifier<?> orderSpecifier;

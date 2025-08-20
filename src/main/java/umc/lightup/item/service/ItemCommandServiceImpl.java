@@ -581,9 +581,9 @@ public class ItemCommandServiceImpl implements ItemCommandService {
 
     @Override
     public List<ItemResponseDTO.ItemResultDTO> searchItems(
-            Pageable pageable, Set<Long> likedItemIds, String category, String sort) {
+            Pageable pageable, Set<Long> likedItemIds, String category, Long positionId, String sort) {
 
-        Page<Tuple> tuples = itemRepository.searchItems(pageable, category, sort);
+        Page<Tuple> tuples = itemRepository.searchItems(pageable, category, positionId, sort);
 
         return tuples.stream()
                 .map(t -> {

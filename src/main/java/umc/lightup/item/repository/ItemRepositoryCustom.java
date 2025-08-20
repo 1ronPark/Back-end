@@ -11,5 +11,5 @@ public interface ItemRepositoryCustom {
     ItemResponseDTO.ItemInfoListDTO getItemInfos
             (Member currentMember, ItemRequestDTO.ItemSearchRequestDTO options);
 
-    Page<Tuple> searchItems(Pageable pageable, String category, String sort);
+    Page<Tuple> searchItems(Pageable pageable, String category, Long positionId, String sort);
 }
