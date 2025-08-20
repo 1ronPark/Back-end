@@ -1,12 +1,8 @@
 package umc.lightup.item.dto;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.validation.constraints.*;
+import lombok.*;
 import umc.lightup.position.validation.annotation.ExistPosition;
 import umc.lightup.region.validation.annotation.ExistSiDo;
 import umc.lightup.region.validation.annotation.ExistSiGunGu;
@@ -66,6 +62,7 @@ public class ItemRequestDTO {
 
     @Getter
     @Setter
+    @Builder
     public static class CollaborationRegionRequestDTO {
         @NotBlank
         @ExistSiDo
@@ -126,5 +123,14 @@ public class ItemRequestDTO {
     public static class ItemCommentRequestDTO {
         @NotBlank
         private String content;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ItemRegionSearchRequestDTO {
+        private List<CollaborationRegionRequestDTO> itemRegions;
     }
 }

@@ -1,5 +1,6 @@
 package umc.lightup.item.service;
 
+import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -211,13 +212,15 @@ public class ItemCommandServiceImpl implements ItemCommandService {
         }
     }
 
-    @Override
+/*    @Override
     public Set<Long> findItemLikes(long memberId) {
         return itemLikeRepository.findItemIdsLikedByMemberId(memberId);
     }
 
     @Override
-    public List<ItemResponseDTO.ItemResultDTO> getAllItems(Pageable pageable, Set<Long> likedItemIds, String category) {
+    public List<ItemResponseDTO.ItemResultDTO> getAllItems(
+            Pageable pageable, Set<Long> likedItemIds, String category) {
+
         Page<Item> itemPage;
 
         if (category == null || category.isBlank()) {
@@ -229,13 +232,12 @@ public class ItemCommandServiceImpl implements ItemCommandService {
 
         return itemPage.stream()
                 .map(item -> {
-                    String itemImageUrl = item.getItemProfileImageUrl();
                     boolean liked = likedItemIds != null && likedItemIds.contains(item.getId());
                     int commentCount = itemCommentRepository.countByItemId(item.getId());
 
-                    return ItemConverter.toItemResultDTO(item, itemImageUrl, commentCount, liked);
+                    return ItemConverter.toItemResultDTO(item, commentCount, liked);
                 }).toList();
-    }
+    }*/
 
     @Override
     public List<ItemResponseDTO.MyItemResultDTO> getMyItems(Member member) {
@@ -577,13 +579,17 @@ public class ItemCommandServiceImpl implements ItemCommandService {
                 .toList();
     }
 
-/*    @Override
-    public ItemResponseDTO.ItemInfoListDTO searchItems(
-            Member member,
-            ItemRequestDTO.ItemSearchRequestDTO options) {
-        if (options.getItemRegions() == null) options.setItemRegions(List.of());
-        return itemRepository.getItemInfos(member, options);
-    }*/
+    @Override
+    public List<ItemResponseDTO.ItemResultDTO> searchItems(
+            Member requestedMember,
+            Pageable pageable,
+            String category,
+            Long positionId,
+            ItemRequestDTO.ItemRegionSearchRequestDTO itemRegionDTOs,
+            Boolean onlyLiked,
+            String sort) {
+        return itemRepository.searchItems(requestedMember, pageable, category, positionId, itemRegionDTOs, onlyLiked, sort);
+    }
 
     private boolean checkItemApply(Member member, Item item, boolean isFromOwnerExpected) {
         return itemApplyRepository.findByMemberAndItem(member, item)

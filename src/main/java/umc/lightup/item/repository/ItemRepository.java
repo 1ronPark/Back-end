@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ItemRepository extends JpaRepository<Item, Long> {
+public interface ItemRepository extends JpaRepository<Item, Long>, ItemRepositoryCustom {
     List<Item> findByMember(Member member);
 
     @Query("select distinct i from Item i left join fetch i.itemComments ic left join fetch ic.commentMember where i.id = :itemId")

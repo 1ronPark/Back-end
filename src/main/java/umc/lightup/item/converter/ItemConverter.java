@@ -23,7 +23,7 @@ public class ItemConverter {
                 .build();
     }
 
-    public static ItemResponseDTO.ItemResultDTO toItemResultDTO(Item item, String itemImageUrl, int commentCount, boolean itemLike) {
+    public static ItemResponseDTO.ItemResultDTO toItemResultDTO(Item item, Long commentCount, boolean itemLike) {
         return ItemResponseDTO.ItemResultDTO.builder()
                 .itemId(item.getId())
                 .itemName(item.getName())
@@ -31,8 +31,8 @@ public class ItemConverter {
                 .schoolName(item.getMember().getSchool() == null ? null : item.getMember().getSchool().getName())
                 .introduce(item.getIntroduce())
                 .memberProfileImageUrl(item.getMember().getProfileImageUrl())
-                .itemImageUrl(itemImageUrl)
-                .updatedAt(item.getUpdatedAt().toLocalDate())
+                .itemImageUrl(item.getItemProfileImageUrl())
+                .updatedAt(item.getUpdatedAt())
                 .recruitStatus(item.isProjectStatus())
                 .viewCount(item.getViewCount())
                 .commentCount(commentCount)

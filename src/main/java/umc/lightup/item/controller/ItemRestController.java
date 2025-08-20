@@ -26,9 +26,8 @@ import umc.lightup.item.service.ItemCommandService;
 import umc.lightup.member.domain.Member;
 import umc.lightup.member.service.MemberCommandService;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
+import java.util.Objects;
 
 @RestController
 @RequiredArgsConstructor
@@ -40,7 +39,7 @@ public class ItemRestController {
 
     private static final int DEFAULT_ITEM_PAGE_SIZE = 12;
 
-    @GetMapping("/search")
+/*    @GetMapping("/search")
     @Operation(summary = "전체 프로젝트 조회 API", description = "전체 프로젝트를 조회하는 API이며 페이징을 포함합니다. 요청 파라미터로 page 번호를 입력할 수 있습니다.")
     public ApiResponse<ItemResponseDTO.ItemResultListDTO> viewAllItems(
             Authentication authentication,
@@ -60,27 +59,28 @@ public class ItemRestController {
 
         List<ItemResponseDTO.ItemResultDTO> allItems = itemCommandService.getAllItems(pageable, likedItemIds, category);
         return ApiResponse.onSuccess(ItemConverter.toItemResultListDTO(allItems));
-    }
+    }*/
 
-/*    @GetMapping("/search")
+    @GetMapping("/search")
     @Operation(summary = "전체 프로젝트 조회 API", description = "전체 프로젝트를 조회하는 API이며 페이징을 포함합니다. 요청 파라미터로 page 번호를 입력할 수 있습니다.")
-    public ApiResponse<ItemResponseDTO.ItemInfoListDTO> viewAllItems(
+    public ApiResponse<ItemResponseDTO.ItemResultListDTO> viewAllItems(
             Authentication authentication,
-            @RequestParam(value = "page", defaultValue = "0") @Min(1) Long page,
+            @RequestParam(value = "page", defaultValue = "0") @Min(1) Integer page,
             @RequestParam(value = "sort", defaultValue = "latest") String sort,
             @RequestParam(value = "category", required = false) String category,
             @RequestParam(value = "positionId", required = false) Long positionId,
-            @RequestParam(value = "regions", required = false) List<String> regions) {
+            @RequestParam(value = "regions", required = false) List<String> regions,
+            @RequestParam(value = "onlyLiked", required = false) Boolean onlyLiked) {
         Member member = null;
         if (authentication != null) {
             String email = authentication.getName();
             member = memberCommandService.getMember(email);
         }
 
-        ItemRequestDTO.ItemSearchRequestDTO request = ItemRequestDTO.ItemSearchRequestDTO.builder()
-                .category(category)
-                .positionId(positionId)
-                .itemRegions(regions == null ? null : regions.stream()
+        Pageable pageable = PageRequest.of(page - 1, DEFAULT_ITEM_PAGE_SIZE);
+
+        ItemRequestDTO.ItemRegionSearchRequestDTO itemRegionDTOs = ItemRequestDTO.ItemRegionSearchRequestDTO.builder()
+                .itemRegions(regions==null?null:regions.stream()
                         .map(r -> {
                             String[] split = r.split("\\s+", 2);
                             if (split.length == 0) return null;
@@ -91,11 +91,11 @@ public class ItemRestController {
                         })
                         .filter(Objects::nonNull)
                         .toList())
-                .page(page)
                 .build();
 
-        return ApiResponse.onSuccess(itemCommandService.searchItems(member, request));
-    }*/
+        List<ItemResponseDTO.ItemResultDTO> allItems = itemCommandService.searchItems(member, pageable, category, positionId, itemRegionDTOs, onlyLiked, sort);
+        return ApiResponse.onSuccess(ItemConverter.toItemResultListDTO(allItems));
+    }
 
     @GetMapping("/me")
     @Operation(summary = "본인 프로젝트 조회 API", description = "사용자의 프로젝트를 조회하는 API 입니다. 등록한 사진이 없다면 itemImageUrl은 null을 반환합니다.")

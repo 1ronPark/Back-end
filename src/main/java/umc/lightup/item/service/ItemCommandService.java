@@ -2,8 +2,6 @@ package umc.lightup.item.service;
 
 import jakarta.annotation.Nullable;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.web.multipart.MultipartFile;
 import umc.lightup.item.domain.Item;
 import umc.lightup.item.domain.ItemApply;
@@ -13,7 +11,6 @@ import umc.lightup.item.dto.ItemResponseDTO;
 import umc.lightup.member.domain.Member;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 public interface ItemCommandService {
@@ -37,12 +34,12 @@ public interface ItemCommandService {
                          ItemRequestDTO.AcceptItemOfferRequestDTO acceptItemOfferRequestDTO);
     ItemComment createItemComment(Member member, Long itemId, ItemRequestDTO.ItemCommentRequestDTO request);
     void removeItemComment(Member member, Long commentId);
-    Set<Long> findItemLikes(long memberId);
+//    Set<Long> findItemLikes(long memberId);
     int countComments(Long itemId);
 
-    List<ItemResponseDTO.ItemResultDTO> getAllItems(Pageable pageable,
+/*    List<ItemResponseDTO.ItemResultDTO> getAllItems(Pageable pageable,
                                                     @Nullable Set<Long> likedItemIds,
-                                                    @Nullable String category);
+                                                    @Nullable String category);*/
 
     List<ItemResponseDTO.MyItemResultDTO> getMyItems(Member member);
 
@@ -54,5 +51,11 @@ public interface ItemCommandService {
 
     List<ItemResponseDTO.ItemCommentResultDTO> getItemComments(Item item);
 
-//    ItemResponseDTO.ItemInfoListDTO searchItems(Member member, ItemRequestDTO.ItemSearchRequestDTO request);
+    List<ItemResponseDTO.ItemResultDTO> searchItems(Member requestedMember,
+                                                    Pageable pageable,
+                                                    @Nullable String category,
+                                                    @Nullable Long positionId,
+                                                    @Nullable ItemRequestDTO.ItemRegionSearchRequestDTO itemRegionDTOs,
+                                                    @Nullable Boolean onlyLiked,
+                                                    String sort);
 }
