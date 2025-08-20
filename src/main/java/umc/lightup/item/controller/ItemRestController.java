@@ -24,10 +24,12 @@ import umc.lightup.item.dto.ItemRequestDTO;
 import umc.lightup.item.dto.ItemResponseDTO;
 import umc.lightup.item.service.ItemCommandService;
 import umc.lightup.member.domain.Member;
+import umc.lightup.member.dto.MemberRequestDTO;
 import umc.lightup.member.service.MemberCommandService;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @RestController
@@ -69,7 +71,8 @@ public class ItemRestController {
             @RequestParam(value = "page", defaultValue = "0") @Min(1) Integer page,
             @RequestParam(value = "sort", defaultValue = "latest") String sort,
             @RequestParam(value = "category", required = false) String category,
-            @RequestParam(value = "positionId", required = false) Long positionId) {
+            @RequestParam(value = "positionId", required = false) Long positionId,
+            @RequestParam(value = "regions", required = false) List<String> regions) {
         Pageable pageable = PageRequest.of(page - 1, DEFAULT_ITEM_PAGE_SIZE);
 
         Set<Long> likedItemIds = Collections.emptySet();
@@ -80,7 +83,21 @@ public class ItemRestController {
             likedItemIds = itemCommandService.findItemLikes(member.getId());
         }
 
-        List<ItemResponseDTO.ItemResultDTO> allItems = itemCommandService.searchItems(pageable, likedItemIds, category, positionId, sort);
+        ItemRequestDTO.ItemRegionSearchRequestDTO itemRegionDTOs = ItemRequestDTO.ItemRegionSearchRequestDTO.builder()
+                .itemRegions(regions==null?null:regions.stream()
+                        .map(r -> {
+                            String[] split = r.split("\\s+", 2);
+                            if (split.length == 0) return null;
+                            else return ItemRequestDTO.CollaborationRegionRequestDTO.builder()
+                                    .siDo(split[0])
+                                    .siGunGu(split.length == 1 ? null : split[1])
+                                    .build();
+                        })
+                        .filter(Objects::nonNull)
+                        .toList())
+                .build();
+
+        List<ItemResponseDTO.ItemResultDTO> allItems = itemCommandService.searchItems(pageable, likedItemIds, category, positionId, itemRegionDTOs, sort);
         return ApiResponse.onSuccess(ItemConverter.toItemResultListDTO(allItems));
     }
 

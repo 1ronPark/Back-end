@@ -130,13 +130,7 @@ public class ItemRequestDTO {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class ItemSearchRequestDTO {
-        private String category;
-        private Long positionId;
+    public static class ItemRegionSearchRequestDTO {
         private List<CollaborationRegionRequestDTO> itemRegions;
-        @Positive
-        private Long page;
-        @Positive
-        private Long limit;
     }
 }

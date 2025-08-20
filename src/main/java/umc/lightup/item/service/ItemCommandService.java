@@ -58,5 +58,6 @@ public interface ItemCommandService {
                                                     @Nullable Set<Long> likedItemIds,
                                                     @Nullable String category,
                                                     @Nullable Long positionId,
+                                                    @Nullable ItemRequestDTO.ItemRegionSearchRequestDTO itemRegionDTOs,
                                                     String sort);
 }
