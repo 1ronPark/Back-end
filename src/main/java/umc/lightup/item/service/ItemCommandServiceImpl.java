@@ -212,7 +212,7 @@ public class ItemCommandServiceImpl implements ItemCommandService {
         }
     }
 
-    @Override
+/*    @Override
     public Set<Long> findItemLikes(long memberId) {
         return itemLikeRepository.findItemIdsLikedByMemberId(memberId);
     }
@@ -237,7 +237,7 @@ public class ItemCommandServiceImpl implements ItemCommandService {
 
                     return ItemConverter.toItemResultDTO(item, commentCount, liked);
                 }).toList();
-    }
+    }*/
 
     @Override
     public List<ItemResponseDTO.MyItemResultDTO> getMyItems(Member member) {
@@ -581,27 +581,14 @@ public class ItemCommandServiceImpl implements ItemCommandService {
 
     @Override
     public List<ItemResponseDTO.ItemResultDTO> searchItems(
+            Member requestedMember,
             Pageable pageable,
-            Set<Long> likedItemIds,
             String category,
             Long positionId,
             ItemRequestDTO.ItemRegionSearchRequestDTO itemRegionDTOs,
+            Boolean onlyLiked,
             String sort) {
-
-        Page<Tuple> tuples = itemRepository.searchItems(pageable, category, positionId, itemRegionDTOs, sort);
-
-        return tuples.stream()
-                .map(t -> {
-                    Item item = t.get(QItem.item);
-                    long itemCommentCount = t.get(QItemComment.itemComment.id.count());
-                    boolean liked = likedItemIds != null && likedItemIds.contains(Objects.requireNonNull(item).getId());
-                    if (item == null) {
-                        throw new GeneralHandler(ErrorStatus.ITEM_NOT_FOUND);
-                    }
-
-                    return ItemConverter.toItemResultDTO(item, (int) itemCommentCount, liked);
-                })
-                .toList();
+        return itemRepository.searchItems(requestedMember, pageable, category, positionId, itemRegionDTOs, onlyLiked, sort);
     }
 
     private boolean checkItemApply(Member member, Item item, boolean isFromOwnerExpected) {

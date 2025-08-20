@@ -43,11 +43,11 @@ public class ItemResponseDTO {
         private String memberName;
         private String memberProfileImageUrl;
         private String itemImageUrl;
-        private LocalDate updatedAt;
-        private boolean recruitStatus;
+        private LocalDateTime updatedAt;
+        private Boolean recruitStatus;
         private Long viewCount;
-        private int commentCount;
-        private boolean likedByCurrentUser;
+        private Long commentCount;
+        private Boolean likedByCurrentUser;
     }
 
     @Getter

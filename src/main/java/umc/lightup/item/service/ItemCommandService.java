@@ -34,12 +34,12 @@ public interface ItemCommandService {
                          ItemRequestDTO.AcceptItemOfferRequestDTO acceptItemOfferRequestDTO);
     ItemComment createItemComment(Member member, Long itemId, ItemRequestDTO.ItemCommentRequestDTO request);
     void removeItemComment(Member member, Long commentId);
-    Set<Long> findItemLikes(long memberId);
+//    Set<Long> findItemLikes(long memberId);
     int countComments(Long itemId);
 
-    List<ItemResponseDTO.ItemResultDTO> getAllItems(Pageable pageable,
+/*    List<ItemResponseDTO.ItemResultDTO> getAllItems(Pageable pageable,
                                                     @Nullable Set<Long> likedItemIds,
-                                                    @Nullable String category);
+                                                    @Nullable String category);*/
 
     List<ItemResponseDTO.MyItemResultDTO> getMyItems(Member member);
 
@@ -51,10 +51,11 @@ public interface ItemCommandService {
 
     List<ItemResponseDTO.ItemCommentResultDTO> getItemComments(Item item);
 
-    List<ItemResponseDTO.ItemResultDTO> searchItems(Pageable pageable,
-                                                    @Nullable Set<Long> likedItemIds,
+    List<ItemResponseDTO.ItemResultDTO> searchItems(Member requestedMember,
+                                                    Pageable pageable,
                                                     @Nullable String category,
                                                     @Nullable Long positionId,
                                                     @Nullable ItemRequestDTO.ItemRegionSearchRequestDTO itemRegionDTOs,
+                                                    @Nullable Boolean onlyLiked,
                                                     String sort);
 }

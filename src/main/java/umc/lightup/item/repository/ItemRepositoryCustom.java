@@ -1,10 +1,18 @@
 package umc.lightup.item.repository;
 
-import com.querydsl.core.Tuple;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import umc.lightup.item.dto.ItemRequestDTO;
+import umc.lightup.item.dto.ItemResponseDTO;
+import umc.lightup.member.domain.Member;
+
+import java.util.List;
 
 public interface ItemRepositoryCustom {
-    Page<Tuple> searchItems(Pageable pageable, String category, Long positionId, ItemRequestDTO.ItemRegionSearchRequestDTO itemRegionDTOs, String sort);
+    List<ItemResponseDTO.ItemResultDTO> searchItems(Member requestedMember,
+                                                    Pageable pageable,
+                                                    String category,
+                                                    Long positionId,
+                                                    ItemRequestDTO.ItemRegionSearchRequestDTO itemRegionDTOs,
+                                                    Boolean onlyLiked,
+                                                    String sort);
 }
