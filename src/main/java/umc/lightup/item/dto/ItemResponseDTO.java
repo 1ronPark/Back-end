@@ -222,4 +222,24 @@ public class ItemResponseDTO {
         List<ItemResponseDTO.ItemResultDTO> items;
         long numOfTotalResults;
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RecentViewedItemListDTO {
+        private List<RecentViewedItemResultDTO> recentViewedItems;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RecentViewedItemResultDTO {
+        private Long itemId;
+        private String itemName;
+        private String introduce;
+        private String itemProfileImageUrl;
+        private LocalDateTime viewedAt;
+    }
 }

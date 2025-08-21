@@ -201,6 +201,12 @@ public class ItemConverter {
                 .build();
     }
 
+    public static ItemResponseDTO.RecentViewedItemListDTO toRecentViewedItemListDTO (List<ItemResponseDTO.RecentViewedItemResultDTO> recentViewedItemResultDTOList) {
+        return ItemResponseDTO.RecentViewedItemListDTO.builder()
+                .recentViewedItems(recentViewedItemResultDTOList)
+                .build();
+    }
+
 /*    public static ItemImage toItemImage(Item item, String imageUrl) {
         return ItemImage.builder()
                 .item(item)
