@@ -201,6 +201,14 @@ public class MemberResponseDTO {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class NicknameExistResultDTO{
+        Boolean exist;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class ProfileImageSaveResultDTO {
         String profileImageUrl;
     }

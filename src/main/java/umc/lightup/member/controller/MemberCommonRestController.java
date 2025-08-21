@@ -3,6 +3,7 @@ package umc.lightup.member.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -64,6 +65,21 @@ public class MemberCommonRestController {
                                                                      @RequestBody @Valid MemberRequestDTO.BasicChangeDto request) {
         String email = authentication.getName();
         return ApiResponse.onSuccess(MemberConverter.toMyInfoDTO(memberCommandService.putMemberBasic(email, request)));
+    }
+
+    @GetMapping("/nickname/exist")
+    @Operation(
+            summary = "닉네임 중복 확인 API",
+            description = "닉네임 중복을 확인할 수 있는 API입니다. 자기 자신의 닉네임을 넣으면 null이 반환됩니다.",
+            security = {@SecurityRequirement(name = "JWT TOKEN")}
+    )
+    public ApiResponse<MemberResponseDTO.NicknameExistResultDTO> checkNicknameDuplicate(Authentication authentication,
+                                                                                        @RequestParam("value") @NotBlank String value) {
+        if (authentication != null &&
+                value.equals(memberCommandService.getMember(authentication.getName()).getNickname()))
+            return ApiResponse.onSuccess(new MemberResponseDTO.NicknameExistResultDTO(null));
+        else return ApiResponse.onSuccess(new MemberResponseDTO.NicknameExistResultDTO
+                (memberCommandService.isNicknameExist(value)));
     }
 
     @GetMapping("/{memberId}")
