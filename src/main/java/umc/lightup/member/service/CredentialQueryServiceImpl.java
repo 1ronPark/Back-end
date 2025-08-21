@@ -169,12 +169,12 @@ public class CredentialQueryServiceImpl implements CredentialQueryService {
         if (userinfo.getEmail() == null || memberCommandService.isEmailExist(userinfo.getEmail()))
             throw new GeneralHandler(ErrorStatus.ALREADY_SIGNED_IN_EMAIL);
 
-        String nickname = userinfo.getKakao_account().getProfile().getNickname();
-        if (memberCommandService.isNicknameExist(nickname)) nickname = null;
+        String name = userinfo.getKakao_account().getProfile().getNickname();
+        // if (memberCommandService.isNicknameExist(nickname)) nickname = null;
 
         Member member = Member.builder()
                 .email(userinfo.getEmail())
-                .nickname(nickname)
+                .name(name)
                 .profileImageUrl(userinfo.getKakao_account().getProfile().getProfile_image_url())
                 .role(Role.PROVISION)
                 .build();
