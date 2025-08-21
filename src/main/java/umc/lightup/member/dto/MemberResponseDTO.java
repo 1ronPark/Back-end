@@ -159,7 +159,7 @@ public class MemberResponseDTO {
         private String profileImageUrl;
         private boolean liked;
     }
-    
+
     @Setter
     @Getter
     @Builder
@@ -169,6 +169,28 @@ public class MemberResponseDTO {
         private CredentialType credentialType;
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
+    }
+
+    @Setter
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class KeywordSearchResultListDTO {
+        private List<KeywordSearchResultDTO> memberResults;
+    }
+
+    @Setter
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class KeywordSearchResultDTO {
+        private long id;
+        private String name;
+        private String nickname;
+        private String description;
+        private String source;
     }
 
     @Getter

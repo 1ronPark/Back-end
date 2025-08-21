@@ -129,6 +129,26 @@ public class MemberCommonRestController {
         return ApiResponse.onSuccess(memberCommandService.searchMember(member, request));
     }
 
+    @GetMapping("/search/keyword")
+    @Operation(
+            summary = "회원 검색 API",
+            description = "회원을 키워드로 검색하는 API입니다.",
+            security = {@SecurityRequirement(name = "JWT TOKEN")}
+    )
+    public ApiResponse<MemberResponseDTO.KeywordSearchResultListDTO> searchMemberByKeyword(
+            Authentication authentication,
+            @RequestParam("keyword") String keyword,
+            @RequestParam(value = "size", defaultValue = "5") @Positive int size
+    ) {
+        Member member = null;
+        if (authentication != null) {
+            String email = authentication.getName();
+            member = memberCommandService.getMember(email);
+        }
+        return ApiResponse.onSuccess(
+                MemberConverter.toKeywordSearchResultListDTO(
+                        memberCommandService.searchByKeyword(member, keyword, size)));
+    }
 
     @GetMapping("/recent")
     @Operation(

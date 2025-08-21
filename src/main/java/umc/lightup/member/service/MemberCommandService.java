@@ -13,6 +13,7 @@ public interface MemberCommandService {
     MemberResponseDTO.MemberInfoDTO getMember(long id, Member requestedMember);
     Member getMemberWithSchool(String email);
     List<MemberResponseDTO.HistoryInfoDTO> getHistory(Member member, long size);
+    List<MemberResponseDTO.KeywordSearchResultDTO> searchByKeyword(Member member, String keyword, int size);
     Member putMember(String email, MemberRequestDTO.ChangeDto request);
     Member putMemberBasic(String email, MemberRequestDTO.BasicChangeDto request);
     MemberResponseDTO.MyProfileDTO getMemberProfile(String email);

@@ -56,6 +56,22 @@ public class MemberConverter {
                 .build();
     }
 
+    public static MemberResponseDTO.KeywordSearchResultListDTO toKeywordSearchResultListDTO(List<MemberResponseDTO.KeywordSearchResultDTO> memberResults) {
+        return MemberResponseDTO.KeywordSearchResultListDTO.builder()
+                .memberResults(memberResults)
+                .build();
+    }
+
+    public static MemberResponseDTO.KeywordSearchResultDTO toKeywordSearchResultDTO(Member member) {
+        return MemberResponseDTO.KeywordSearchResultDTO.builder()
+                .id(member.getId())
+                .name(member.getName())
+                .nickname(member.getNickname())
+                .description(member.getProfileTitle())
+                .source("member")
+                .build();
+    }
+
     public static MemberResponseDTO.selectRegionResultsDTO toSelectRegionResultsDTO(List<MemberResponseDTO.singleRegionResultDTO> regionList) {
         return MemberResponseDTO.selectRegionResultsDTO.builder()
                 .regions(regionList)

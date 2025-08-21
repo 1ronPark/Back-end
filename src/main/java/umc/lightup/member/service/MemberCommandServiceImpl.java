@@ -1,6 +1,7 @@
 package umc.lightup.member.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -139,6 +140,18 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     @Override
     public List<MemberResponseDTO.HistoryInfoDTO> getHistory(Member member, long size) {
         return memberRepository.getMemberViewHistoryInfos(member, size);
+    }
+
+    @Override
+    public List<MemberResponseDTO.KeywordSearchResultDTO> searchByKeyword(Member member,
+                                                                          String keyword,
+                                                                          int size) {
+        return memberRepository
+                .findByNameContainingOrNicknameContainingOrProfileTitleContaining
+                        (keyword, keyword, keyword, Pageable.ofSize(size))
+                .stream()
+                .map(MemberConverter::toKeywordSearchResultDTO)
+                .toList();
     }
 
     @Override
