@@ -104,6 +104,7 @@ public class ItemResponseDTO {
         private int commentCount;
         private LocalDate updatedAt;
         private boolean likedByCurrentUser;
+        private Boolean recruitStatus;
         private boolean applicantStatus;
         private boolean suggestStatus;
     }

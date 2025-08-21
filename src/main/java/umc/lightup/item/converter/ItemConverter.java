@@ -90,6 +90,7 @@ public class ItemConverter {
                 .commentCount(commentCount)
                 .updatedAt(item.getUpdatedAt().toLocalDate())
                 .likedByCurrentUser(itemLike)
+                .recruitStatus(item.isProjectStatus())
                 .applicantStatus(itemApplyStatus)
                 .suggestStatus(itemSuggestStatus)
                 .build();
