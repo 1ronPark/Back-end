@@ -97,6 +97,16 @@ public class ItemRestController {
         return ApiResponse.onSuccess(ItemConverter.toItemResultListDTO(allItems));
     }
 
+    @GetMapping("/recent")
+    @Operation(summary = "최근에 본 프로젝트 조회 API", description = "로그인한 사용자가 최근에 본 프로젝트를 조회하는 API 입니다. 3개 까지만 조회됩니다.")
+    public ApiResponse<ItemResponseDTO.RecentViewedItemListDTO> viewRecentItems(Authentication authentication) {
+        String email = authentication.getName();
+        Member member = memberCommandService.getMember(email);
+
+        List<ItemResponseDTO.RecentViewedItemResultDTO> recentViewedItemResultDTOList = itemCommandService.searchRecentItems(member);
+        return ApiResponse.onSuccess(ItemConverter.toRecentViewedItemListDTO(recentViewedItemResultDTOList));
+    }
+
     @GetMapping("/me")
     @Operation(summary = "본인 프로젝트 조회 API", description = "사용자의 프로젝트를 조회하는 API 입니다. 등록한 사진이 없다면 itemImageUrl은 null을 반환합니다.")
     public ApiResponse<ItemResponseDTO.MyItemResultListDTO> viewMyItems(Authentication authentication) {

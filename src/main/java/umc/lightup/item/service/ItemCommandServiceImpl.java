@@ -591,6 +591,22 @@ public class ItemCommandServiceImpl implements ItemCommandService {
         return itemRepository.searchItems(requestedMember, pageable, category, positionId, itemRegionDTOs, onlyLiked, sort);
     }
 
+    @Override
+    public List<ItemResponseDTO.RecentViewedItemResultDTO> searchRecentItems(Member member) {
+        List<ItemViewHistory> histories = itemViewHistoryRepository.findTop3ByMemberOrderByViewedAtDesc(member);
+
+        return histories.stream()
+                .map(history -> ItemResponseDTO.RecentViewedItemResultDTO.builder()
+                        .itemId(history.getItem().getId())
+                        .itemName(history.getItem().getName())
+                        .introduce(history.getItem().getIntroduce())
+                        .itemProfileImageUrl(history.getItem().getItemProfileImageUrl())
+                        .viewedAt(history.getViewedAt())
+                        .build()
+                )
+                .toList();
+    }
+
     private boolean checkItemApply(Member member, Item item, boolean isFromOwnerExpected) {
         return itemApplyRepository.findByMemberAndItem(member, item)
                 .filter(itemApply -> itemApply.isFromOwner() == isFromOwnerExpected && itemApply.getStatus().equals(ItemApplyStatus.PENDING))

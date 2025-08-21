@@ -58,4 +58,6 @@ public interface ItemCommandService {
                                                     @Nullable ItemRequestDTO.ItemRegionSearchRequestDTO itemRegionDTOs,
                                                     @Nullable Boolean onlyLiked,
                                                     String sort);
+
+    List<ItemResponseDTO.RecentViewedItemResultDTO> searchRecentItems(Member member);
 }
