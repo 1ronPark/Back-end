@@ -47,7 +47,8 @@ public class SecurityConfig {
                                 "/api/v1/notification/{notificationId}",
                                 "/api/v1/members/*/like",
                                 "/api/v1/items/**",
-                                "/api/v1/light-talk/posts/**"
+                                "/api/v1/light-talk/posts/**",
+                                "/api/v1/items/recent"
                                 )
                         .authenticated()
                         .anyRequest().permitAll()
