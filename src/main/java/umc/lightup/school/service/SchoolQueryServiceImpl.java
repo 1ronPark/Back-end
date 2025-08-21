@@ -54,13 +54,15 @@ public class SchoolQueryServiceImpl implements SchoolQueryService {
         throw new GeneralHandler(ErrorStatus.SCHOOL_EMAIL_ALREADY_IN_PROGRESS);
       } else if(existing.isVerified()){
         throw new GeneralHandler(ErrorStatus.SCHOOL_EMAIL_ALREADY_VERIFIED);
+      } else if(existing.getExpiredAt().isBefore(LocalDateTime.now())){
+        schoolEmailVerificationRepository.deleteById(existing.getId());
       }
     });
     // 랜덤 코드 생성 로직
     String randomCode = generateRandomCode(6);
 
     //인증코드 유효기간 설정
-    LocalDateTime expiredAt = LocalDateTime.now().plusDays(1);
+    LocalDateTime expiredAt = LocalDateTime.now().plusMinutes(1);
 
     SchoolEmailRequestDTO.SchoolEmailDTO schoolEmailDTO = SchoolEmailRequestDTO.SchoolEmailDTO.builder()
             .userName(member.getName())
