@@ -84,6 +84,7 @@ public class ItemConverter {
                 .schoolName(item.getMember().getSchool() == null ? null : item.getMember().getSchool().getName())
                 .regions(itemRegionResultDTOList)
                 .description(item.getDescription())
+                .itemPlanFileUrl(item.getItemPlanFileUrl())
                 .recruitPositions(recruitPositionResultDTOList)
                 .itemCategories(itemCategoriesResultDTOList)
                 .itemComments(itemCommentResultDTOList)
