@@ -1,8 +1,6 @@
 package umc.lightup.item.service;
 
-import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +22,6 @@ import umc.lightup.member.repository.MemberRepository;
 import umc.lightup.notification.dto.NotificationEventRequestDTO;
 import umc.lightup.notification.enums.NotificationType;
 import umc.lightup.notification.enums.ReferenceType;
-import umc.lightup.notification.service.NotificationCommandService;
 import umc.lightup.notification.utli.NotificationEventSender;
 import umc.lightup.position.domain.Position;
 import umc.lightup.position.repository.PositionRepository;
@@ -50,7 +47,6 @@ public class ItemCommandServiceImpl implements ItemCommandService {
     private final MemberRepository memberRepository;
 
     private final NotificationEventSender notificationEventSender;
-    private final NotificationCommandService notificationCommandService;
     private final AmazonS3Manager s3Manager;
     private final UuidRepository uuidRepository;
     private final ItemCategoryRepository itemCategoryRepository;
@@ -387,7 +383,6 @@ public class ItemCommandServiceImpl implements ItemCommandService {
                         .referenceType(ReferenceType.MEMBER)
                         .referenceId(member.getId())
                         .build();
-        notificationCommandService.saveNotification(eventDTO);
         notificationEventSender.send(eventDTO);
 
         return itemApplyRepository.save(ItemApply.builder()
@@ -441,7 +436,6 @@ public class ItemCommandServiceImpl implements ItemCommandService {
                         .referenceType(ReferenceType.ITEM)
                         .referenceId(itemApply.getItem().getId())
                         .build();
-        notificationCommandService.saveNotification(eventDTO);
         notificationEventSender.send(eventDTO);
     }
 
@@ -491,7 +485,6 @@ public class ItemCommandServiceImpl implements ItemCommandService {
                         .referenceType(ReferenceType.ITEM)
                         .referenceId(item.getId())
                         .build();
-        notificationCommandService.saveNotification(eventDTO);
         notificationEventSender.send(eventDTO);
 
         return itemApplyRepository.save(ItemApply.builder()
@@ -533,7 +526,6 @@ public class ItemCommandServiceImpl implements ItemCommandService {
                         .referenceType(ReferenceType.MEMBER)
                         .referenceId(offeredMember.getId())
                         .build();
-        notificationCommandService.saveNotification(eventDTO);
         notificationEventSender.send(eventDTO);
     }
 
