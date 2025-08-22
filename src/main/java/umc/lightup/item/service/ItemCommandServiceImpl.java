@@ -380,8 +380,8 @@ public class ItemCommandServiceImpl implements ItemCommandService {
                                 "님에게서 " +
                                 item.getName() +
                                 "에 지원했어요!")
-                        .referenceType(ReferenceType.MEMBER)
-                        .referenceId(member.getId())
+                        .referenceType(ReferenceType.ITEM)
+                        .referenceId(item.getId())
                         .build();
         notificationEventSender.send(eventDTO);
 
@@ -523,8 +523,8 @@ public class ItemCommandServiceImpl implements ItemCommandService {
                                 // 그렇다고 알림에서부터 수락/거절 사실을 통보하면 마음아플 것 같음...
                                 // 취업준비할 때 거절은 이를 돌려 말하는 것처럼...
                         )
-                        .referenceType(ReferenceType.MEMBER)
-                        .referenceId(offeredMember.getId())
+                        .referenceType(ReferenceType.ITEM)
+                        .referenceId(itemApply.getItem().getId())
                         .build();
         notificationEventSender.send(eventDTO);
     }
