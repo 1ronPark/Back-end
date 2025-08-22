@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class NotificationResponseDTO {
@@ -31,6 +32,7 @@ public class NotificationResponseDTO {
     String notificationType;  // 알림 종류
     Boolean isRead;           // 알림 읽음 여부
     Long referenceId;         // 래퍼런스 아이디
+    LocalDateTime createdAt;  // 만들어진 시간
   }
 
   @Builder
