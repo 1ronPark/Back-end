@@ -98,6 +98,7 @@ public class ItemResponseDTO {
         private String schoolName;
         private List<ItemRegionResultDTO> regions;
         private String description;
+        private String itemPlanFileUrl;
         private List<RecruitPositionResultDTO> recruitPositions;
         private List<ItemCategoriesResultDTO> itemCategories;
         private List<ItemCommentResultDTO> itemComments;
