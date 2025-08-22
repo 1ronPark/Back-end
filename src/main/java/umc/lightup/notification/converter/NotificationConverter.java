@@ -16,9 +16,11 @@ public class NotificationConverter {
     return NotificationResponseDTO.NotificationDTO.builder()
             .notificationId(notification.getId())
             .message(notification.getMessage())
-            .notificationType(String.valueOf(notification.getType()))
+            .notificationType(notification.getType())
             .isRead(notification.getIsRead())
+            .referenceType(notification.getReferenceType())
             .referenceId(notification.getReferenceId())
+            .createdAt(notification.getCreatedAt())
             .build();
   }
 
